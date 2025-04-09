@@ -1,0 +1,149 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// npx prisma db push آپدیت مدل ها
+/////////////////////////////       Model User         /////////////////////////////
+model User {
+  id        String     @id @default(uuid()) @db.Uuid
+  name      String // نام  
+  password  String
+  email     String?    @unique // ایمیل
+  phone     String     @unique // شماره تلفن
+  role      RolePerson @default(CUSTOMER) // جنسیت
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  Product Product[]
+  Chat    Chat[]
+  Message Message[]
+
+  @@index([email, phone])
+}
+
+enum RolePerson {
+  ADMIN
+  CUSTOMER
+  AUTHOR
+}
+
+/////////////////////////////       Model Category         /////////////////////////////
+
+model Category {
+  id            Int        @id @default(autoincrement())
+  name          String     @unique
+  subCategoryId Int?
+  subCategoryTo Category?  @relation("SubCategory", fields: [subCategoryId], references: [id])
+  subCategorys  Category[] @relation("SubCategory")
+  Product       Product[]
+  supportId     Int?
+
+  @@index([subCategoryId])
+}
+
+/////////////////////////////       Model Product         /////////////////////////////
+
+model Product {
+  id           Int       @id @default(autoincrement())
+  isStatus     Boolean   @default(false)
+  isAvailable  Boolean   @default(true)
+  refCode      String    @unique
+  slug         String    @unique
+  name         String
+  gallery      Json?
+  description  String
+  tags         String[]
+  price        Decimal
+  weight       Decimal
+  stock        Int
+  detail       Json?
+  rating       Decimal?
+  totalComment Int?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  userId       String    @db.Uuid
+  User         User      @relation(fields: [userId], references: [id])
+  discountId   Int?
+  Discount     Discount? @relation(fields: [discountId], references: [id])
+  Comment      Comment[]
+  Category     Category  @relation(fields: [categoryId], references: [id])
+  categoryId   Int
+
+  @@index([slug, isStatus])
+  @@index([refCode, isAvailable, price, name, description])
+}
+
+/////////////////////////////       Model Discount         /////////////////////////////
+
+model Discount {
+  id        Int          @id @default(autoincrement())
+  amount    Int?
+  code      String?      @unique
+  type      TypeDiscount
+  discount  Decimal
+  startDate DateTime
+  endDate   DateTime
+  Product   Product[]
+
+  @@index([code, endDate])
+}
+
+enum TypeDiscount {
+  PERCENT
+  FIXED
+}
+
+/////////////////////////////       Model Comment         /////////////////////////////
+model Comment {
+  id         Int      @id @default(autoincrement())
+  isApproved Boolean  @default(false)
+  name       String
+  phone      String
+  email      String
+  content    String   @db.Text
+  rating     Int?
+  createdAt  DateTime @default(now())
+  productId  Int
+  Product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, isApproved])
+}
+
+/////////////////////////////       Model Category         /////////////////////////////
+
+/////////////////////////////       Model Chat         /////////////////////////////
+model Chat {
+  id        Int       @id @default(autoincrement())
+  title     String
+  isDone    Boolean   @default(false)
+  userId    String    @db.Uuid
+  User      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+  Message   Message[]
+
+  @@index([title, isDone])
+}
+
+/////////////////////////////       Model Message       /////////////////////////////
+model Message {
+  id         Int        @id @default(autoincrement())
+  content    String     @db.Text
+  userId     String     @db.Uuid
+  senderType SenderType
+  User       User       @relation(fields: [userId], references: [id])
+  chatId     Int
+  chat       Chat       @relation(fields: [chatId], references: [id])
+  createdAt  DateTime   @default(now())
+
+  @@index([chatId])
+}
+
+enum SenderType {
+  CUSTOMER
+  ADMIN
+}
