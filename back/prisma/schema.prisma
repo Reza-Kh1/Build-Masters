@@ -10,140 +10,193 @@ generator client {
 // npx prisma db push آپدیت مدل ها
 /////////////////////////////       Model User         /////////////////////////////
 model User {
-  id        String     @id @default(uuid()) @db.Uuid
-  name      String // نام  
-  password  String
-  email     String?    @unique // ایمیل
-  phone     String     @unique // شماره تلفن
-  role      RolePerson @default(CUSTOMER) // جنسیت
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id         String      @id @default(uuid()) @db.Uuid
+  name       String // نام  
+  password   String
+  email      String?     @unique // ایمیل
+  phone      String      @unique // شماره تلفن
+  role       RolePerson  @default(AUTHOR)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  Contractor Contractor?
+  Post       Post[]
 
-  Product Product[]
-  Chat    Chat[]
-  Message Message[]
-
-  @@index([email, phone])
+  @@index([name, phone, role])
 }
 
 enum RolePerson {
   ADMIN
-  CUSTOMER
+  Contractor
   AUTHOR
+}
+
+/////////////////////////////       Model Contractor         /////////////////////////////
+model Contractor {
+  id          Int       @id @default(autoincrement())
+  name        String
+  phone       String    @unique
+  email       String    @unique
+  socialMedia Json
+  bio         String    @db.Text
+  avatar      String
+  rating      Float
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String?   @unique @db.Uuid
+  User        User?     @relation(fields: [userId], references: [id])
+  Comment     Comment[]
+  Project     Project[]
+
+  @@index([name, bio])
+  @@index([id])
 }
 
 /////////////////////////////       Model Category         /////////////////////////////
 
 model Category {
   id            Int        @id @default(autoincrement())
-  name          String     @unique
+  name          String
+  slug          String     @unique
   subCategoryId Int?
   subCategoryTo Category?  @relation("SubCategory", fields: [subCategoryId], references: [id])
   subCategorys  Category[] @relation("SubCategory")
-  Product       Product[]
-  supportId     Int?
+  Post          Post[]
 
   @@index([subCategoryId])
 }
 
-/////////////////////////////       Model Product         /////////////////////////////
+/////////////////////////////       Model Post         /////////////////////////////
 
-model Product {
-  id           Int       @id @default(autoincrement())
-  isStatus     Boolean   @default(false)
-  isAvailable  Boolean   @default(true)
-  refCode      String    @unique
-  slug         String    @unique
-  name         String
-  gallery      Json?
-  description  String
-  tags         String[]
-  price        Decimal
-  weight       Decimal
-  stock        Int
-  detail       Json?
-  rating       Decimal?
-  totalComment Int?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  userId       String    @db.Uuid
-  User         User      @relation(fields: [userId], references: [id])
-  discountId   Int?
-  Discount     Discount? @relation(fields: [discountId], references: [id])
-  Comment      Comment[]
-  Category     Category  @relation(fields: [categoryId], references: [id])
-  categoryId   Int
+model Post {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  image       String
+  description String   @db.Text
+  status      Boolean
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  @@index([slug, isStatus])
-  @@index([refCode, isAvailable, price, name, description])
+  tagName    String
+  tags       Tag?     @relation("PostTags", fields: [tagName], references: [name])
+  userId     String   @unique @db.Uuid
+  user       User     @relation(fields: [userId], references: [id])
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  DetailPost DetailPost[]
+  Comment    Comment[]
+
+  @@index([name, description])
+  @@index([status])
 }
 
-/////////////////////////////       Model Discount         /////////////////////////////
-
-model Discount {
-  id        Int          @id @default(autoincrement())
-  amount    Int?
-  code      String?      @unique
-  type      TypeDiscount
-  discount  Decimal
-  startDate DateTime
-  endDate   DateTime
-  Product   Product[]
-
-  @@index([code, endDate])
+/////////////////////////////       Model DetailPost         /////////////////////////////
+model DetailPost {
+  id      Int      @id @default(autoincrement())
+  content String   @db.Text
+  title   String
+  keyword String[]
+  postId  Int
+  post    Post     @relation(fields: [postId], references: [id])
 }
 
-enum TypeDiscount {
-  PERCENT
-  FIXED
+/////////////////////////////       Model onlinePrice         /////////////////////////////
+model Tag {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  Project Project[] @relation("ProjectTags")
+  Post    Post[]    @relation("PostTags")
+
+  @@index([name])
 }
 
 /////////////////////////////       Model Comment         /////////////////////////////
 model Comment {
-  id         Int      @id @default(autoincrement())
-  isApproved Boolean  @default(false)
-  name       String
-  phone      String
-  email      String
-  content    String   @db.Text
-  rating     Int?
-  createdAt  DateTime @default(now())
-  productId  Int
-  Product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id          Int     @id @default(autoincrement())
+  isPublished Boolean @default(false)
+  name        String
+  phone       String
+  email       String
+  content     String  @db.Text
+  rating      Int?
 
-  @@index([productId, isApproved])
+  postId         Int?
+  post           Post?       @relation(fields: [postId], references: [id])
+  contractorId   Int?
+  contractor     Contractor? @relation(fields: [contractorId], references: [id])
+  commentReply   Int?
+  commentReplyTo Comment?    @relation("commentReplys", fields: [commentReply], references: [id])
+  commentReplys  Comment[]   @relation("commentReplys")
+  createdAt      DateTime    @default(now())
+
+  @@index([isPublished, commentReply])
 }
 
-/////////////////////////////       Model Category         /////////////////////////////
+/////////////////////////////       Model Project         /////////////////////////////
+model Project {
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  address     String
+  image       String
+  gallery     String[]
+  video       String
+  description String
+  stratDate   DateTime?
+  endDate     DateTime?
+  price       String?
+  isPublished Boolean   @default(false)
 
-/////////////////////////////       Model Chat         /////////////////////////////
-model Chat {
+  tagName      String
+  tags         Tag?        @relation("ProjectTags", fields: [tagName], references: [name])
+  contractorId Int?
+  contractor   Contractor? @relation(fields: [contractorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+}
+
+/////////////////////////////       Model Media         /////////////////////////////
+model Media {
   id        Int       @id @default(autoincrement())
-  title     String
-  isDone    Boolean   @default(false)
-  userId    String    @db.Uuid
-  User      User      @relation(fields: [userId], references: [id])
+  url       String
+  type      TypeMedia @default(IMAGE)
+  isAdmin   Boolean   @default(false)
   createdAt DateTime  @default(now())
-  Message   Message[]
-
-  @@index([title, isDone])
 }
 
-/////////////////////////////       Model Message       /////////////////////////////
-model Message {
-  id         Int        @id @default(autoincrement())
-  content    String     @db.Text
-  userId     String     @db.Uuid
-  senderType SenderType
-  User       User       @relation(fields: [userId], references: [id])
-  chatId     Int
-  chat       Chat       @relation(fields: [chatId], references: [id])
-  createdAt  DateTime   @default(now())
-
-  @@index([chatId])
+enum TypeMedia {
+  IMAGE
+  VIDEO
 }
 
-enum SenderType {
-  CUSTOMER
-  ADMIN
+/////////////////////////////       Model onlinePrice         /////////////////////////////
+model onlinePrice {
+  id          Int      @id @default(autoincrement())
+  name        String
+  phone       String
+  description String   @db.Text
+  price       String?
+  subject     String
+  images      String[]
+  size        String
+  isStatus    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updateAt    DateTime @updatedAt
+}
+
+/////////////////////////////       Model PageData         /////////////////////////////
+
+model PageData {
+  id           Int      @id @default(autoincrement())
+  page         String   @unique
+  conetent     Json
+  keyword      String[]
+  description  String
+  title        String
+  name         String
+  canonicalUrl String
+
+  @@index([page])
 }
