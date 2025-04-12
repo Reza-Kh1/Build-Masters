@@ -11,9 +11,9 @@ generator client {
 /////////////////////////////       Model User         /////////////////////////////
 model User {
   id         String      @id @default(uuid()) @db.Uuid
-  name       String // نام  
+  name       String
   password   String
-  email      String?     @unique // ایمیل
+  email      String      @unique // ایمیل
   phone      String      @unique // شماره تلفن
   role       RolePerson  @default(AUTHOR)
   createdAt  DateTime    @default(now())
@@ -26,7 +26,7 @@ model User {
 
 enum RolePerson {
   ADMIN
-  Contractor
+  CONSTRACTOR
   AUTHOR
 }
 
@@ -36,10 +36,10 @@ model Contractor {
   name        String
   phone       String    @unique
   email       String    @unique
-  socialMedia Json
-  bio         String    @db.Text
-  avatar      String
-  rating      Float
+  socialMedia Json?
+  bio         String?   @db.Text
+  avatar      String?
+  rating      Float?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   userId      String?   @unique @db.Uuid
@@ -72,7 +72,7 @@ model Post {
   name        String   @unique
   image       String
   description String   @db.Text
-  status      Boolean
+  isPublished Boolean
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -87,7 +87,7 @@ model Post {
   Comment    Comment[]
 
   @@index([name, description])
-  @@index([status])
+  @@index([description])
 }
 
 /////////////////////////////       Model DetailPost         /////////////////////////////

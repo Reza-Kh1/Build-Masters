@@ -9,7 +9,7 @@ const isLogin = (req: Request, res: any, next: NextFunction) => {
     token.verify(cookie, process.env.TOKEN_SECURITY as string);
     next();
   } catch (err) {
-    throw customError('وارد حساب کاربری خود شوید.', 403);
+    throw customError('وارد حساب کاربری خود شوید.', 403, err);
   }
 };
 export default isLogin;

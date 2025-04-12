@@ -14,6 +14,6 @@ export async function comaprePassword(
     if (!checkPass) throw customError('پسورد وارد شده اشتباه است', 403);
     return checkPass;
   } catch (err) {
-    throw customError('پسورد وارد شده اشتباه است', 403);
+    throw customError('پسورد وارد شده اشتباه است', 403, err);
   }
 }

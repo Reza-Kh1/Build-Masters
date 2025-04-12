@@ -77,3 +77,19 @@ module.exports = [
     "forceConsistentCasingInFileNames": true,           
     "skipLibCheck": true,    
 }}    
+
+14_ install redis
+https://github.com/microsoftarchive/redis/releases
+دانلود فایل Redis-x64-3.0.504.msi نصب
+ویرایش متغیر محیطی PATH
+ویندوز + R را بزنید و sysdm.cpl را وارد کنید → OK.
+
+به تب Advanced بروید → Environment Variables....
+
+در بخش System variables، متغیر Path را انتخاب و Edit کنید.
+
+روی New کلیک کنید و مسیر Redis را Paste کنید (مثلاً C:\Program Files\Redis).
+
+OK → OK → OK برای ذخیره تغییرات.
+برای تست :
+redis-cli ping

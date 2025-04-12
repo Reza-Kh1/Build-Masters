@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import { globalHandler, notFound } from '../middlewares/globalError';
+import userRoute from '../routes/userRoute';
 ///////////// config Security
 dotenv.config();
 const app = express();
@@ -24,9 +25,7 @@ const defualtApi = process.env.API_VERSION;
 
 ///////////// Api Routes
 
-app.use(defualtApi + 'auth', (req, res) => {
-  res.send({ msg: 'ok' });
-});
+app.use(defualtApi + 'user', userRoute);
 
 app.use(globalHandler);
 app.use(notFound);
