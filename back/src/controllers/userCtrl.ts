@@ -7,6 +7,7 @@ import createToken from '../utils/createToken';
 import { deleteCahce, getCache, setCache } from '../utils/deleteCache';
 const prisma = new PrismaClient();
 const pageLimit = Number(process.env.PAGE_LIMITE);
+
 const getUsers = expressAsyncHandler(async (req, res) => {
   const { email, phone, role, page = 1 } = req.query;
   const cacheKey = `users:${email}:${phone}:${role}:${page}`;
@@ -45,6 +46,7 @@ const getUsers = expressAsyncHandler(async (req, res) => {
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
+
 const signUpUser = expressAsyncHandler(async (req, res) => {
   const { name, email, password, phone, role } = req.body;
   try {
@@ -81,6 +83,7 @@ const signUpUser = expressAsyncHandler(async (req, res) => {
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
+
 const updateUser = expressAsyncHandler(async (req, res) => {
   const { name, email, password, phone, role } = req.body;
   const { id } = req.params;
@@ -110,6 +113,7 @@ const updateUser = expressAsyncHandler(async (req, res) => {
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
+
 const deleteUser = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
@@ -120,9 +124,11 @@ const deleteUser = expressAsyncHandler(async (req, res) => {
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
+
 const forgetPassword = expressAsyncHandler(async (req, res) => {
   res.send({ msg: 'ok' });
 });
+
 const signInUser = expressAsyncHandler(async (req, res) => {
   const { email, password, phone } = req.body;
   const data = (await prisma.user.findUnique({

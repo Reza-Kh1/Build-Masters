@@ -79,7 +79,7 @@ model Post {
   name        String   @unique
   image       String
   description String   @db.Text
-  status      Boolean
+  isPublished Boolean
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -91,10 +91,8 @@ model Post {
 
   DetailPost DetailPost?
   Comment    Comment[]
-  tagId      Int?
-
   @@index([name, description])
-  @@index([status])
+  @@index([isPublished])
 }
 
 /////////////////////////////       Model DetailPost         /////////////////////////////
