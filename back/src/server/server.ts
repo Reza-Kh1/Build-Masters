@@ -7,6 +7,15 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { globalHandler, notFound } from '../middlewares/globalError';
 import userRoute from '../routes/userRoute';
+import categoryRoute from '../routes/categoryRoute';
+import contractorRoute from '../routes/contractorRoute';
+import tagRoute from '../routes/tagRoute';
+import postRoute from '../routes/postRoute';
+import detailPost from '../routes/detailPost';
+import projectRoute from '../routes/projectRoute';
+import commentRoute from '../routes/commentRoute';
+import onlinePriceRoute from '../routes/onlinePriceRoute';
+import pageDataRoute from '../routes/pageDataRoute';
 ///////////// config Security
 dotenv.config();
 const app = express();
@@ -26,6 +35,17 @@ const defualtApi = process.env.API_VERSION;
 ///////////// Api Routes
 
 app.use(defualtApi + 'user', userRoute);
+app.use(defualtApi + 'tag', tagRoute);
+app.use(defualtApi + 'category', categoryRoute);
+app.use(defualtApi + 'contractor', contractorRoute);
+
+app.use(defualtApi + 'post', postRoute);
+app.use(defualtApi + 'detailPost', detailPost);
+app.use(defualtApi + 'project', projectRoute);
+app.use(defualtApi + 'comment', commentRoute);
+app.use(defualtApi + 'onlinePrice', onlinePriceRoute);
+app.use(defualtApi + 'pages', pageDataRoute);
+// app.use(defualtApi + 'media', mediaRoute);
 
 app.use(globalHandler);
 app.use(notFound);

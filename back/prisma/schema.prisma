@@ -33,20 +33,19 @@ enum RolePerson {
 /////////////////////////////       Model Contractor         /////////////////////////////
 model Contractor {
   id          Int      @id @default(autoincrement())
-  name        String
+  name        String   @unique
   phone       String   @unique
   email       String   @unique
-  socialMedia Json
-  bio         String   @db.Text
-  avatar      String
-  rating      Float
+  socialMedia Json?
+  bio         String?  @db.Text
+  avatar      String?
+  rating      Float?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   categoryId  Int
   Category    Category @relation(fields: [categoryId], references: [id])
 
-  tagName String
-  tags    Tag?   @relation("ContractorTags", fields: [tagName], references: [name])
+  Tags Tag[] @relation("ContractorTags")
 
   userId  String?   @unique @db.Uuid
   User    User?     @relation(fields: [userId], references: [id])
@@ -61,7 +60,7 @@ model Contractor {
 
 model Category {
   id            Int          @id @default(autoincrement())
-  name          String
+  name          String       @unique
   slug          String       @unique
   subCategoryId Int?
   SubCategoryTo Category?    @relation("SubCategory", fields: [subCategoryId], references: [id])
@@ -84,15 +83,15 @@ model Post {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  tagName    String
-  tags       Tag?     @relation("PostTags", fields: [tagName], references: [name])
+  Tags       Tag[]    @relation("PostTags")
   userId     String   @unique @db.Uuid
   user       User     @relation(fields: [userId], references: [id])
   categoryId Int
   Category   Category @relation(fields: [categoryId], references: [id])
 
-  DetailPost DetailPost[]
+  DetailPost DetailPost?
   Comment    Comment[]
+  tagId      Int?
 
   @@index([name, description])
   @@index([status])
@@ -104,7 +103,7 @@ model DetailPost {
   content String   @db.Text
   title   String
   keyword String[]
-  postId  Int
+  postId  Int      @unique
   Post    Post     @relation(fields: [postId], references: [id])
 }
 
@@ -157,12 +156,11 @@ model Project {
   price       String?
   isPublished Boolean   @default(false)
 
-  categoryId Int
-  Category   Category? @relation(fields: [categoryId], references: [id])
-  tagName      String
-  Tags         Tag?        @relation("ProjectTags", fields: [tagName], references: [name])
-  contractorId Int?
-  Contractor   Contractor? @relation(fields: [contractorId], references: [id])
+  categoryId   Int
+  Category     Category   @relation(fields: [categoryId], references: [id])
+  Tags         Tag[]      @relation("ProjectTags")
+  contractorId Int
+  Contractor   Contractor @relation(fields: [contractorId], references: [id])
 
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
@@ -170,11 +168,16 @@ model Project {
 
 /////////////////////////////       Model Media         /////////////////////////////
 model Media {
-  id        Int       @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   url       String
-  type      TypeMedia @default(IMAGE)
-  isAdmin   Boolean   @default(false)
-  createdAt DateTime  @default(now())
+  type      TypeMedia    @default(IMAGE)
+  uploader  TypeUploader @default(USER)
+  createdAt DateTime     @default(now())
+}
+
+enum TypeUploader {
+  ADMIN
+  USER
 }
 
 enum TypeMedia {
