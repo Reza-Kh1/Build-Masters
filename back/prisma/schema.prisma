@@ -11,9 +11,9 @@ generator client {
 /////////////////////////////       Model User         /////////////////////////////
 model User {
   id         String      @id @default(uuid()) @db.Uuid
-  name       String
+  name       String // نام  
   password   String
-  email      String      @unique // ایمیل
+  email      String?     @unique // ایمیل
   phone      String      @unique // شماره تلفن
   role       RolePerson  @default(AUTHOR)
   createdAt  DateTime    @default(now())
@@ -26,26 +26,32 @@ model User {
 
 enum RolePerson {
   ADMIN
-  CONSTRACTOR
+  CONSTARCTOR
   AUTHOR
 }
 
 /////////////////////////////       Model Contractor         /////////////////////////////
 model Contractor {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
-  phone       String    @unique
-  email       String    @unique
-  socialMedia Json?
-  bio         String?   @db.Text
-  avatar      String?
-  rating      Float?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  userId      String?   @unique @db.Uuid
-  User        User?     @relation(fields: [userId], references: [id])
-  Comment     Comment[]
-  Project     Project[]
+  phone       String   @unique
+  email       String   @unique
+  socialMedia Json
+  bio         String   @db.Text
+  avatar      String
+  rating      Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  categoryId  Int
+  Category    Category @relation(fields: [categoryId], references: [id])
+
+  tagName String
+  tags    Tag?   @relation("ContractorTags", fields: [tagName], references: [name])
+
+  userId  String?   @unique @db.Uuid
+  User    User?     @relation(fields: [userId], references: [id])
+  Comment Comment[]
+  Project Project[]
 
   @@index([name, bio])
   @@index([id])
@@ -54,13 +60,15 @@ model Contractor {
 /////////////////////////////       Model Category         /////////////////////////////
 
 model Category {
-  id            Int        @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
   name          String
-  slug          String     @unique
+  slug          String       @unique
   subCategoryId Int?
-  subCategoryTo Category?  @relation("SubCategory", fields: [subCategoryId], references: [id])
-  subCategorys  Category[] @relation("SubCategory")
+  SubCategoryTo Category?    @relation("SubCategory", fields: [subCategoryId], references: [id])
+  SubCategorys  Category[]   @relation("SubCategory")
   Post          Post[]
+  Contractor    Contractor[]
+  Project       Project[]
 
   @@index([subCategoryId])
 }
@@ -72,7 +80,7 @@ model Post {
   name        String   @unique
   image       String
   description String   @db.Text
-  isPublished Boolean
+  status      Boolean
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -81,13 +89,13 @@ model Post {
   userId     String   @unique @db.Uuid
   user       User     @relation(fields: [userId], references: [id])
   categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
+  Category   Category @relation(fields: [categoryId], references: [id])
 
   DetailPost DetailPost[]
   Comment    Comment[]
 
   @@index([name, description])
-  @@index([description])
+  @@index([status])
 }
 
 /////////////////////////////       Model DetailPost         /////////////////////////////
@@ -97,7 +105,7 @@ model DetailPost {
   title   String
   keyword String[]
   postId  Int
-  post    Post     @relation(fields: [postId], references: [id])
+  Post    Post     @relation(fields: [postId], references: [id])
 }
 
 /////////////////////////////       Model onlinePrice         /////////////////////////////
@@ -105,8 +113,9 @@ model Tag {
   id   Int    @id @default(autoincrement())
   name String @unique
 
-  Project Project[] @relation("ProjectTags")
-  Post    Post[]    @relation("PostTags")
+  Project    Project[]    @relation("ProjectTags")
+  Post       Post[]       @relation("PostTags")
+  Contractor Contractor[] @relation("ContractorTags")
 
   @@index([name])
 }
@@ -122,12 +131,12 @@ model Comment {
   rating      Int?
 
   postId         Int?
-  post           Post?       @relation(fields: [postId], references: [id])
+  Post           Post?       @relation(fields: [postId], references: [id])
   contractorId   Int?
-  contractor     Contractor? @relation(fields: [contractorId], references: [id])
+  Contractor     Contractor? @relation(fields: [contractorId], references: [id])
   commentReply   Int?
-  commentReplyTo Comment?    @relation("commentReplys", fields: [commentReply], references: [id])
-  commentReplys  Comment[]   @relation("commentReplys")
+  CommentReplyTo Comment?    @relation("commentReplys", fields: [commentReply], references: [id])
+  CommentReplys  Comment[]   @relation("commentReplys")
   createdAt      DateTime    @default(now())
 
   @@index([isPublished, commentReply])
@@ -148,10 +157,12 @@ model Project {
   price       String?
   isPublished Boolean   @default(false)
 
+  categoryId Int
+  Category   Category? @relation(fields: [categoryId], references: [id])
   tagName      String
-  tags         Tag?        @relation("ProjectTags", fields: [tagName], references: [name])
+  Tags         Tag?        @relation("ProjectTags", fields: [tagName], references: [name])
   contractorId Int?
-  contractor   Contractor? @relation(fields: [contractorId], references: [id])
+  Contractor   Contractor? @relation(fields: [contractorId], references: [id])
 
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
@@ -187,7 +198,6 @@ model onlinePrice {
 }
 
 /////////////////////////////       Model PageData         /////////////////////////////
-
 model PageData {
   id           Int      @id @default(autoincrement())
   page         String   @unique

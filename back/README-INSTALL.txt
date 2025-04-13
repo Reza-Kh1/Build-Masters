@@ -51,8 +51,9 @@ module.exports = [
             'prettier/prettier': 'error',
         },
     },
-    eslintConfigPrettier,
+    ...eslintConfigPrettier,
 ];
+
 
 12_ create file .prettierrc : 
 {

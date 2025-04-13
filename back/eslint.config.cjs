@@ -27,5 +27,5 @@ module.exports = [
             'prettier/prettier': 'error',
         },
     },
-    eslintConfigPrettier,
+    ...eslintConfigPrettier,
 ];

@@ -3,18 +3,10 @@ import { comaprePassword, createHash } from '../utils/hashPassword';
 import pagination from '../utils/pagination';
 import expressAsyncHandler from 'express-async-handler';
 import { PrismaClient } from '@prisma/client';
-import redis from '../utils/redisClient';
 import createToken from '../utils/createToken';
 import { deleteCahce, getCache, setCache } from '../utils/deleteCache';
 const prisma = new PrismaClient();
 const pageLimit = Number(process.env.PAGE_LIMITE);
-// const cacheKey = `users:${email}:${phone}:${role}:${page}`;
-// const cachedData = await redis.get(cacheKey);
-// await redis.setex(cacheKey, Number(process.env.REDIS_TIMER), JSON.stringify(responseData));
-// const keys = await redis.keys(pattern);
-// if (keys.length > 0) {
-//     await redis.del(keys);
-// }
 const getUsers = expressAsyncHandler(async (req, res) => {
   const { email, phone, role, page = 1 } = req.query;
   const cacheKey = `users:${email}:${phone}:${role}:${page}`;
