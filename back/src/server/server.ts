@@ -16,7 +16,7 @@ import projectRoute from '../routes/projectRoute';
 import commentRoute from '../routes/commentRoute';
 import onlinePriceRoute from '../routes/onlinePriceRoute';
 import pageDataRoute from '../routes/pageDataRoute';
-import mediaRoute from "../routes/mediaRoute"
+import mediaRoute from '../routes/mediaRoute';
 ///////////// config Security
 dotenv.config();
 const app = express();

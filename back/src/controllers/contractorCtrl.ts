@@ -2,21 +2,76 @@ import { customError } from '../middlewares/globalError';
 import expressAsyncHandler from 'express-async-handler';
 import { PrismaClient } from '@prisma/client';
 import { deleteCahce, getCache, setCache } from '../utils/deleteCache';
-import redis from '../utils/redisClient';
+import pagination from '../utils/pagination';
 const prisma = new PrismaClient();
 const pageLimit = Number(process.env.PAGE_LIMITE);
+type QueryContractor = {
+  page?: number;
+  order?: 'desc' | 'asc';
+  tags?: number[];
+  search?: string;
+  category?: number;
+};
 
 const getAllContractor = expressAsyncHandler(async (req, res) => {
-  const { page = 1, order, tags, search, category } = req.query;
+  const {
+    page = 1,
+    order,
+    tags,
+    search,
+    category,
+  } = req.query as QueryContractor;
   try {
-    const cacheKey = 'contractors:all';
-    const cache = await getCache(cacheKey);
-    if (cache) {
-      res.send(cache);
-      return;
-    }
-    const data = await prisma.contractor.findMany({ where: {} });
-    res.send(data);
+    // const cacheKey = `Contractors:${page}&${order}&${tags}&${search}&${category}`;
+    // const cache = await getCache(cacheKey);
+    // if (cache) {
+    //   res.send(cache);
+    //   return;
+    // }
+    const data = await prisma.contractor.findMany({
+      where: {
+        name: {
+          contains: search || undefined,
+          mode:'insensitive'
+        },
+        categoryId: Number(category) || undefined,
+      },
+      select: {
+        Tags: tags
+          ? {
+              where: {
+                id: { in: tags },
+              },
+            }
+          : undefined,
+        avatar: true,
+        name: true,
+        createdAt: true,
+        rating: true,
+      },
+      orderBy: { createdAt: order || 'desc' },
+      skip: (Number(page) - 1) * pageLimit,
+      take: pageLimit,
+    });
+    const count = await prisma.contractor.count({
+      where: {
+        name: {
+          contains: search || undefined,
+          mode: 'insensitive',
+        },
+        categoryId: Number(category) || undefined,
+        Tags: tags?.length
+          ? {
+              some: {
+                id: { in: tags },
+              },
+            }
+          : undefined,
+      },
+    });
+    const pager = pagination(count, Number(page), pageLimit);
+    // setCache(cacheKey, { data, pagination: pager });
+    res.send({ data, pagination: pager });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
   }
@@ -56,7 +111,7 @@ const createContractor = expressAsyncHandler(async (req, res) => {
         },
       },
     });
-    deleteCahce('contractor:*');
+    deleteCahce('Contractor:*');
     res.send({ success: true });
   } catch (err) {
     console.log(err);
@@ -95,7 +150,7 @@ const updateContractor = expressAsyncHandler(async (req, res) => {
         categoryId: categoryId || undefined,
       },
     });
-    deleteCahce('contractors:*');
+    deleteCahce('Contractors:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
@@ -106,7 +161,7 @@ const deleteContractor = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
     await prisma.contractor.delete({ where: { id: Number(id) } });
-    deleteCahce('contractors:*');
+    deleteCahce('Contractors:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
@@ -116,7 +171,7 @@ const deleteContractor = expressAsyncHandler(async (req, res) => {
 const getSingleContractor = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
-    const cacheKey = 'contractors:';
+    const cacheKey = `Contractors:${id}`;
     const cache = await getCache(cacheKey);
     if (cache) {
       res.send(cache);
@@ -129,6 +184,7 @@ const getSingleContractor = expressAsyncHandler(async (req, res) => {
         Project: true,
         Category: {
           select: {
+            id: true,
             name: true,
             slug: true,
           },

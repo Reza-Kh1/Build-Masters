@@ -6,8 +6,7 @@ const prisma = new PrismaClient();
 const pageLimit = Number(process.env.PAGE_LIMITE);
 
 const createOnlinePrice = expressAsyncHandler(async (req, res) => {
-  const { name, phone, description, price, subject, images, size } =
-    req.body;
+  const { name, phone, description, price, subject, images, size } = req.body;
   try {
     await prisma.onlinePrice.create({
       data: {
@@ -66,7 +65,7 @@ const updateOnlinePrice = expressAsyncHandler(async (req, res) => {
         id: Number(id),
       },
     });
-    deleteCahce('onlinePrice:*')
+    deleteCahce('onlinePrice:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
@@ -81,7 +80,7 @@ const deleteOnlinePrice = expressAsyncHandler(async (req, res) => {
         id: Number(id),
       },
     });
-    deleteCahce('onlinePrice:*')
+    deleteCahce('onlinePrice:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);

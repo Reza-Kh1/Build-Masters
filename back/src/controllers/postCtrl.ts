@@ -73,10 +73,10 @@ const createPost = expressAsyncHandler(async (req, res) => {
           connect: tags.map((id: string) => ({ id })),
         },
         user: {
-          connect: { id: userId }
+          connect: { id: userId },
         },
         Category: {
-          connect: { id: categoryId }
+          connect: { id: categoryId },
         },
       },
     });
