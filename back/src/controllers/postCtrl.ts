@@ -72,13 +72,19 @@ const createPost = expressAsyncHandler(async (req, res) => {
         Tags: {
           connect: tags.map((id: string) => ({ id })),
         },
-        userId,
-        categoryId,
+        user: {
+          connect: { id: userId }
+        },
+        Category: {
+          connect: { id: categoryId }
+        },
       },
     });
     deleteCahce('posts:*');
     res.send({ success: true });
   } catch (err) {
+    console.log(err);
+
     throw customError('خطا در دیتابیس', 500, err);
   }
 });

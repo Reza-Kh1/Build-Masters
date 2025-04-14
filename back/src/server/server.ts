@@ -16,6 +16,7 @@ import projectRoute from '../routes/projectRoute';
 import commentRoute from '../routes/commentRoute';
 import onlinePriceRoute from '../routes/onlinePriceRoute';
 import pageDataRoute from '../routes/pageDataRoute';
+import mediaRoute from "../routes/mediaRoute"
 ///////////// config Security
 dotenv.config();
 const app = express();
@@ -45,7 +46,7 @@ app.use(defualtApi + 'onlinePrice', onlinePriceRoute);
 app.use(defualtApi + 'pages', pageDataRoute);
 
 app.use(defualtApi + 'comment', commentRoute);
-// app.use(defualtApi + 'media', mediaRoute);
+app.use(defualtApi + 'media', mediaRoute);
 
 app.use(globalHandler);
 app.use(notFound);
