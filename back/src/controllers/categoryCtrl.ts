@@ -9,15 +9,25 @@ const getCategory = expressAsyncHandler(async (req, res) => {
   const { admin } = req.query;
   try {
     const keyCache = `category:${admin ? 'admin' : 'all'}`;
-    const cache = await getCache(keyCache);
-    if (cache) {
-      res.send(cache);
-      return;
-    }
+    // const cache = await getCache(keyCache);
+    // if (cache) {
+    //   res.send(cache);
+    //   return;
+    // }
     let data: Category | Category[] | null;
     if (admin) {
       data = await prisma.category.findMany({
-        include: { SubCategoryTo: true },
+        select: {
+          name: true,
+          slug: true,
+          id: true,
+          subCategoryId: true,
+          SubCategoryTo: {
+            select: {
+              name: true
+            }
+          }
+        }
       });
     } else {
       data = await prisma.category.findMany({

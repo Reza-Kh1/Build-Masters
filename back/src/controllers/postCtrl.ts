@@ -2,19 +2,66 @@ import { customError } from '../middlewares/globalError';
 import expressAsyncHandler from 'express-async-handler';
 import { PrismaClient } from '@prisma/client';
 import { deleteCahce, getCache, setCache } from '../utils/deleteCache';
+import pagination from '../utils/pagination';
 const prisma = new PrismaClient();
+const pageLimit = Number(process.env.PAGE_LIMITE);
+
+type QueryPost = {
+  tags?: string
+  isPublished?: string
+  search?: string
+  category?: number
+  order?: "desc" | "asc"
+  page?: number
+}
 
 const getAllPost = expressAsyncHandler(async (req, res) => {
+  const { tags, isPublished, search, category, order, page = 1 }: QueryPost = req.query
   try {
     const keyCache = 'posts:all';
-    const cache = await getCache(keyCache);
-    if (cache) {
-      res.send(cache);
-      return;
+    // const cache = await getCache(keyCache);
+    // if (cache) {
+    //   res.send(cache);
+    //   return;
+    // }
+    const tagFilter = tags ? JSON.parse(tags).map((i: number) => Number(i)) : [];
+    const searchFilter = {
+      Tags: tagFilter.length > 0 ? {
+        some: {
+          id: { in: tagFilter }
+        }
+      } : undefined,
+      isPublished: isPublished === "false" ? false : true,
+      categoryId: category ? Number(category) : undefined,
+    } as any;
+    if (search) {
+      searchFilter.OR = [
+        {
+          name: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        },
+        {
+          description: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        },
+      ]
     }
-    const data = await prisma.post.findMany({ where: {} });
-    setCache(keyCache, data);
-    res.send(data);
+    console.log(searchFilter);
+
+    const data = await prisma.post.findMany({
+      where: searchFilter,
+      orderBy: { createdAt: order || 'desc' },
+      skip: (Number(page) - 1) * pageLimit,
+      take: pageLimit,
+    });
+    // setCache(keyCache, data);
+    const count = await prisma.post.count({ where: searchFilter });
+    const pager = pagination(count, Number(page), pageLimit);
+    res.send({ data, pagination: pager });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
   }
@@ -24,11 +71,11 @@ const getSinglePost = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
     const keyCache = `posts:${id}`;
-    const cache = await getCache(keyCache);
-    if (cache) {
-      res.send(cache);
-      return;
-    }
+    // const cache = await getCache(keyCache);
+    // if (cache) {
+    //   res.send(cache);
+    //   return;
+    // }
     const data = await prisma.post.findUnique({
       where: { name: id },
       include: {
@@ -48,7 +95,7 @@ const getSinglePost = expressAsyncHandler(async (req, res) => {
         },
       },
     });
-    setCache(keyCache, data);
+    // setCache(keyCache, data);
     if (!data) {
       res.status(404).json({ msg: 'Not Found' });
       return;
@@ -76,7 +123,7 @@ const createPost = expressAsyncHandler(async (req, res) => {
           connect: { id: userId },
         },
         Category: {
-          connect: { id: categoryId },
+          connect: { id: Number(categoryId) },
         },
       },
     });

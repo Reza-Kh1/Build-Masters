@@ -8,7 +8,7 @@ const pageLimit = Number(process.env.PAGE_LIMITE);
 type QueryContractor = {
   page?: number;
   order?: 'desc' | 'asc';
-  tags?: number[];
+  tags?: string;
   search?: string;
   category?: number;
 };
@@ -20,7 +20,7 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
     tags,
     search,
     category,
-  } = req.query as QueryContractor;
+  }: QueryContractor = req.query;
   try {
     // const cacheKey = `Contractors:${page}&${order}&${tags}&${search}&${category}`;
     // const cache = await getCache(cacheKey);
@@ -28,22 +28,31 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
     //   res.send(cache);
     //   return;
     // }
+    const tagFilter = tags ? JSON.parse(tags).map((i: number) => Number(i)) : [];
+    const searchFilter = {
+      Tags: tagFilter.length > 0 ? {
+        some: {
+          id: { in: tagFilter }
+        }
+      } : undefined,
+      name: search ? {
+        contains: search,
+        mode: 'insensitive'
+      } : undefined,
+      categoryId: category ? Number(category) : undefined,
+    } as any;
     const data = await prisma.contractor.findMany({
-      where: {
-        name: {
-          contains: search || undefined,
-          mode:'insensitive'
-        },
-        categoryId: Number(category) || undefined,
-      },
+      where: searchFilter,
       select: {
-        Tags: tags
-          ? {
-              where: {
-                id: { in: tags },
-              },
-            }
-          : undefined,
+        Category: {
+          select: {
+            name: true,
+            slug: true
+          }
+        },
+        userId: true,
+        id: true,
+        Tags: true,
         avatar: true,
         name: true,
         createdAt: true,
@@ -53,26 +62,13 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
       skip: (Number(page) - 1) * pageLimit,
       take: pageLimit,
     });
-    const count = await prisma.contractor.count({
-      where: {
-        name: {
-          contains: search || undefined,
-          mode: 'insensitive',
-        },
-        categoryId: Number(category) || undefined,
-        Tags: tags?.length
-          ? {
-              some: {
-                id: { in: tags },
-              },
-            }
-          : undefined,
-      },
-    });
+    const count = await prisma.contractor.count({ where: searchFilter });
     const pager = pagination(count, Number(page), pageLimit);
     // setCache(cacheKey, { data, pagination: pager });
     res.send({ data, pagination: pager });
   } catch (err) {
+    console.log(err);
+
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
@@ -172,13 +168,13 @@ const getSingleContractor = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
     const cacheKey = `Contractors:${id}`;
-    const cache = await getCache(cacheKey);
-    if (cache) {
-      res.send(cache);
-      return;
-    }
+    // const cache = await getCache(cacheKey);
+    // if (cache) {
+    //   res.send(cache);
+    //   return;
+    // }
     const data = await prisma.contractor.findUnique({
-      where: { id: Number(id) },
+      where: { name: id },
       include: {
         Tags: true,
         Project: true,
@@ -192,7 +188,7 @@ const getSingleContractor = expressAsyncHandler(async (req, res) => {
         Comment: true,
       },
     });
-    setCache(cacheKey, data);
+    // setCache(cacheKey, data);
     res.send(data);
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);

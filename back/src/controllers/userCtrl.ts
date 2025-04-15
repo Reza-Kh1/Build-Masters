@@ -11,17 +11,17 @@ const pageLimit = Number(process.env.PAGE_LIMITE);
 const getUsers = expressAsyncHandler(async (req, res) => {
   const { email, phone, role, page = 1 } = req.query;
   const cacheKey = `users:${email}:${phone}:${role}:${page}`;
-  const cache = await getCache(cacheKey);
-  if (cache) {
-    res.send(cache);
-    return;
-  }
+  // const cache = await getCache(cacheKey);
+  // if (cache) {
+  //   res.send(cache);
+  //   return;
+  // }
   try {
     const search = {} as any;
     if (email || phone) {
       search.OR = [
-        { email: email ? { contains: email.toString() } : {} },
-        { phone: phone ? { contains: phone.toString() } : {} },
+        { email: email ? { contains: email.toString(), mode: "insensitive" } : undefined },
+        { phone: phone ? { contains: phone.toString(), mode: "insensitive" } : undefined },
       ];
     }
     if (role) search.role = role.toString();
@@ -40,7 +40,7 @@ const getUsers = expressAsyncHandler(async (req, res) => {
     });
     const count = await prisma.user.count({ where: search });
     const pages = pagination(count, Number(page), pageLimit);
-    setCache(cacheKey, JSON.stringify({ data: data, pagination: pages }));
+    // setCache(cacheKey, { data: data, pagination: pages });
     res.send({ data: data, pagination: pages });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);

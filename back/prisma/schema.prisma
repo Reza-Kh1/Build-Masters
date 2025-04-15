@@ -52,8 +52,8 @@ model Contractor {
   Comment Comment[]
   Project Project[]
 
-  @@index([name, bio])
-  @@index([id])
+  @@index([name, categoryId])
+  @@index([name])
 }
 
 /////////////////////////////       Model Category         /////////////////////////////
@@ -70,6 +70,7 @@ model Category {
   Project       Project[]
 
   @@index([subCategoryId])
+  @@index([slug])
 }
 
 /////////////////////////////       Model Post         /////////////////////////////
@@ -84,7 +85,7 @@ model Post {
   updatedAt   DateTime @updatedAt
 
   Tags       Tag[]    @relation("PostTags")
-  userId     String   @unique @db.Uuid
+  userId     String   @db.Uuid
   user       User     @relation(fields: [userId], references: [id])
   categoryId Int
   Category   Category @relation(fields: [categoryId], references: [id])
@@ -92,8 +93,8 @@ model Post {
   DetailPost DetailPost?
   Comment    Comment[]
 
-  @@index([name, description])
-  @@index([isPublished])
+  @@index([name])
+  @@index([isPublished, description, categoryId, name])
 }
 
 /////////////////////////////       Model DetailPost         /////////////////////////////
@@ -104,6 +105,8 @@ model DetailPost {
   keyword String[]
   postId  Int      @unique
   Post    Post     @relation(fields: [postId], references: [id])
+
+  @@index([postId])
 }
 
 /////////////////////////////       Model onlinePrice         /////////////////////////////
@@ -162,6 +165,9 @@ model Project {
 
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
+
+  @@index([slug])
+  @@index([isPublished, name, address])
 }
 
 /////////////////////////////       Model Media         /////////////////////////////
@@ -171,6 +177,8 @@ model Media {
   type      TypeMedia    @default(IMAGE)
   uploader  TypeUploader @default(USER)
   createdAt DateTime     @default(now())
+
+  @@index([type, uploader])
 }
 
 enum TypeUploader {
@@ -196,6 +204,8 @@ model onlinePrice {
   isStatus    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updateAt    DateTime @updatedAt
+
+  @@index([isStatus])
 }
 
 /////////////////////////////       Model PageData         /////////////////////////////

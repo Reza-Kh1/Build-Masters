@@ -2,18 +2,56 @@ import { customError } from '../middlewares/globalError';
 import expressAsyncHandler from 'express-async-handler';
 import { PrismaClient } from '@prisma/client';
 import { deleteCahce, getCache, setCache } from '../utils/deleteCache';
+import pagination from '../utils/pagination';
 const prisma = new PrismaClient();
+const pageLimit = Number(process.env.PAGE_LIMITE);
+
+type QueryProject = {
+  tags?: string
+  page?: number
+  order?: 'asc' | 'desc'
+  category?: string
+  search?: string
+  isPublished?: string
+}
 
 const getAllProject = expressAsyncHandler(async (req, res) => {
-  const {} = req.query;
+  const { tags, page = 1, order, category, search, isPublished }: QueryProject = req.query;
   try {
     const keyCache = 'projects:all';
-    const cache = await getCache(keyCache);
-    if (cache) {
-      res.send(cache);
-      return;
+    // const cache = await getCache(keyCache);
+    // if (cache) {
+    //   res.send(cache);
+    //   return;
+    // }
+    const tagFilter = tags ? JSON.parse(tags).map((i: number) => Number(i)) : [];
+    const searchFilter = {
+      Tags: tagFilter.length > 0 ? {
+        some: {
+          id: { in: tagFilter }
+        }
+      } : undefined,
+      isPublished: isPublished === "false" ? false : true,
+      categoryId: category ? Number(category) : undefined,
+    } as any;
+    if (search) {
+      searchFilter.OR = [
+        {
+          name: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        },
+        {
+          address: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        },
+      ]
     }
     const data = await prisma.project.findMany({
+      where: searchFilter,
       select: {
         Category: {
           select: {
@@ -35,14 +73,23 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
         name: true,
         slug: true,
         image: true,
-        description: true,
+        id: true,
+        address: true,
         isPublished: true,
         updateAt: true,
       },
+      orderBy: { createdAt: order || 'desc' },
+      skip: (Number(page) - 1) * pageLimit,
+      take: pageLimit,
     });
-    setCache(keyCache, data);
-    res.send(data);
+
+    // setCache(keyCache, data);
+    const count = await prisma.post.count({ where: searchFilter });
+    const pager = pagination(count, Number(page), pageLimit);
+    res.send({ data, pagination: pager });
   } catch (err) {
+    console.log(err);
+
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
