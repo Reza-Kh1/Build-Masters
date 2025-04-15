@@ -3,9 +3,10 @@ import {
   createComment,
   deleteComment,
   getAllComment,
+  publishedComment,
   updateComment,
 } from '../controllers/commentCtrl';
 const route = express.Router();
-route.route('/').post(createComment).get(getAllComment);
+route.route('/').post(createComment).get(getAllComment).put(publishedComment);
 route.route('/:id').put(updateComment).delete(deleteComment);
 export = route;

@@ -24,10 +24,10 @@ const getCategory = expressAsyncHandler(async (req, res) => {
           subCategoryId: true,
           SubCategoryTo: {
             select: {
-              name: true
-            }
-          }
-        }
+              name: true,
+            },
+          },
+        },
       });
     } else {
       data = await prisma.category.findMany({

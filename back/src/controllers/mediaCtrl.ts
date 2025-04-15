@@ -64,7 +64,7 @@ const uploadMedia = expressAsyncHandler(async (req, res) => {
       },
     });
     fs.unlinkSync(req.file.path);
-    deleteCahce("Media:*")
+    deleteCahce('Media:*');
     res.json({ url });
   } catch (err) {
     await client.remove(`/public_html/uploads/${req.file.filename}`);
@@ -127,7 +127,7 @@ const deleteMedia = expressAsyncHandler(async (req, res) => {
         url: url?.toString(),
       },
     });
-    deleteCahce("Media:*")
+    deleteCahce('Media:*');
     res.send({ sucess: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);

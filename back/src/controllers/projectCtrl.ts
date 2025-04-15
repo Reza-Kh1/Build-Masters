@@ -7,16 +7,23 @@ const prisma = new PrismaClient();
 const pageLimit = Number(process.env.PAGE_LIMITE);
 
 type QueryProject = {
-  tags?: string
-  page?: number
-  order?: 'asc' | 'desc'
-  category?: string
-  search?: string
-  isPublished?: string
-}
+  tags?: string;
+  page?: number;
+  order?: 'asc' | 'desc';
+  category?: string;
+  search?: string;
+  isPublished?: string;
+};
 
 const getAllProject = expressAsyncHandler(async (req, res) => {
-  const { tags, page = 1, order, category, search, isPublished }: QueryProject = req.query;
+  const {
+    tags,
+    page = 1,
+    order,
+    category,
+    search,
+    isPublished,
+  }: QueryProject = req.query;
   try {
     const keyCache = 'projects:all';
     // const cache = await getCache(keyCache);
@@ -24,14 +31,19 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
     //   res.send(cache);
     //   return;
     // }
-    const tagFilter = tags ? JSON.parse(tags).map((i: number) => Number(i)) : [];
+    const tagFilter = tags
+      ? JSON.parse(tags).map((i: number) => Number(i))
+      : [];
     const searchFilter = {
-      Tags: tagFilter.length > 0 ? {
-        some: {
-          id: { in: tagFilter }
-        }
-      } : undefined,
-      isPublished: isPublished === "false" ? false : true,
+      Tags:
+        tagFilter.length > 0
+          ? {
+              some: {
+                id: { in: tagFilter },
+              },
+            }
+          : undefined,
+      isPublished: isPublished === 'false' ? false : true,
       categoryId: category ? Number(category) : undefined,
     } as any;
     if (search) {
@@ -39,16 +51,16 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
         {
           name: {
             contains: search,
-            mode: 'insensitive'
-          }
+            mode: 'insensitive',
+          },
         },
         {
           address: {
             contains: search,
-            mode: 'insensitive'
-          }
+            mode: 'insensitive',
+          },
         },
-      ]
+      ];
     }
     const data = await prisma.project.findMany({
       where: searchFilter,

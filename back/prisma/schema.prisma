@@ -32,18 +32,19 @@ enum RolePerson {
 
 /////////////////////////////       Model Contractor         /////////////////////////////
 model Contractor {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  phone       String   @unique
-  email       String   @unique
-  socialMedia Json?
-  bio         String?  @db.Text
-  avatar      String?
-  rating      Float?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  categoryId  Int
-  Category    Category @relation(fields: [categoryId], references: [id])
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  phone        String   @unique
+  email        String   @unique
+  socialMedia  Json?
+  bio          String?  @db.Text
+  avatar       String?
+  totalComment Float?   @default(0)
+  rating       Float?   @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  categoryId   Int
+  Category     Category @relation(fields: [categoryId], references: [id])
 
   Tags Tag[] @relation("ContractorTags")
 
@@ -76,13 +77,14 @@ model Category {
 /////////////////////////////       Model Post         /////////////////////////////
 
 model Post {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  image       String
-  description String   @db.Text
-  isPublished Boolean
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  image        String
+  description  String   @db.Text
+  isPublished  Boolean
+  totalComment Float?   @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   Tags       Tag[]    @relation("PostTags")
   userId     String   @db.Uuid

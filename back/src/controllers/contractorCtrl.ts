@@ -28,17 +28,24 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
     //   res.send(cache);
     //   return;
     // }
-    const tagFilter = tags ? JSON.parse(tags).map((i: number) => Number(i)) : [];
+    const tagFilter = tags
+      ? JSON.parse(tags).map((i: number) => Number(i))
+      : [];
     const searchFilter = {
-      Tags: tagFilter.length > 0 ? {
-        some: {
-          id: { in: tagFilter }
-        }
-      } : undefined,
-      name: search ? {
-        contains: search,
-        mode: 'insensitive'
-      } : undefined,
+      Tags:
+        tagFilter.length > 0
+          ? {
+              some: {
+                id: { in: tagFilter },
+              },
+            }
+          : undefined,
+      name: search
+        ? {
+            contains: search,
+            mode: 'insensitive',
+          }
+        : undefined,
       categoryId: category ? Number(category) : undefined,
     } as any;
     const data = await prisma.contractor.findMany({
@@ -47,8 +54,8 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
         Category: {
           select: {
             name: true,
-            slug: true
-          }
+            slug: true,
+          },
         },
         userId: true,
         id: true,
@@ -57,6 +64,7 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
         name: true,
         createdAt: true,
         rating: true,
+        totalComment: true,
       },
       orderBy: { createdAt: order || 'desc' },
       skip: (Number(page) - 1) * pageLimit,

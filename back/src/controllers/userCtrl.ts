@@ -20,8 +20,16 @@ const getUsers = expressAsyncHandler(async (req, res) => {
     const search = {} as any;
     if (email || phone) {
       search.OR = [
-        { email: email ? { contains: email.toString(), mode: "insensitive" } : undefined },
-        { phone: phone ? { contains: phone.toString(), mode: "insensitive" } : undefined },
+        {
+          email: email
+            ? { contains: email.toString(), mode: 'insensitive' }
+            : undefined,
+        },
+        {
+          phone: phone
+            ? { contains: phone.toString(), mode: 'insensitive' }
+            : undefined,
+        },
       ];
     }
     if (role) search.role = role.toString();

@@ -7,16 +7,23 @@ const prisma = new PrismaClient();
 const pageLimit = Number(process.env.PAGE_LIMITE);
 
 type QueryPost = {
-  tags?: string
-  isPublished?: string
-  search?: string
-  category?: number
-  order?: "desc" | "asc"
-  page?: number
-}
+  tags?: string;
+  isPublished?: string;
+  search?: string;
+  category?: number;
+  order?: 'desc' | 'asc';
+  page?: number;
+};
 
 const getAllPost = expressAsyncHandler(async (req, res) => {
-  const { tags, isPublished, search, category, order, page = 1 }: QueryPost = req.query
+  const {
+    tags,
+    isPublished,
+    search,
+    category,
+    order,
+    page = 1,
+  }: QueryPost = req.query;
   try {
     const keyCache = 'posts:all';
     // const cache = await getCache(keyCache);
@@ -24,14 +31,19 @@ const getAllPost = expressAsyncHandler(async (req, res) => {
     //   res.send(cache);
     //   return;
     // }
-    const tagFilter = tags ? JSON.parse(tags).map((i: number) => Number(i)) : [];
+    const tagFilter = tags
+      ? JSON.parse(tags).map((i: number) => Number(i))
+      : [];
     const searchFilter = {
-      Tags: tagFilter.length > 0 ? {
-        some: {
-          id: { in: tagFilter }
-        }
-      } : undefined,
-      isPublished: isPublished === "false" ? false : true,
+      Tags:
+        tagFilter.length > 0
+          ? {
+              some: {
+                id: { in: tagFilter },
+              },
+            }
+          : undefined,
+      isPublished: isPublished === 'false' ? false : true,
       categoryId: category ? Number(category) : undefined,
     } as any;
     if (search) {
@@ -39,21 +51,27 @@ const getAllPost = expressAsyncHandler(async (req, res) => {
         {
           name: {
             contains: search,
-            mode: 'insensitive'
-          }
+            mode: 'insensitive',
+          },
         },
         {
           description: {
             contains: search,
-            mode: 'insensitive'
-          }
+            mode: 'insensitive',
+          },
         },
-      ]
+      ];
     }
-    console.log(searchFilter);
-
     const data = await prisma.post.findMany({
       where: searchFilter,
+      include: {
+        Category: {
+          select: {
+            name: true,
+            slug: true,
+          },
+        },
+      },
       orderBy: { createdAt: order || 'desc' },
       skip: (Number(page) - 1) * pageLimit,
       take: pageLimit,

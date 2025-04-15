@@ -7,10 +7,10 @@ const prisma = new PrismaClient();
 const pageLimit = Number(process.env.PAGE_LIMITE);
 
 type QueryOnlinePrice = {
-  page?: number
-  status?: string
-  order?: 'desc' | 'asc'
-}
+  page?: number;
+  status?: string;
+  order?: 'desc' | 'asc';
+};
 
 const createOnlinePrice = expressAsyncHandler(async (req, res) => {
   const { name, phone, description, price, subject, images, size } = req.body;
@@ -43,7 +43,7 @@ const getAllOnlinePrice = expressAsyncHandler(async (req, res) => {
     //   return;
     // }
     const searchFilter = {
-      isStatus: status === "false" ? false : true,
+      isStatus: status === 'false' ? false : true,
     };
     const data = await prisma.onlinePrice.findMany({
       where: searchFilter,
