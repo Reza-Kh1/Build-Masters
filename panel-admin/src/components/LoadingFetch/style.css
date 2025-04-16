@@ -1,0 +1,28 @@
+.loader {
+    width: 10px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    animation: l5 1s infinite linear alternate;
+}
+
+@keyframes l5 {
+    0% {
+        box-shadow: 13px 0 #ffffff, -13px 0 rgba(60, 60, 60, 0.133);
+        background: #ffffff
+    }
+
+    33% {
+        box-shadow: 13px 0 #ffffff, -13px 0 rgba(60, 60, 60, 0.133);
+        background: rgba(60, 60, 60, 0.133)
+    }
+
+    66% {
+        box-shadow: 13px 0 rgba(60, 60, 60, 0.133), -13px 0 #ffffff;
+        background: rgba(60, 60, 60, 0.133)
+    }
+
+    100% {
+        box-shadow: 13px 0 rgba(60, 60, 60, 0.133), -13px 0 #ffffff;
+        background: #ffffff
+    }
+}

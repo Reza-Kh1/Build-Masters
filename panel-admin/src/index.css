@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: "iranSans";
+    src: url("./fonts/Vazir-Regular.woff") format("woff");
+}
+
+@keyframes ldio-q5iz3826roe {
+    0% {
+        opacity: 1
+    }
+
+    100% {
+        opacity: 0
+    }
+}
+
+.font-sans {
+    font-family: "iranSans", Arial, Helvetica, sans-serif !important;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(360deg, #596a7b, #8bb4ca);
+    font-family: "iranSans", Arial, Helvetica, sans-serif !important;
+    box-sizing: border-box;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+.box-editor {
+    max-width: 1300px;
+    border: 1px;
+}
+
+.ql-snow .ql-picker.ql-header .ql-picker-label::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item::before {
+    content: 'Normal';
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-label::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item::before {
+    content: 'Size';
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-label::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item::before {
+    content: 'Font';
+}
+
+.ql-container.ql-snow {
+    min-height: 700px;
+    background-color: #f4f4f4;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0px 0px 6px 8px #c8c8c8;
+}
+
+.ql-toolbar.ql-snow {
+    position: sticky;
+    width: 100%;
+    z-index: 50;
+    box-shadow: 0px 0px 13px 1px #c8c8c8;
+    background: aliceblue;
+    top: 0;
+}
+
+.rmdp-input {
+    box-shadow: 0px 1px 5px 1px #716f6f;
+    color: #ededed;
+    background: #343333;
+    border: none !important;
+    width: 100%;
+    border-radius: 4px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 7px 5px !important;
+    cursor: pointer;
+}
+
+.rmdp-panel-body li .b-deselect {
+    padding: 0 5px;
+}
+
+.ql-snow .ql-picker-label {
+    direction: ltr;
+}
+
+.ql-editor {
+    font-family: "iranSans", Arial, Helvetica, sans-serif !important;
+}
+
+.rmdp-container {
+    width: 100% !important;
+}
+
+.jodit-container {
+    min-height: 500px !important;
+}
+
+.jodit-workplace {
+    min-height: 400px !important;
+}
+
+.jodit-wysiwyg {
+    min-height: 400px !important;
+}
+
+.cutline {
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+
+.cutline-1 {
+    -webkit-line-clamp: 1;
+}
+
+.cutline-2 {
+    -webkit-line-clamp: 2;
+}
+
+.cutline-3 {
+    -webkit-line-clamp: 3;
+}
+
+.cutline-4 {
+    -webkit-line-clamp: 4;
+}
+
+.box-shadow-customer {
+    box-shadow: 0px -9px 16px 0px #000000d6;
+}
+
+.transition-customer {
+    transition: all ease-in-out 0.3s;
+}
