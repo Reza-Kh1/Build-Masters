@@ -77,7 +77,11 @@ const updateCategory = expressAsyncHandler(async (req, res) => {
   try {
     await prisma.category.update({
       where: { id: Number(id) },
-      data: { name, slug, subCategoryId: Number(subCategoryId) || undefined },
+      data: {
+        name,
+        slug,
+        subCategoryId: subCategoryId === null ? null : Number(subCategoryId),
+      },
     });
     deleteCahce('Category:*');
     res.send({ success: true });
