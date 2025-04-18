@@ -8,22 +8,21 @@ type TagsBoxType = {
   name: string;
   setTags: (value: { name: string }[]) => void;
 };
-type TagsType = {
-  data: { name: string }[];
-};
 export default function TagAutocomplete({ tags, setTags, name }: TagsBoxType) {
-  const { data } = useQuery<TagsType>({
-    queryKey: ["tagsName"],
+  const { data } = useQuery<{ name: string }[]|[]>({
+    queryKey: ["TagsName"],
     staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24,
     queryFn: fetchTags,
   });
-  return data?.data?.length ? (
+  console.log(data);
+  
+  return data?.length ? (
     <Autocomplete
       multiple
       className="shadow-md"
       id="tags-outlined"
-      options={data?.data}
+      options={data}
       getOptionLabel={(option) => option.name}
       isOptionEqualToValue={(option, value) => option.name === value.name}
       value={tags}

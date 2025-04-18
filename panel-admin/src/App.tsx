@@ -7,6 +7,9 @@ import "./index.css";
 import LoadingFetch from "./components/LoadingFetch/LoadingFetch";
 axios.defaults.baseURL = import.meta.env.VITE_PUBLIC_API;
 axios.defaults.withCredentials = true;
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+ModuleRegistry.registerModules([AllCommunityModule]);
+
 function App() {
   const route = useRoutes(routes);
   return (

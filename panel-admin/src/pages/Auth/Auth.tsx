@@ -30,6 +30,8 @@ export default function Auth() {
       }
     },
     onSuccess: ({ data }) => {
+      console.log(data);
+      
       Cookies.set(cookieKey, data.token, { expires: 7 });
       const body = {
         id: data.data.id,

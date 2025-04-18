@@ -2,22 +2,24 @@ type CategortType = {
   id: string;
   name: string;
   slug: string;
-  createdAt: Date;
-  parentCategory?: {
+  subCategoryId: null | string;
+  SubCategoryTo: null | {
     name: string;
   };
-  parentCategoryId: string | null;
 };
+
 type UserArrayType = {
   count: number;
   data: UserType[];
   pagination: PaginationType;
 };
+
 type PaginationType = {
   allPage: number;
   nextPage?: number;
   prevPage?: number;
 };
+
 type UserType = {
   id: string;
   name?: string;
@@ -26,6 +28,7 @@ type UserType = {
   role?: string;
   createdAt: Date;
 };
+
 type FormPostType = {
   title: string;
   description: string;
@@ -33,17 +36,20 @@ type FormPostType = {
   categoryId: string;
   titleDetail: string;
 };
+
 type FormDetailType = {
   text: string;
   title: string;
   keyward: string[];
   id: string;
 };
+
 type AllPostType = {
   count: number;
   rows: PostType[];
   paginate: PaginationType;
 };
+
 type PostType = {
   id: number;
   title: string;
@@ -61,6 +67,7 @@ type PostType = {
     name: string;
   };
 };
+
 type SinglePostType = {
   id: string;
   title: string;
@@ -88,11 +95,13 @@ type SinglePostType = {
     name: string;
   }[];
 };
+
 type AllReviewType = {
   count: number;
   rows: ReviewType[];
   paginate: PaginationType;
 };
+
 type ReviewType = {
   id: number;
   position: "USER" | "AUTHOR" | "ADMIN";
@@ -108,16 +117,19 @@ type ReviewType = {
     title?: string;
   };
 };
+
 type LinkSidebarType = {
   icon: React.ReactNode;
   url: string;
   name: string;
 };
+
 type AllonlinePriceType = {
   count: number;
   rows: OnlinePriceType[];
   paginate: PaginationType;
 };
+
 type OnlinePriceType = {
   id: number;
   name: string;
@@ -131,11 +143,13 @@ type OnlinePriceType = {
   createdAt: Date;
   updatedAt: Date;
 };
+
 type AllMessageType = {
   count: number;
   rows: MessageType[];
   paginate: PaginationType;
 };
+
 type MessageType = {
   id: number;
   name: string;
@@ -146,20 +160,24 @@ type MessageType = {
   createdAt: Date;
   updatedAt: Date;
 };
+
 type MediaType = {
   url: string;
   id: number;
   status: boolean;
   type: "video" | "image";
 };
+
 type DataMediaType = {
   url: string;
   alt: string;
 };
+
 type TagType = {
   id: number;
   name: string;
 };
+
 type WorkerType = {
   id: number;
   name: string;
@@ -181,10 +199,10 @@ type WorkerType = {
   }[];
   Projects: ProjectType[];
 };
-type AllWorkerType = {
-  count: number;
-  rows: WorkerType[];
-  paginate: PaginationType;
+
+type AllContractorType = {
+  data: WorkerType[];
+  pagination: PaginationType;
 };
 
 type ProjectType = {
@@ -211,11 +229,13 @@ type ProjectType = {
   };
   Tags: { name: string; id: number }[];
 };
+
 type AllProjectType = {
   count: number;
   rows: ProjectType[];
   paginate: PaginationType;
 };
+
 type BackUpAllType = {
   success: boolean;
   backups: {
@@ -224,6 +244,18 @@ type BackUpAllType = {
     lastModified: Date;
   }[];
 };
+
+type FieldsType = {
+  required?: boolean
+  label: string
+  name: string
+  type: 'input' | 'select'
+  dataOptions?: {
+      name: string
+      value: string
+  }[]
+}
+
 export type {
   ReviewType,
   CategortType,
@@ -245,8 +277,9 @@ export type {
   DataMediaType,
   TagType,
   WorkerType,
-  AllWorkerType,
+  AllContractorType,
   AllProjectType,
   ProjectType,
   BackUpAllType,
+  FieldsType
 };

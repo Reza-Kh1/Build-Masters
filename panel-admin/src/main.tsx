@@ -13,7 +13,17 @@ import rtlPlugin from "stylis-plugin-rtl";
 import React from "react";
 import App from "./App.tsx";
 import { toast } from "react-toastify";
+import { themeQuartz } from "ag-grid-community";
 const cookieKey = import.meta.env.VITE_PUBLIC_COOKIE_KEY
+
+export const myThemeTable = themeQuartz.withParams({
+  backgroundColor: "#F7F9FC",
+  foregroundColor: "#1F2937",
+  headerTextColor: "#FFFFFF",
+  headerBackgroundColor: "#334155",
+  oddRowBackgroundColor: "#F1F5F9",
+  headerColumnResizeHandleColor: "#CBD5E1",
+});
 
 const theme = createTheme({
   typography: {

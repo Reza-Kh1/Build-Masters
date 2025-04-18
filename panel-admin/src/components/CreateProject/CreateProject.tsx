@@ -26,7 +26,7 @@ import { fetchSingleProject } from "../../services/project";
 import queryString from "query-string";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BiMessageSquareEdit } from "react-icons/bi";
-import DeleteButton from "../DeleteButton/DeleteButton";
+import DeleteButton from "../DeleteButtonEx/DeleteButton";
 import { GiPencilRuler } from "react-icons/gi";
 import { IoLocation } from "react-icons/io5";
 import deleteCache from "../../services/revalidate";

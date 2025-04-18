@@ -8,7 +8,7 @@ import {
   TextField,
 } from "@mui/material";
 import { SiReaddotcv } from "react-icons/si";
-import { LuFileEdit } from "react-icons/lu";
+import { RiFileEditLine } from "react-icons/ri";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { CategortType, DataMediaType, FormPostType, SinglePostType } from "../../type";
@@ -23,7 +23,7 @@ import JoditForm from "../JoditEditor/JoditEditor";
 import TagAutocomplete from "../TagAutocomplete/TagAutocomplete";
 import SelectMedia from "../SelectMedia/SelectMedia";
 import ImageComponent from "../ImageComponent/ImageComponent";
-import DeleteButton from "../DeleteButton/DeleteButton";
+import DeleteButton from "../DeleteButtonEx/DeleteButton";
 import PendingApi from "../PendingApi/PendingApi";
 import deleteCache from "../../services/revalidate";
 export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {  
@@ -329,7 +329,7 @@ export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
                 disabled={isPendingDetail2}
                 onClick={() => updateDetailPost()}
                 color="primary"
-                endIcon={<LuFileEdit />}
+                endIcon={<RiFileEditLine />}
                 variant="contained"
               >
                 ویرایش اطلاعات پست

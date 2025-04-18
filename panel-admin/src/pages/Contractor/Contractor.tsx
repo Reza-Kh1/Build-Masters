@@ -3,31 +3,36 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { MdOutlinePersonAdd } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
-import { fetchWorker } from "../../services/worker";
+import { fetchContractor } from "../../services/contractor";
 import queryString from "query-string";
-import { AllWorkerType } from "../../type";
+import { AllContractorType } from "../../type";
 import Pagination from "../../components/Pagination/Pagination";
 import { FaShare } from "react-icons/fa6";
 import SearchBox from "../../components/SearchBox/SearchBox";
 import DontData from "../../components/DontData/DontData";
+import Create from "./Create";
 
-export default function Worker() {
+export default function Contractor() {
   const [searchQuery, setSearchQuery] = useState<any>();
   const { search } = useLocation();
-  const { data } = useInfiniteQuery<AllWorkerType>({
-    queryKey: ["AllWorker", searchQuery],
-    queryFn: () => fetchWorker(searchQuery),
+
+  const { data } = useInfiniteQuery<AllContractorType>({
+    queryKey: ["AllContractor"],
+    queryFn: () => fetchContractor(searchQuery),
     staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24,
-    getNextPageParam: (lastPage) => lastPage.paginate.nextPage || undefined,
+    getNextPageParam: (lastPage) => lastPage?.pagination?.nextPage || undefined,
     initialPageParam: "",
   });
+
   useEffect(() => {
     const query = queryString.parse(search);
     setSearchQuery(query);
   }, [search]);
+
   return (
     <div className="w-full">
+      <Create />
       <Link to={"create-worker"}>
         <Button
           endIcon={<MdOutlinePersonAdd />}
@@ -42,17 +47,10 @@ export default function Worker() {
       <div>
         <SearchBox />
       </div>
-      <DontData
-        text={
-          data?.pages[0].count
-            ? data?.pages[0].count + " مجری"
-            : "مجری ای یافت نشد!"
-        }
-      />
-      {data?.pages[0].rows.length ?
+      {data?.pages[0].data.length ?
         <>
           <div className="grid grid-cols-4 gap-3 my-5 items-center justify-between">
-            {data?.pages[0].rows.map((i, index) => (
+            {data?.pages[0].data.map((i, index) => (
               <div key={index} className="group shadow-md relative gap-3 p-3 border rounded-md bg-slate-200 hover:bg-gray-200 flex">
                 <figure>
                   <img src={i.image || "/notfound.webp"} onError={({ currentTarget }) => {
@@ -72,8 +70,10 @@ export default function Worker() {
             ))}
           </div>
         </>
-        : null}
-      <Pagination pager={data?.pages[0].paginate} />
+        :
+        <DontData text="هیچ مجری ثبت نشده است" />
+      }
+      <Pagination pager={data?.pages[0].pagination} />
     </div>
   );
 }

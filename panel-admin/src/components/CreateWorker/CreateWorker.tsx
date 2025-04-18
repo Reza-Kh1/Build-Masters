@@ -43,9 +43,9 @@ import {
 import axios from "axios";
 import { toast } from "react-toastify";
 import PendingApi from "../PendingApi/PendingApi";
-import { fetchSingleWorker } from "../../services/worker";
+import { fetchSingleContractor } from "../../services/contractor";
 import queryString from "query-string";
-import DeleteButton from "../DeleteButton/DeleteButton";
+import DeleteButton from "../DeleteButtonEx/DeleteButton";
 import { FaCalendarAlt } from "react-icons/fa";
 import { fetchProjectWorker } from "../../services/project";
 import deleteCache from "../../services/revalidate";
@@ -136,7 +136,7 @@ export default function CreateWorker() {
     queryKey: ["workerSingle", test.worker],
     staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24,
-    queryFn: () => fetchSingleWorker(test?.worker),
+    queryFn: () => fetchSingleContractor(test?.worker),
     enabled: test?.worker ? true : false,
   });
   const { isPending: pendingCreate, mutate: submitAction } = useMutation({
@@ -155,7 +155,7 @@ export default function CreateWorker() {
     },
     onSuccess: () => {
       navigate("/home/worker?order=createdAt-DESC&search=&tags=");
-      queryClient.invalidateQueries({ queryKey: ["AllWorker"] });
+      queryClient.invalidateQueries({ queryKey: ["AllContractor"] });
       queryClient.invalidateQueries({ queryKey: ["workerName"] });
       toast.success("مجری با موفقیت ایجاد شد");
     },
@@ -199,7 +199,7 @@ export default function CreateWorker() {
       queryClient.invalidateQueries({
         queryKey: ["workerSingle", test.worker],
       });
-      queryClient.invalidateQueries({ queryKey: ["AllWorker"] });
+      queryClient.invalidateQueries({ queryKey: ["AllContractor"] });
       queryClient.invalidateQueries({ queryKey: ["workerName"] });
       toast.info("با موفقیت حذف شد");
     },

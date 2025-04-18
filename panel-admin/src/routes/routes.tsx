@@ -12,7 +12,7 @@ import SinglePost from "../pages/SinglePost/SinglePost";
 import Users from "../pages/Users/Users";
 import ForgetPassword from "../pages/ForgetPassword/ForgetPassword";
 import OnlinePrice from "../pages/OnlinePrice/OnlinePrice";
-import Worker from "../pages/Worker/Worker";
+import Contractor from "../pages/Contractor/Contractor";
 import Projects from "../pages/Projects/Projects";
 import PageInfo from "../pages/PageInfo/PageInfo";
 import Message from "../pages/Message/Message";
@@ -30,7 +30,7 @@ export default [
     children: [
       { path: "users", element: <Users /> },
       { path: "online-price", element: <OnlinePrice /> },
-      { path: "worker", element: <Worker /> },
+      { path: "contractor", element: <Contractor /> },
       { path: "worker/create-worker", element: <CreateWorker /> },
       { path: "projects", element: <Projects /> },
       { path: "projects/create-project", element: <CreateProject /> },
