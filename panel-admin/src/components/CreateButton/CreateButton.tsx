@@ -73,7 +73,7 @@ export default function CreateButton(formData: CreateButtonType) {
                 <DialogContent>
                     {loadingBtn && <PendingApi />}
                     <form className="w-full grid grid-cols-4 gap-4 mt-5">
-                        {fields.map((row, index) => <FieldsInputs data={row} register={register} setValue={setValue} key={index} />)}
+                        {fields.map((row, index) => <FieldsInputs data={row} register={register} key={index} />)}
                     </form>
                 </DialogContent>
                 <DialogActions className='!justify-between'>

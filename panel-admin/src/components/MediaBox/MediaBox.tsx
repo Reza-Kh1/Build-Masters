@@ -5,17 +5,16 @@ import { FaSearchengin, FaTrash } from 'react-icons/fa6';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Button, ButtonGroup, IconButton } from '@mui/material';
-import { MediaType } from '../../type';
+import { MediaType, PaginationType } from '../../type';
 import { TbPhotoCirclePlus } from "react-icons/tb";
 import { IoIosImages } from 'react-icons/io';
 import DontData from '../DontData/DontData';
 type AllMediaType = {
-    count: number
-    rows: MediaType[]
-    next: string | null;
+    data: MediaType[]
+    pagination: PaginationType;
 };
 type SearchFilterType = {
-    order: "createdAt-DESC" | "createdAt-ASC";
+    order: "desc" | "asc";
     status: string;
     type: "image" | "video" | "";
 }
@@ -23,21 +22,21 @@ type MediaBoxType = {
     setUrlImg?: (value: MediaType) => void
 }
 export default function MediaBox({ setUrlImg }: MediaBoxType) {
-    const [searchQuery, setSearchQuery] = useState<SearchFilterType>({ order: "createdAt-DESC", type: "", status: "true" })
-    const [search, setSearch] = useState<SearchFilterType>({ order: "createdAt-DESC", type: "", status: "true" })
+    const [searchQuery, setSearchQuery] = useState<SearchFilterType>({ order: "desc", type: "", status: "true" })
+    const [search, setSearch] = useState<SearchFilterType>({ order: "desc", type: "", status: "true" })
     const query = useQueryClient();
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } =
         useInfiniteQuery<AllMediaType>({
             queryKey: ["mediaDB", searchQuery],
             queryFn: ({ pageParam = 1 }) => fetchImage({ pageParam, searchQuery }),
-            getNextPageParam: (lastPage) => lastPage.next || undefined,
+            getNextPageParam: (lastPage) => lastPage.pagination.nextPage || undefined,
             staleTime: 1000 * 60 * 60 * 24,
             gcTime: 1000 * 60 * 60 * 24,
             initialPageParam: "",
         });
     const { mutate } = useMutation({
-        mutationFn: (i: number) => {
-            return axios.delete(`media/${i}`);
+        mutationFn: (i: string) => {
+            return axios.delete(`media?url=${i}`);
         },
         onSuccess: () => {
             toast.success("عکس با موفقیت حذف شد");
@@ -85,8 +84,8 @@ export default function MediaBox({ setUrlImg }: MediaBoxType) {
                         variant="contained"
                         aria-label="Disabled button group"
                     >
-                        <Button color={search.order === "createdAt-DESC" ? "primary" : "inherit"} onClick={() => setSearch({ ...search, order: "createdAt-DESC" })}>جدید ترین</Button>
-                        <Button color={search.order === "createdAt-ASC" ? "primary" : "inherit"} onClick={() => setSearch({ ...search, order: "createdAt-ASC" })}>قدیمی ترین</Button>
+                        <Button color={search.order === "desc" ? "primary" : "inherit"} onClick={() => setSearch({ ...search, order: "desc" })}>جدید ترین</Button>
+                        <Button color={search.order === "asc" ? "primary" : "inherit"} onClick={() => setSearch({ ...search, order: "asc" })}>قدیمی ترین</Button>
                     </ButtonGroup>
                 </div>
                 <div className='w-1/6'>
@@ -95,12 +94,12 @@ export default function MediaBox({ setUrlImg }: MediaBoxType) {
             </div>
             <div className="grid grid-cols-5 gap-5">
                 {data?.pages?.map((item, index) => {
-                    if (!item.count) {
-                        return <DontData key={index} text='اطلاعاتی یافت نشد!'/>
+                    if (!item.data.length) {
+                        return <DontData key={index} text='اطلاعاتی یافت نشد!' />
                     }
-                    return item?.rows?.map((i, index) => (
+                    return item?.data?.map((i, index) => (
                         <figure key={index} className="relative h-52 group">
-                            {i.type === "image" ?
+                            {i.type === "IMAGE" ?
                                 <img
                                     alt=""
                                     src={i.url}
@@ -116,7 +115,7 @@ export default function MediaBox({ setUrlImg }: MediaBoxType) {
                                 </video>}
                             <span
                                 className="absolute bottom-2 cursor-pointer left-2"
-                                onClick={() => mutate(i.id)}
+                                onClick={() => mutate(i.url)}
                             >
                                 <IconButton>
                                     <FaTrash size={20} color="red" />

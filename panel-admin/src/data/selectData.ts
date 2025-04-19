@@ -4,8 +4,8 @@ export const dataRole = [
   { value: "ADMIN", name: "ادمین" },
 ];
 export const dataOrder = [
-  { value: "createdAt-DESC", name: "جدید ترین" },
-  { value: "createdAt-ASC", name: "قدیمی ترین" },
+  { value: "desc", name: "جدید ترین" },
+  { value: "asc", name: "قدیمی ترین" },
 ];
 export const dataStatus = [
   { value: "all", name: "همه" },

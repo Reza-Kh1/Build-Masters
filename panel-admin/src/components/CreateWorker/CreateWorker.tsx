@@ -154,7 +154,7 @@ export default function CreateWorker() {
       return axios.post("worker", body);
     },
     onSuccess: () => {
-      navigate("/home/worker?order=createdAt-DESC&search=&tags=");
+      navigate("/home/worker?order=descC&search=&tags=");
       queryClient.invalidateQueries({ queryKey: ["AllContractor"] });
       queryClient.invalidateQueries({ queryKey: ["workerName"] });
       toast.success("مجری با موفقیت ایجاد شد");

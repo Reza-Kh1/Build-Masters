@@ -38,7 +38,7 @@ export default function SearchBox({
   const { register, setValue, handleSubmit, watch } = useForm<SearchFormType>({
     defaultValues: {
       status: "all",
-      order: "createdAt-DESC",
+      order: "desc",
       role: "all",
     },
   });

@@ -9,14 +9,19 @@ const prisma = new PrismaClient();
 const pageLimit = Number(process.env.PAGE_LIMITE);
 
 const getUsers = expressAsyncHandler(async (req, res) => {
-  const { email, phone, role, page = 1 } = req.query;
+  const { email, phone, role, page = 1, contractor } = req.query;
   const cacheKey = `Users:${email}:${phone}:${role}:${page}`;
   const cache = await getCache(cacheKey);
-  if (cache) {
-    res.send(cache);
-    return;
-  }
+  // if (cache) {
+  //   res.send(cache);
+  //   return;
+  // }
   try {
+    if (contractor === 'true') {
+      const data = await prisma.user.findMany({ where: { role: 'CONTRACTOR', Contractor: null }, select: { id: true, name: true } })
+      res.send(data)
+      return
+    }
     const search = {} as any;
     if (email || phone) {
       search.OR = [
@@ -90,6 +95,8 @@ const signUpUser = expressAsyncHandler(async (req, res) => {
     delete data.password;
     res.send({ token, data });
   } catch (err) {
+    console.log(err);
+
     throw customError('خطا در دیتابیس', 500, err);
   }
 });

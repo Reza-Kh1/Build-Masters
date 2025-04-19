@@ -165,7 +165,8 @@ type MediaType = {
   url: string;
   id: number;
   status: boolean;
-  type: "video" | "image";
+  uploader: 'ADMIN' | 'USER'
+  type: "VIDEO" | "IMAGE";
 };
 
 type DataMediaType = {
@@ -178,30 +179,25 @@ type TagType = {
   name: string;
 };
 
-type WorkerType = {
-  id: number;
-  name: string;
-  phone: string;
-  socialMedia: {
-    link: string;
-    type: string;
-    id: number;
-    text: string;
-  }[];
-  address: string;
-  description: string;
-  image: string;
-  alt: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  Tags: {
-    name: string;
-  }[];
-  Projects: ProjectType[];
+type ContractorType = {
+  id: number,
+  name: string
+  phone: string
+  email: string
+  socialMedia: string|null
+  bio: string
+  avatar: string
+  totalComment: number,
+  rating: number,
+  createdAt: Date,
+  updatedAt: Date,
+  categoryId: number,
+  userId: string | null
+  Tags: TagType[]|[],
 };
 
 type AllContractorType = {
-  data: WorkerType[];
+  data: ContractorType[];
   pagination: PaginationType;
 };
 
@@ -246,13 +242,16 @@ type BackUpAllType = {
 };
 
 type FieldsType = {
+  className?: string
   required?: boolean
   label: string
   name: string
-  type: 'input' | 'select'
+  type: 'input' | 'select' | 'autoComplate'
+  nameGetValue?: string
   dataOptions?: {
-      name: string
-      value: string
+    name?: string | React.ReactNode
+    value?: string
+    id?: number | string
   }[]
 }
 
@@ -276,7 +275,7 @@ export type {
   MediaType,
   DataMediaType,
   TagType,
-  WorkerType,
+  ContractorType,
   AllContractorType,
   AllProjectType,
   ProjectType,

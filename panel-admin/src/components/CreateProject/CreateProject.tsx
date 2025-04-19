@@ -83,7 +83,7 @@ export default function CreateProject() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["AllProject"] });
-      navigate("/home/projects?page=1&order=createdAt-DESC&search=&tags=");
+      navigate("/home/projects?page=1&order=desc&search=&tags=");
       toast.success("پروژه با موفقیت ایجاد شد");
     },
     onError: (err: any) => {
@@ -128,7 +128,7 @@ export default function CreateProject() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["AllProject"] });
       queryClient.invalidateQueries({ queryKey: ["projectSingle", test.name] });
-      navigate("/home/projects?page=1&order=createdAt-DESC&search=&tags=");
+      navigate("/home/projects?page=1&order=desc&search=&tags=");
       toast.success("پروژه با موفقیت ویرایش شد");
     },
     onError: (err: any) => {

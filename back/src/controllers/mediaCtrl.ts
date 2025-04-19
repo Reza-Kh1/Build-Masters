@@ -23,7 +23,7 @@ const uploadMedia = expressAsyncHandler(async (req, res) => {
     return;
   }
   const remoteFilePath = `/public_html/uploads/${req.file.filename}`;
-  const url = `${process.env.URL_IAMGE}/${req.file.filename}`;
+  const url = `http://${process.env.URL_IAMGE}/${req.file.filename}`;
   const mimeType = req.file.mimetype;
   let typeMedia: 'IMAGE' | 'VIDEO';
   let typeUploader: 'ADMIN' | 'USER';

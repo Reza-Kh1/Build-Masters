@@ -12,7 +12,7 @@ const fetchContractorName = async () => {
 
 const fetchSingleContractor = async (name?: string) => {
   // const url = name?.replace(/-/g, " ")
-  const { data } = await axios.get(`Contractor/${name}`);
-  return data?.data;
+  const { data } = await axios.get(`contractor/${name}`);  
+  return data;
 };
 export { fetchContractorName, fetchContractor, fetchSingleContractor };

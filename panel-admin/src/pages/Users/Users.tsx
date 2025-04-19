@@ -145,6 +145,7 @@ export default function Users() {
           <>
             <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
               <AgGridReact
+                enableRtl
                 rowData={data?.pages[0]?.data}
                 columnDefs={columnDefs}
                 rowHeight={55}

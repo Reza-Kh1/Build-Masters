@@ -7,8 +7,12 @@ const fetchUser = async (search: any) => {
   return data;
 };
 const fetchGteProfile = async () => {
-  const { id } = JSON.parse(localStorage.getItem(cookieKey) as any);  
+  const { id } = JSON.parse(localStorage.getItem(cookieKey) as any);
   const { data } = await axios.get(`user/${id}`);
   return data.data;
 };
-export { fetchUser, fetchGteProfile };
+const fetchGetUserContractor = async () => {
+  const { data } = await axios.get('user?contractor=true');
+  return data;
+};
+export { fetchUser, fetchGteProfile, fetchGetUserContractor };

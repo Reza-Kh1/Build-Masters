@@ -1,5 +1,4 @@
 import MediaBox from "../../components/MediaBox/MediaBox";
-import ShowDBaaS from "../../components/ShowDBaaS/ShowDBaaS";
 import UploadMedia from "../../components/UploadMedia/UploadMedia";
 export default function Images() {
   return (
@@ -10,7 +9,6 @@ export default function Images() {
       </div>
       <div className="mt-8">
         <MediaBox />
-        <ShowDBaaS />
       </div>
     </div>
   );

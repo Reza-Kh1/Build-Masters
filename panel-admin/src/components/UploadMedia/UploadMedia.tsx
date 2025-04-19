@@ -47,7 +47,7 @@ export default function UploadMedia() {
             if (!newFile?.length) return Promise.reject(new Error("هیچ عکسی انتخاب نشده"));
             const formData = new FormData();
             for (let file of newFile) {
-                formData.append("media", file);
+                formData.append("file", file);
             }
             const { data } = await axios.post("media", formData, {
                 onUploadProgress: (event) => {
