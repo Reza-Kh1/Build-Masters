@@ -1,354 +1,147 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  MenuItem,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  styled,
-  tableCellClasses,
-} from "@mui/material";
 import axios from "axios";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { CategortType } from "../../type";
-import { FaMinus, FaPen, FaPlus, FaTrash } from "react-icons/fa6";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchCategory } from "../../services/category";
 import { toast } from "react-toastify";
 import PendingApi from "../../components/PendingApi/PendingApi";
 import DontData from "../../components/DontData/DontData";
 import deleteCache from "../../services/revalidate";
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-}));
-type FormCategoryType = {
-  name: string;
-  slug: string;
-  categoryId?: string;
-};
+import { AgGridReact } from "ag-grid-react";
+import { myThemeTable } from "../../main";
+import EditButton from "../../components/EditButton/EditButton";
+import { ColDef, ICellRendererParams } from "ag-grid-community";
+import DeleteButton from "../../components/DeleteButton/DeleteButton";
+import { MdOutlineCategory } from "react-icons/md";
+import CreateButton from "../../components/CreateButton/CreateButton";
+
 export default function Categorys() {
-  const { register, handleSubmit, getValues, setValue, reset } =
-    useForm<FormCategoryType>();
-  const [openAddCategory, setOpenAddCategory] = useState<boolean>(false);
-  const [singleCategory, setSingleCategory] = useState<{
-    position: boolean;
-    category: CategortType;
-  } | null>(null);
-  const [open, setOpen] = useState<boolean>(false);
   const query = useQueryClient();
   const { data } = useQuery<CategortType[]>({
-    queryKey: ["getCategory"],
+    queryKey: ["GetCategory"],
     queryFn: fetchCategory,
     staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24,
   });
-  const { isPending: createPending, mutate: createCategory } = useMutation({
-    mutationFn: async (form: FormCategoryType) => {
-      const body = {
-        ...form,
-      };
-      if (form.categoryId === "s") {
-        delete body.categoryId;
-      }
-      await deleteCache({ tag:"category"});
-      return axios.post("category", body);
+  const { isPending: createPending, mutate: createCategory, isSuccess: successCreate } = useMutation({
+    mutationFn: async (form) => {
+      await deleteCache({ tag: "category" });
+      return axios.post("category", form);
     },
     onSuccess: () => {
-      query.invalidateQueries({ queryKey: ["getCategory"] });
-      setOpenAddCategory(false);
+      query.invalidateQueries({ queryKey: ["GetCategory"] });
       toast.success("دسته با موفقیت اضافه شد");
-      reset();
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message || "خطا در اضافه کردن دسته");
     },
   });
   const { isPending: updatePending, mutate: updateCategory } = useMutation({
-    mutationFn: async (form: FormCategoryType) => {
-      const body = {
-        ...form,
-      };
-      if (form.categoryId === "s") {
-        delete body.categoryId;
+    mutationFn: async ({ data, values }: any) => {
+      if (data.subCategoryId === 's') {
+        data.subCategoryId = null
       }
-      await deleteCache({ tag:"category"});
-      return axios
-        .put(`category/${singleCategory?.category.id}`, body)
-        .then(() => {});
+      await deleteCache({ tag: "category" });
+      return axios.put(`category/${values?.id}`, data)
     },
     onSuccess: () => {
-      closeHandler();
-      query.invalidateQueries({ queryKey: ["getCategory"] });
+      query.invalidateQueries({ queryKey: ["GetCategory"] });
     },
     onError: (err) => {
       console.log(err);
-      closeHandler();
     },
   });
-  const { isPending: deletePending, mutate: deleteCategory } = useMutation({
-    mutationFn: async (id?: string) => {
-      await deleteCache({ tag:"category"});
-      return axios.delete(`category/${id}`);
-    },
-    onSuccess: () => {
-      query.invalidateQueries({ queryKey: ["getCategory"] });
-      toast.success("دسته با موفقیت حذف شد");
-      closeHandler();
-    },
-    onError: (err) => {
-      toast.warning("چک کنید دسته محصولاتی نداشته باشد");
-      console.log(err);
-    },
-  });
-  const openUpdate = (items: CategortType) => {
-    setValue("name", items.name);
-    setValue("slug", items.slug);
-    setValue("categoryId", items?.parentCategoryId || "s");
-    setSingleCategory({
-      category: items,
-      position: true,
-    });
-    setOpen(true);
-  };
-  const FormCategory = () => {
-    return (
-      <form className="flex gap-3 mb-3 mt-5">
-        <TextField
-          autoComplete="off"
-          fullWidth
-          className="shadow-md"
-          {...register("name", { required: true })}
-          label={"نام دسته را وارد کنید"}
-        />
-        <TextField
-          autoComplete="off"
-          fullWidth
-          className="shadow-md"
-          {...register("slug", { required: true })}
-          label={"اسلاگ دسته را اضافه کنید"}
-        />
-        {data?.length ? (
-          <TextField
-            fullWidth
-            autoComplete="off"
-            select
-            className="shadow-md"
-            label="تمام دسته ها"
-            id="evaluationField"
-            defaultValue={getValues("categoryId") || "s"}
-            inputProps={{
-              inputRef: (ref: HTMLInputElement | null) => {
-                if (!ref) return;
+  const dataOptions = () => {
+    if (!data || !data?.length) return []
+    return data.map((row) => {
+      return {
+        value: row.id,
+        name: row.name
+      }
+    })
+  }
 
-                setValue("categoryId", ref.value);
+  const columnDefs: ColDef[] = [
+    {
+      headerName: "عملیات",
+      cellRenderer: (params: ICellRendererParams) => (
+        <div className="flex gap-2 h-full items-center justify-center">
+          <EditButton
+            loadingBtn={updatePending}
+            actionForm={updateCategory}
+            values={params.data}
+            fields={[
+              { label: "نام دسته", name: "name", type: "input", required: true },
+              { label: "اسلاگ", name: "slug", type: "input" },
+              {
+                label: "زیر مجموعه", name: "subCategoryId", type: "select", required: true,
+                dataOptions: dataOptions()
               },
-            }}
-          >
-            <MenuItem value={"s"}>انتخاب کنید</MenuItem>
-            {data?.map((i, index) => (
-              <MenuItem key={index} value={i.id}>
-                {i.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        ) : null}
-      </form>
-    );
-  };
-  const closeHandler = () => {
-    setOpen(false);
-    setSingleCategory(null);
-    reset();
-  };
+            ]}
+            title="ویرایش اطلاعات کاربران"
+          />
+          <DeleteButton id={params.value} keyQuery="GetCategory" keyCacheNext={{ tag: 'category' }} urlAction="category" headerText="حذف دسته" />
+        </div>
+      ),
+      field: "id",
+      pinned: 'left',
+      width: 200,
+      filter: false,
+      sortable: false,
+    },
+    {
+      field: "SubCategoryTo", headerName: "زیر مجموعه", valueFormatter: (params) => {
+        if (params?.value === null) {
+          return "دسته اصلی"
+        } else {
+          return params?.value?.name
+        }
+      }
+    },
+    { field: "slug", headerName: "اسلاگ" },
+    { field: "name", headerName: "نام", flex: 2 },
+  ]
+
   return (
     <>
-      {(createPending || updatePending || deletePending) && <PendingApi />}
+      {(createPending || updatePending) && <PendingApi />}
       <div>
-        <div>
-          {openAddCategory && <FormCategory />}
-          <div className="flex justify-between">
-            {openAddCategory && (
-              <Button
-                onClick={handleSubmit((data) => createCategory(data))}
-                variant="contained"
-                className="!w-1/6"
-                color="warning"
-                disabled={createPending}
-                endIcon={<FaPlus />}
-              >
-                افزودن
-              </Button>
-            )}
-            <Button
-              onClick={() => setOpenAddCategory((prev) => !prev)}
-              variant="outlined"
-              className={openAddCategory ? "!w-1/6" : "w-full"}
-              color="primary"
-              endIcon={openAddCategory ? <FaMinus /> : <FaPlus />}
-            >
-              {openAddCategory ? "بستن باکس" : "افزودن دسته"}
-            </Button>
-          </div>
-        </div>
+        <CreateButton
+          actionForm={createCategory}
+          btnCreate={{
+            icon: <MdOutlineCategory />,
+            name: "افزودن دسته"
+          }}
+          fields={[
+            { label: 'نام دسته', name: 'name', type: 'input', required: true },
+            { label: 'اسلاگ', name: 'slug', type: 'input', required: true },
+            { label: "زیر مجموعه", name: "subCategoryId", type: "select", required: true, dataOptions: dataOptions() },
+          ]}
+          isSuccess={successCreate}
+          loadingBtn={createPending}
+          title="ایجاد دسته"
+        />
         <div className="mt-5">
           {data?.length ? (
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 700 }} aria-label="customized table">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell align="center">#</StyledTableCell>
-                    <StyledTableCell align="center">نام دسته</StyledTableCell>
-                    <StyledTableCell align="center">اسلاگ</StyledTableCell>
-                    <StyledTableCell align="center">دسته مادر</StyledTableCell>
-                    <StyledTableCell align="center">تاریخ</StyledTableCell>
-                    <StyledTableCell align="center">عملیات</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data?.map((items, index) => (
-                    <StyledTableRow key={index}>
-                      <StyledTableCell align="center">
-                        {index + 1}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {items.name}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {items.slug}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {items.parentCategory?.name || "---"}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {new Date(items.createdAt).toLocaleDateString("fa")}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <div className="flex justify-evenly">
-                          <Button
-                            onClick={() => {
-                              setSingleCategory({
-                                category: items,
-                                position: false,
-                              }),
-                                setOpen(true);
-                            }}
-                            color="error"
-                            variant="outlined"
-                            endIcon={<FaTrash size={15} />}
-                            disabled={deletePending}
-                          >
-                            حذف
-                          </Button>
-                          <Button
-                            onClick={() => openUpdate(items)}
-                            color="success"
-                            variant="outlined"
-                            endIcon={<FaPen size={15} />}
-                            disabled={updatePending}
-                          >
-                            ویرایش
-                          </Button>
-                        </div>
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
+              <AgGridReact
+                rowData={data}
+                columnDefs={columnDefs}
+                rowHeight={55}
+                theme={myThemeTable}
+                defaultColDef={{
+                  cellStyle: { direction: 'rtl' },
+                  headerStyle: { direction: 'rtl' },
+                  filter: true,
+                  sortable: true,
+                  resizable: true,
+                }}
+              />
+            </div>
           ) : (
             <DontData text="دسته ای یافت نشد!" />
           )}
         </div>
       </div>
-      <Dialog
-        fullWidth={true}
-        maxWidth={"md"}
-        open={open}
-        onClose={closeHandler}
-      >
-        <DialogTitle>حذف دسته</DialogTitle>
-        <DialogContent>
-          {singleCategory?.position ? (
-            <FormCategory />
-          ) : (
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 700 }} aria-label="customized table">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell align="center">نام دسته</StyledTableCell>
-                    <StyledTableCell align="center">اسلاگ</StyledTableCell>
-                    <StyledTableCell align="center">دسته مادر</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <StyledTableRow>
-                    <StyledTableCell align="center">
-                      {singleCategory?.category.name}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {singleCategory?.category.slug}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {singleCategory?.category.parentCategory?.name || "---"}
-                    </StyledTableCell>
-                  </StyledTableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <div className="w-full flex justify-between">
-            {singleCategory?.position ? (
-              <Button
-                variant="text"
-                color="success"
-                onClick={handleSubmit((data) => updateCategory(data))}
-                disabled={updatePending}
-              >
-                ذخیره
-              </Button>
-            ) : (
-              <Button
-                variant="text"
-                color="error"
-                onClick={() => {
-                  deleteCategory(singleCategory?.category?.id);
-                }}
-                disabled={deletePending}
-              >
-                حذف
-              </Button>
-            )}
-            <Button variant="text" color="primary" onClick={closeHandler}>
-              بستن
-            </Button>
-          </div>
-        </DialogActions>
-      </Dialog>
     </>
   );
 }

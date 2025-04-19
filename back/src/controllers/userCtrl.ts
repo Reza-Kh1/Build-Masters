@@ -51,6 +51,8 @@ const getUsers = expressAsyncHandler(async (req, res) => {
     setCache(cacheKey, { data: data, pagination: pages });
     res.send({ data: data, pagination: pages });
   } catch (err) {
+    console.log(err);
+
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
@@ -88,8 +90,6 @@ const signUpUser = expressAsyncHandler(async (req, res) => {
     delete data.password;
     res.send({ token, data });
   } catch (err) {
-    console.log(err);
-    
     throw customError('خطا در دیتابیس', 500, err);
   }
 });

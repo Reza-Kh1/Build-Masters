@@ -6,7 +6,7 @@ import { fetchBackUp } from "../../services/backUp";
 import { BackUpAllType } from "../../type";
 import { BsDatabaseSlash } from "react-icons/bs";
 import { LuDatabaseBackup } from "react-icons/lu";
-import DeleteButton from "../../components/DeleteButton/DeleteButton";
+import DeleteButton from "../../components/DeleteButtonEx/DeleteButton";
 import { IoMdDownload } from "react-icons/io";
 import PendingApi from "../../components/PendingApi/PendingApi";
 import DontData from "../../components/DontData/DontData";

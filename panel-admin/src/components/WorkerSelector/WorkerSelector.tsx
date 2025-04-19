@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchWorkerName } from "../../services/worker";
+import { fetchContractor } from "../../services/contractor";
 import { Button, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { Link } from "react-router-dom";
 import { FaShare } from "react-icons/fa6";
@@ -12,7 +12,7 @@ export default function WorkerSelector({ worker, setWorker }: WorkerType) {
     queryKey: ["workerName"],
     staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24,
-    queryFn: fetchWorkerName,
+    queryFn: fetchContractor,
   });
   if (!data) return
   return (
