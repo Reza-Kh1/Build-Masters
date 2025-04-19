@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 const getAllTag = expressAsyncHandler(async (req, res) => {
   try {
-    const keyCache = 'tag:all';
+    const keyCache = 'Tag:all';
     const cache = await getCache(keyCache);
     if (cache) {
       res.send(cache);
@@ -28,7 +28,7 @@ const createTag = expressAsyncHandler(async (req, res) => {
         name,
       },
     });
-    deleteCahce('tag:*');
+    deleteCahce('Tag:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
@@ -43,7 +43,7 @@ const deleteTag = expressAsyncHandler(async (req, res) => {
         id: Number(id),
       },
     });
-    deleteCahce('tag:*');
+    deleteCahce('Tag:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
@@ -62,7 +62,7 @@ const updateTag = expressAsyncHandler(async (req, res) => {
         name,
       },
     });
-    deleteCahce('tag:*');
+    deleteCahce('Tag:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);

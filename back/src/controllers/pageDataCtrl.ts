@@ -4,22 +4,25 @@ import { PageData, PrismaClient } from '@prisma/client';
 import { deleteCahce, getCache, setCache } from '../utils/deleteCache';
 const prisma = new PrismaClient();
 
-const createPageData = expressAsyncHandler(async (req, res) => {
-  const { page, conetent, keyword, description, title, name, canonicalUrl } =
-    req.body;
+type QueryPageData = {
+  conetent: string
+  keyword: string[]
+  description: string
+  title: string
+  name: string
+  canonicalUrl: string
+  page: string
+}
+
+const savePageData = expressAsyncHandler(async (req, res) => {
+  const { conetent, keyword, description, title, name, page, canonicalUrl }: QueryPageData = req.body;
   try {
-    await prisma.pageData.create({
-      data: {
-        page,
-        conetent,
-        keyword,
-        description,
-        title,
-        name,
-        canonicalUrl,
-      },
+    await prisma.pageData.upsert({
+      where: { page },
+      create: { conetent, keyword, description, title, name, page, canonicalUrl },
+      update: { conetent, keyword, description, title, name, canonicalUrl },
     });
-    deleteCahce('pageData:*');
+    deleteCahce('PageData:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
@@ -29,7 +32,7 @@ const createPageData = expressAsyncHandler(async (req, res) => {
 const getPageData = expressAsyncHandler(async (req, res) => {
   const { page } = req.query;
   try {
-    const keyCache = `pageData:${page ? page : 'all'}`;
+    const keyCache = `PageData:${page ? page : 'all'}`;
     const cache = await getCache(keyCache);
     if (cache) {
       res.send(cache);
@@ -55,29 +58,4 @@ const getPageData = expressAsyncHandler(async (req, res) => {
   }
 });
 
-const updatePageData = expressAsyncHandler(async (req, res) => {
-  const { conetent, keyword, description, title, name, canonicalUrl } =
-    req.body;
-  const { id } = req.params;
-  try {
-    await prisma.pageData.update({
-      where: {
-        id: Number(id),
-      },
-      data: {
-        conetent,
-        keyword,
-        description,
-        title,
-        name,
-        canonicalUrl,
-      },
-    });
-    deleteCahce('pageData:*');
-    res.send({ success: true });
-  } catch (err) {
-    throw customError('خطا در دیتابیس', 500, err);
-  }
-});
-
-export { createPageData, getPageData, updatePageData };
+export { savePageData, getPageData };

@@ -22,12 +22,12 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
     category,
   }: QueryContractor = req.query;
   try {
-    // const cacheKey = `Contractors:${page}&${order}&${tags}&${search}&${category}`;
-    // const cache = await getCache(cacheKey);
-    // if (cache) {
-    //   res.send(cache);
-    //   return;
-    // }
+    const cacheKey = `Contractors:${page}&${order}&${tags}&${search}&${category}`;
+    const cache = await getCache(cacheKey);
+    if (cache) {
+      res.send(cache);
+      return;
+    }
     const tagFilter = tags
       ? JSON.parse(tags).map((i: number) => Number(i))
       : [];
@@ -72,7 +72,7 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
     });
     const count = await prisma.contractor.count({ where: searchFilter });
     const pager = pagination(count, Number(page), pageLimit);
-    // setCache(cacheKey, { data, pagination: pager });
+    setCache(cacheKey, { data, pagination: pager });
     res.send({ data, pagination: pager });
   } catch (err) {
     console.log(err);
@@ -115,7 +115,7 @@ const createContractor = expressAsyncHandler(async (req, res) => {
         },
       },
     });
-    deleteCahce('Contractor:*');
+    deleteCahce('Contractors:*');
     res.send({ success: true });
   } catch (err) {
     console.log(err);
@@ -176,11 +176,11 @@ const getSingleContractor = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
     const cacheKey = `Contractors:${id}`;
-    // const cache = await getCache(cacheKey);
-    // if (cache) {
-    //   res.send(cache);
-    //   return;
-    // }
+    const cache = await getCache(cacheKey);
+    if (cache) {
+      res.send(cache);
+      return;
+    }
     const data = await prisma.contractor.findUnique({
       where: { name: id },
       include: {
@@ -196,7 +196,7 @@ const getSingleContractor = expressAsyncHandler(async (req, res) => {
         Comment: true,
       },
     });
-    // setCache(cacheKey, data);
+    setCache(cacheKey, data);
     res.send(data);
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);

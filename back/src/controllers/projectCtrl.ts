@@ -25,12 +25,12 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
     isPublished,
   }: QueryProject = req.query;
   try {
-    const keyCache = 'projects:all';
-    // const cache = await getCache(keyCache);
-    // if (cache) {
-    //   res.send(cache);
-    //   return;
-    // }
+    const keyCache = `Projects:${tags}&${page}&${order}&${category}&${search}&${isPublished}`;
+    const cache = await getCache(keyCache);
+    if (cache) {
+      res.send(cache);
+      return;
+    }
     const tagFilter = tags
       ? JSON.parse(tags).map((i: number) => Number(i))
       : [];
@@ -95,13 +95,11 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
       take: pageLimit,
     });
 
-    // setCache(keyCache, data);
+    setCache(keyCache, data);
     const count = await prisma.post.count({ where: searchFilter });
     const pager = pagination(count, Number(page), pageLimit);
     res.send({ data, pagination: pager });
   } catch (err) {
-    console.log(err);
-
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
@@ -144,7 +142,7 @@ const createProject = expressAsyncHandler(async (req, res) => {
         contractorId,
       },
     });
-    deleteCahce('projects:*');
+    deleteCahce('Projects:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
@@ -154,7 +152,7 @@ const createProject = expressAsyncHandler(async (req, res) => {
 const getSingleProject = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
-    const keyCache = `projects:${id}`;
+    const keyCache = `Projects:${id}`;
     const cache = await getCache(keyCache);
     if (cache) {
       res.send(cache);
@@ -231,7 +229,7 @@ const updateProject = expressAsyncHandler(async (req, res) => {
         contractorId,
       },
     });
-    deleteCahce('projects:*');
+    deleteCahce('Projects:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
@@ -242,7 +240,7 @@ const deleteProject = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
     await prisma.project.delete({ where: { id: Number(id) } });
-    deleteCahce('projects:*');
+    deleteCahce('Projects:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);

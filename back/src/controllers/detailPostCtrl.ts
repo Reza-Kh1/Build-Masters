@@ -15,7 +15,7 @@ const createDetailPost = expressAsyncHandler(async (req, res) => {
         postId,
       },
     });
-    deleteCahce(`posts:${postId}`);
+    deleteCahce(`Posts:${postId}`);
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
@@ -35,7 +35,7 @@ const updateDetailPost = expressAsyncHandler(async (req, res) => {
         keyword,
       },
     });
-    deleteCahce(`posts:${postId}`);
+    deleteCahce(`Posts:${postId}`);
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);

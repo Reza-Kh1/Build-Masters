@@ -25,12 +25,12 @@ const getAllPost = expressAsyncHandler(async (req, res) => {
     page = 1,
   }: QueryPost = req.query;
   try {
-    const keyCache = 'posts:all';
-    // const cache = await getCache(keyCache);
-    // if (cache) {
-    //   res.send(cache);
-    //   return;
-    // }
+    const keyCache = `Posts:${tags}&${isPublished}&${search}&${category}&${order}&${page}`;
+    const cache = await getCache(keyCache);
+    if (cache) {
+      res.send(cache);
+      return;
+    }
     const tagFilter = tags
       ? JSON.parse(tags).map((i: number) => Number(i))
       : [];
@@ -76,7 +76,7 @@ const getAllPost = expressAsyncHandler(async (req, res) => {
       skip: (Number(page) - 1) * pageLimit,
       take: pageLimit,
     });
-    // setCache(keyCache, data);
+    setCache(keyCache, data);
     const count = await prisma.post.count({ where: searchFilter });
     const pager = pagination(count, Number(page), pageLimit);
     res.send({ data, pagination: pager });
@@ -88,12 +88,12 @@ const getAllPost = expressAsyncHandler(async (req, res) => {
 const getSinglePost = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
-    const keyCache = `posts:${id}`;
-    // const cache = await getCache(keyCache);
-    // if (cache) {
-    //   res.send(cache);
-    //   return;
-    // }
+    const keyCache = `Posts:${id}`;
+    const cache = await getCache(keyCache);
+    if (cache) {
+      res.send(cache);
+      return;
+    }
     const data = await prisma.post.findUnique({
       where: { name: id },
       include: {
@@ -113,7 +113,7 @@ const getSinglePost = expressAsyncHandler(async (req, res) => {
         },
       },
     });
-    // setCache(keyCache, data);
+    setCache(keyCache, data);
     if (!data) {
       res.status(404).json({ msg: 'Not Found' });
       return;
@@ -145,7 +145,7 @@ const createPost = expressAsyncHandler(async (req, res) => {
         },
       },
     });
-    deleteCahce('posts:*');
+    deleteCahce('Posts:*');
     res.send({ success: true });
   } catch (err) {
     console.log(err);
@@ -175,7 +175,7 @@ const updatePost = expressAsyncHandler(async (req, res) => {
         id: Number(id),
       },
     });
-    deleteCahce('posts:*');
+    deleteCahce('Posts:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
@@ -186,7 +186,7 @@ const deletePost = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
     await prisma.post.delete({ where: { id: Number(id) } });
-    deleteCahce('posts:*');
+    deleteCahce('Posts:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);

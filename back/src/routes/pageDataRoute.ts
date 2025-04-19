@@ -1,10 +1,5 @@
 import express from 'express';
-import {
-  createPageData,
-  getPageData,
-  updatePageData,
-} from '../controllers/pageDataCtrl';
+import { getPageData, savePageData } from '../controllers/pageDataCtrl';
 const route = express.Router();
-route.route('/').post(createPageData).get(getPageData);
-route.route('/:id').put(updatePageData);
+route.route('/').post(savePageData).get(getPageData);
 export = route;

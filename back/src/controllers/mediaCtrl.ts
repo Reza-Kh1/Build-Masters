@@ -73,7 +73,6 @@ const uploadMedia = expressAsyncHandler(async (req, res) => {
     if (data) {
       await prisma.media.delete({ where: { url } });
     }
-    console.error('❌ خطا در آپلود:', err);
     throw customError('خطا در دیتابیس', 400, err);
   }
 });

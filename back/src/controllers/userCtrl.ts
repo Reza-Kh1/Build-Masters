@@ -10,12 +10,12 @@ const pageLimit = Number(process.env.PAGE_LIMITE);
 
 const getUsers = expressAsyncHandler(async (req, res) => {
   const { email, phone, role, page = 1 } = req.query;
-  const cacheKey = `users:${email}:${phone}:${role}:${page}`;
-  // const cache = await getCache(cacheKey);
-  // if (cache) {
-  //   res.send(cache);
-  //   return;
-  // }
+  const cacheKey = `Users:${email}:${phone}:${role}:${page}`;
+  const cache = await getCache(cacheKey);
+  if (cache) {
+    res.send(cache);
+    return;
+  }
   try {
     const search = {} as any;
     if (email || phone) {
@@ -48,7 +48,7 @@ const getUsers = expressAsyncHandler(async (req, res) => {
     });
     const count = await prisma.user.count({ where: search });
     const pages = pagination(count, Number(page), pageLimit);
-    // setCache(cacheKey, { data: data, pagination: pages });
+    setCache(cacheKey, { data: data, pagination: pages });
     res.send({ data: data, pagination: pages });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
@@ -73,7 +73,7 @@ const signUpUser = expressAsyncHandler(async (req, res) => {
         return;
       }
     }
-    deleteCahce('users:*');
+    deleteCahce('Users:*');
     const userCount = await prisma.user.count();
     const finalRole = userCount === 0 ? 'ADMIN' : role || 'AUTHOR';
     const hash = await createHash(password);
@@ -88,6 +88,8 @@ const signUpUser = expressAsyncHandler(async (req, res) => {
     delete data.password;
     res.send({ token, data });
   } catch (err) {
+    console.log(err);
+    
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
@@ -110,7 +112,7 @@ const updateUser = expressAsyncHandler(async (req, res) => {
       },
     })) as any;
     delete data.password;
-    deleteCahce('users:*');
+    deleteCahce('Users:*');
     const token = createToken({
       id: data.id,
       name: data.name,
@@ -126,7 +128,7 @@ const deleteUser = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
     await prisma.user.delete({ where: { id } });
-    deleteCahce('users:*');
+    deleteCahce('Users:*');
     res.send({ success: true });
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
@@ -138,11 +140,10 @@ const forgetPassword = expressAsyncHandler(async (req, res) => {
 });
 
 const signInUser = expressAsyncHandler(async (req, res) => {
-  const { email, password, phone } = req.body;
+  const { email, password } = req.body;
   const data = (await prisma.user.findUnique({
     where: {
       email: email || undefined,
-      phone: phone || undefined,
     },
   })) as any;
   if (!data) {

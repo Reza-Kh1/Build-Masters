@@ -8,12 +8,12 @@ const pageLimit = Number(process.env.PAGE_LIMITE);
 const getCategory = expressAsyncHandler(async (req, res) => {
   const { admin } = req.query;
   try {
-    const keyCache = `category:${admin ? 'admin' : 'all'}`;
-    // const cache = await getCache(keyCache);
-    // if (cache) {
-    //   res.send(cache);
-    //   return;
-    // }
+    const keyCache = `Category:${admin ? 'admin' : 'all'}`;
+    const cache = await getCache(keyCache);
+    if (cache) {
+      res.send(cache);
+      return;
+    }
     let data: Category | Category[] | null;
     if (admin) {
       data = await prisma.category.findMany({
