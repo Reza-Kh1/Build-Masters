@@ -38,7 +38,6 @@ export default function EditButton(formData: EditButtonType) {
         setValue,
         handleSubmit,
         reset,
-        watch
     } = useForm();
     const syncData = () => {
         fields.map((row) => {
@@ -67,7 +66,7 @@ export default function EditButton(formData: EditButtonType) {
                 </DialogTitle>
                 <DialogContent>
                     <form className="w-full grid grid-cols-4 gap-4 mt-5">
-                        {fields.map((row, index) => <FieldsInputs watch={watch} data={row} register={register} key={index} />)}
+                        {fields.map((row, index) => <FieldsInputs data={row} defualtVal={values} register={register} key={index} />)}
                     </form>
                 </DialogContent>
                 <DialogActions className='!justify-between'>

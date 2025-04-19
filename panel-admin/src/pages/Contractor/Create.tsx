@@ -61,13 +61,16 @@ export default function Create({ id }: { id?: string }) {
         staleTime: 1000 * 60 * 60 * 24,
         gcTime: 1000 * 60 * 60 * 24,
     });
-    const { setValue,
-        register,
-        handleSubmit,
-        reset,
-        watch
-    } = useForm();
+    const { setValue, register, handleSubmit, reset, } = useForm();
 
+    const dataUserInput = () => {
+        if (dataUsers?.length && singleData?.userId) {
+            const body = dataUsers?.map((row: any) => { return { value: row.id, name: row.name } })
+            return [...body, { value: singleData?.userId, name: "انتخاب شده" }]
+        } else {
+            return dataUsers?.length ? dataUsers?.map((row: any) => { return { value: row.id, name: row.name } }) : []
+        }
+    }
     const fields: FieldsType[] = [
         { label: 'نام', name: 'name', type: 'input', required: true },
         { label: 'شماره تلفن', name: 'phone', type: 'input', required: true },
@@ -85,18 +88,19 @@ export default function Create({ id }: { id?: string }) {
             name: 'userId',
             type: 'select',
             required: true,
-            dataOptions: dataUsers?.length ? dataUsers?.map((row: any) => { return { value: row.id, name: row.name } }) : []
+            dataOptions: dataUserInput()
         },
         {
             label: 'انتخاب تگ',
             name: 'tagName',
             type: 'autoComplate',
-            nameGetValue: 'name',
+            nameGetValue: 'Tags',
             required: true,
             dataOptions: dataTag?.length ? dataTag : [],
             className: 'col-span-2'
         }
     ]
+
     const { isPending: createPending, mutate: createContractor } = useMutation({
         mutationFn: async (form: any) => {
             const body = {
@@ -104,11 +108,10 @@ export default function Create({ id }: { id?: string }) {
                 avatar,
                 socialMedia: JSON.stringify(socialMedia)
             }
-            body.tagName = form.tagName?.map((items: any) => items.id)
             return axios.post("contractor", body);
         },
         onSuccess: () => {
-            toast.success("کاربر اضافه شد");
+            toast.success("مجری افزوده شد");
             query.invalidateQueries({ queryKey: ["AllContractor"] });
         },
         onError: (err) => {
@@ -116,7 +119,6 @@ export default function Create({ id }: { id?: string }) {
             console.log(err);
         },
     });
-    console.log(singleData?.id);
 
     const { isPending: updatePending, mutate: updateContractor } = useMutation({
         mutationFn: async (form: any) => {
@@ -125,12 +127,10 @@ export default function Create({ id }: { id?: string }) {
                 avatar,
                 socialMedia: JSON.stringify(socialMedia)
             }
-            body.tagName = form.tagName?.map((items: any) => items.id)
-
-            return axios.put("contractor/" + singleData?.id,body);
+            return axios.put("contractor/" + singleData?.id, body);
         },
         onSuccess: () => {
-            toast.success("کاربر اضافه شد");
+            toast.success("اطلاعات مجری ویرایش شد");
             query.invalidateQueries({ queryKey: ["AllContractor"] });
         },
         onError: (err) => {
@@ -138,6 +138,7 @@ export default function Create({ id }: { id?: string }) {
             console.log(err);
         },
     });
+
     useEffect(() => {
         if (id && singleData) {
             setValue('email', singleData.email)
@@ -151,6 +152,7 @@ export default function Create({ id }: { id?: string }) {
             setSocialMedia(JSON.parse(singleData.socialMedia || ''))
         }
     }, [singleData])
+
     return (
         <>
             <Button
@@ -171,41 +173,45 @@ export default function Create({ id }: { id?: string }) {
                 <DialogTitle className='bg-blue-100'>
                     ایجاد مجری جدید
                 </DialogTitle>
-                <DialogContent>
-                    {(createPending || updatePending) && <PendingApi />}
-                    <form className="w-full grid grid-cols-4  gap-4 mt-5">
-                        {fields.map((row, index) => <FieldsInputs setValue={setValue} watch={watch} register={register} data={row} key={index} />)}
-                    </form>
-                    <div className="flex py-7">
-                        <FormSocialMedia
-                            setSocialMedia={setSocialMedia}
-                            socialMedia={socialMedia}
-                        />
-                    </div>
-                    <SelectMedia
-                        addMedia={(_alt, image) => setAvatar(image.url)}
-                        textHelp='عکس پروفایل خود را آپلود کنید'
-                    />
-                    {avatar ? (
-                        <figure className="group relative inline-block mt-3">
-                            <img
-                                className="rounded-full w-36 p-1 h-36 object-cover shadow-md transition duration-500 hover:opacity-75"
-                                src={avatar || "/notfound.webp"}
-                                alt=""
+                {id && !singleData ?
+                    null
+                    :
+                    <DialogContent>
+                        {(createPending || updatePending) && <PendingApi />}
+                        <form className="w-full grid grid-cols-4  gap-4 mt-5">
+                            {fields.map((row, index) => <FieldsInputs defualtVal={singleData} register={register} data={row} key={index} />)}
+                        </form>
+                        <div className="flex py-7">
+                            <FormSocialMedia
+                                setSocialMedia={setSocialMedia}
+                                socialMedia={socialMedia}
                             />
-                            <i
-                                onClick={() => setAvatar('')}
-                                className="absolute group-hover:opacity-100 opacity-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 text-2xl right-1/2 bg-red-500/70 p-1 rounded-full cursor-pointer text-white shadow-md"
-                            >
-                                <MdClose />
+                        </div>
+                        <SelectMedia
+                            addMedia={(_alt, image) => setAvatar(image.url)}
+                            textHelp='عکس پروفایل خود را آپلود کنید'
+                        />
+                        {avatar ? (
+                            <figure className="group relative inline-block mt-3">
+                                <img
+                                    className="rounded-full w-36 p-1 h-36 object-cover shadow-md transition duration-500 hover:opacity-75"
+                                    src={avatar || "/notfound.webp"}
+                                    alt=""
+                                />
+                                <i
+                                    onClick={() => setAvatar('')}
+                                    className="absolute group-hover:opacity-100 opacity-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 text-2xl right-1/2 bg-red-500/70 p-1 rounded-full cursor-pointer text-white shadow-md"
+                                >
+                                    <MdClose />
+                                </i>
+                            </figure>
+                        ) : (
+                            <i className="mt-3 inline-block" onClick={() => setAvatar('')}>
+                                <FaUser className=" w-36 p-1 h-36 rounded-full bg-slate-200 shadow-md" />
                             </i>
-                        </figure>
-                    ) : (
-                        <i className="mt-3 inline-block" onClick={() => setAvatar('')}>
-                            <FaUser className=" w-36 p-1 h-36 rounded-full bg-slate-200 shadow-md" />
-                        </i>
-                    )}
-                </DialogContent>
+                        )}
+                    </DialogContent>
+                }
                 <DialogActions className='!justify-between'>
                     <Button
                         endIcon={<MdOutlineDataSaverOn />}

@@ -40,7 +40,6 @@ export default function CreateButton(formData: CreateButtonType) {
     const [openDialog, setOpenDialog] = useState<boolean>(false)
     const {
         register,
-        setValue,
         handleSubmit,
         reset,
     } = useForm();

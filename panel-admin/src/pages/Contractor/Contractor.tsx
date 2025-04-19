@@ -21,7 +21,7 @@ export default function Contractor() {
   const { search } = useLocation();
 
   const { data } = useInfiniteQuery<AllContractorType>({
-    queryKey: ["AllContractor"],
+    queryKey: ["AllContractor", searchQuery],
     queryFn: () => fetchContractor(searchQuery),
     staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24,
@@ -39,7 +39,7 @@ export default function Contractor() {
       cellRenderer: (params: ICellRendererParams) => (
         <div className="flex gap-2 h-full items-center justify-center">
           <Create id={params.data.name} />
-          <DeleteButton id={params.value} keyQuery="GetUsers" urlAction="user" headerText="حذف کاربران" />
+          <DeleteButton id={params.value} keyQuery="AllContractor" urlAction="contractor" headerText="حذف مجری" />
         </div>
       ),
       field: "id",
@@ -54,14 +54,15 @@ export default function Contractor() {
       headerName: "تگ",
       cellRenderer: (params: ICellRendererParams) => (
         <div className="flex gap-1 items-center">
-          {params.value?.map((tag: { id: string, name: string }) => (
-            <span key={tag.id} className="mx-2">
-              {tag.name},
-            </span>))}
+          {params.value.length ? params.value.map((tag: { id: string, name: string }) => (
+            <span key={tag.id} className="ml-1">
+              {tag?.name},
+            </span>))
+            : null}
         </div>
       ), flex: 1
     },
-    { field: "Category", headerName: "دسته", valueFormatter: p => p.value.name, flex: 1 },
+    { field: "Category", headerName: "دسته", valueFormatter: p => p.value?.name, flex: 1 },
     { field: "totalComment", width: 120, headerName: "کامنت" },
     { field: "rating", width: 120, headerName: "امتیاز" },
     { field: "name", headerName: "نام" },
@@ -97,32 +98,6 @@ export default function Contractor() {
           <Pagination pager={data?.pages[0].pagination} />
         </>
       ) : <DontData text="هیچ مجری ثبت نشده است" />}
-      {/* {data?.pages[0].data.length ?
-        <>
-          <div className="grid grid-cols-4 gap-3 my-5 items-center justify-between">
-            {data?.pages[0].data.map((i, index) => (
-              <div key={index} className="group shadow-md relative gap-3 p-3 border rounded-md bg-slate-200 hover:bg-gray-200 flex">
-                <figure>
-                  <img src={i.image || "/notfound.webp"} onError={({ currentTarget }) => {
-                    currentTarget.onerror = null;
-                    currentTarget.src = "/notfound.webp";
-                  }} className="w-24 rounded-full p-1 bg-slate-100 border h-24 object-cover" alt={i.name} />
-                </figure>
-                <div className="flex flex-col justify-evenly">
-                  <span className="text-slate-700">{i.name}</span>
-                  <span className="text-lg text-slate-800">{i.phone}</span>
-                  <span className="text-xs">{new Date(i.createdAt).toLocaleDateString("fa")}</span>
-                </div>
-                <Link to={"create-worker?worker=" + i.name.replace(/ /g, "-")} className="top-0 opacity-0 group-hover:opacity-100 transition-all left-3 transform translate-y-1/2 text-xl hover:bg-slate-700 text-blue-500 bg-slate-300 rounded-full p-3 shadow-md absolute">
-                  <FaShare />
-                </Link>
-              </div>
-            ))}
-          </div>
-        </>
-        :
-        <DontData text="هیچ مجری ثبت نشده است" />
-      } */}
       <Pagination pager={data?.pages[0].pagination} />
     </div>
   );
