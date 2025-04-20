@@ -70,8 +70,8 @@ export default function Categorys() {
             actionForm={updateCategory}
             values={params.data}
             fields={[
-              { label: "نام دسته", name: "name", type: "input", required: true },
-              { label: "اسلاگ", name: "slug", type: "input" },
+              { label: "نام دسته", name: "name", type: "text", required: true },
+              { label: "اسلاگ", name: "slug", type: "text" },
               {
                 label: "زیر مجموعه", name: "subCategoryId", type: "select", required: true,
                 dataOptions: dataOptions()
@@ -91,7 +91,7 @@ export default function Categorys() {
     {
       field: "SubCategoryTo", headerName: "زیر مجموعه", valueFormatter: (params) => {
         if (params?.value === null) {
-          return "دسته اصلی"
+          return "-------"
         } else {
           return params?.value?.name
         }
@@ -112,8 +112,8 @@ export default function Categorys() {
             name: "افزودن دسته"
           }}
           fields={[
-            { label: 'نام دسته', name: 'name', type: 'input', required: true },
-            { label: 'اسلاگ', name: 'slug', type: 'input', required: true },
+            { label: 'نام دسته', name: 'name', type: 'text', required: true },
+            { label: 'اسلاگ', name: 'slug', type: 'text', required: true },
             { label: "زیر مجموعه", name: "subCategoryId", type: "select", required: true, dataOptions: dataOptions() },
           ]}
           isSuccess={successCreate}

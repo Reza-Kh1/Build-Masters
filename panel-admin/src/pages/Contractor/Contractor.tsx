@@ -98,7 +98,6 @@ export default function Contractor() {
           <Pagination pager={data?.pages[0].pagination} />
         </>
       ) : <DontData text="هیچ مجری ثبت نشده است" />}
-      <Pagination pager={data?.pages[0].pagination} />
     </div>
   );
 }

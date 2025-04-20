@@ -5,14 +5,15 @@ const fetchContractor = async (search: any) => {
   return data;
 };
 
-const fetchContractorName = async () => {  
-  const { data } = await axios.get("Contractor/name-Contractor");
+const fetchContractorName = async () => {
+  const { data } = await axios.get("contractor?allContractorname=true");
   return data;
 };
 
 const fetchSingleContractor = async (name?: string) => {
   // const url = name?.replace(/-/g, " ")
-  const { data } = await axios.get(`contractor/${name}`);  
+  const { data } = await axios.get(`contractor/${name}`);
   return data;
 };
+
 export { fetchContractorName, fetchContractor, fetchSingleContractor };

@@ -13,6 +13,7 @@ import { MdAddHomeWork, MdClose } from "react-icons/md";
 import SearchBox from "../../components/SearchBox/SearchBox";
 import DontData from "../../components/DontData/DontData";
 import { GrUserWorker } from "react-icons/gr";
+import Create from "./Create";
 export default function Projects() {
   const [searchQuery, setSearchQuery] = useState<any>();
   const { search } = useLocation();
@@ -21,7 +22,7 @@ export default function Projects() {
     queryFn: () => fetchProject(searchQuery),
     staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24,
-    getNextPageParam: (lastPage) => lastPage.paginate.nextPage || undefined,
+    getNextPageParam: (lastPage) => lastPage.pagination.nextPage || undefined,
     initialPageParam: "",
   });
   useEffect(() => {
@@ -41,76 +42,74 @@ export default function Projects() {
           ایجاد پروژه
         </Button>
       </Link>
+      <Create />
       <div>
-        <SearchBox status nameWorker />
+        {/* <SearchBox status nameWorker /> */}
       </div>
-      <DontData
-        text={
-          data?.pages[0].count
-            ? data?.pages[0].count + " پروژه"
-            : "پروژه ای یافت نشد!"
-        }
-      />
       {
-        data?.pages[0].rows.length ?
-          <div className="w-full my-3 grid grid-cols-3 gap-3">
-            {data?.pages[0].rows.map((i, index) => (
-              <div key={index} className="shadow-md p-2 rounded-md">
-                <figure className="relative group overflow-hidden">
-                  <img
-                    src={i.image || "/notfound.webp"}
-                    onError={({ currentTarget }) => {
-                      currentTarget.onerror = null;
-                      currentTarget.src = "/notfound.webp";
-                    }}
-                    alt={i.alt}
-                    className="object-cover w-full h-64 rounded-md"
-                  />
-                  <Link
-                    to={"create-project?name=" + i.name.replace(/ /g, "-")}
-                    className="absolute opacity-0 text-white bg-black/30 group-hover:opacity-100 transition-customer backdrop-blur-md p-5 shadow-md text-2xl rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                  >
-                    <FaPlay />
-                  </Link>
-                  <div className="-bottom-[100%] text-sm transition-customer box-shadow-customer absolute rounded-md w-full text-center bg-black/70 text-white py-2 group-hover:bottom-[0%]">
-                    <span>عنوان عکس :{i.alt}</span>
-                    <p>آدرس :{i.address}</p>
-                  </div>
-                  <div className="left-2 text-sm flex items-center gap-3 bg-black/50 px-3 py-1 text-white rounded-md top-2 absolute">
-                    <i>
-                      <FaCalendarAlt />
-                    </i>
-                    <span className="pt-1">
-                      {new Date(i.updatedAt).toLocaleDateString("fa")}
-                    </span>
-                  </div>
-                </figure>
-                <div className="flex justify-between px-2 mt-3 items-center">
-                  <p className="text-base font-semibold flex items-center gap-1">
-                    <MdAddHomeWork />
-                    {i.name}
-                  </p>
-                  {i.status ? (
-                    <Button endIcon={<FaCheck />} color="success" size="small">
-                      منتشر شده
-                    </Button>
-                  ) : (
-                    <Button endIcon={<MdClose />} color="error" size="small">
-                      منتشر نشده
-                    </Button>
-                  )}
-                </div>
-                <span className="text-gray-700 flex items-center gap-1">
-                  <GrUserWorker />
-                  {i.Worker.name}</span>
-              </div>
-            ))}
-          </div>
-          : null
+        data?.pages[0].data.length ?
+          <>
+            <div className="w-full my-3 grid grid-cols-3 gap-3">
+              {data?.pages[0].data.map((i, index) => (
+                <></>
+                // <div key={index} className="shadow-md p-2 rounded-md">
+                //   <figure className="relative group overflow-hidden">
+                //     <img
+                //       src={i.image || "/notfound.webp"}
+                //       onError={({ currentTarget }) => {
+                //         currentTarget.onerror = null;
+                //         currentTarget.src = "/notfound.webp";
+                //       }}
+                //       alt={i.alt}
+                //       className="object-cover w-full h-64 rounded-md"
+                //     />
+                //     <Link
+                //       to={"create-project?name=" + i.name.replace(/ /g, "-")}
+                //       className="absolute opacity-0 text-white bg-black/30 group-hover:opacity-100 transition-customer backdrop-blur-md p-5 shadow-md text-2xl rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                //     >
+                //       <FaPlay />
+                //     </Link>
+                //     <div className="-bottom-[100%] text-sm transition-customer box-shadow-customer absolute rounded-md w-full text-center bg-black/70 text-white py-2 group-hover:bottom-[0%]">
+                //       <span>عنوان عکس :{i.alt}</span>
+                //       <p>آدرس :{i.address}</p>
+                //     </div>
+                //     <div className="left-2 text-sm flex items-center gap-3 bg-black/50 px-3 py-1 text-white rounded-md top-2 absolute">
+                //       <i>
+                //         <FaCalendarAlt />
+                //       </i>
+                //       <span className="pt-1">
+                //         {new Date(i.updatedAt).toLocaleDateString("fa")}
+                //       </span>
+                //     </div>
+                //   </figure>
+                //   <div className="flex justify-between px-2 mt-3 items-center">
+                //     <p className="text-base font-semibold flex items-center gap-1">
+                //       <MdAddHomeWork />
+                //       {i.name}
+                //     </p>
+                //     {i.status ? (
+                //       <Button endIcon={<FaCheck />} color="success" size="small">
+                //         منتشر شده
+                //       </Button>
+                //     ) : (
+                //       <Button endIcon={<MdClose />} color="error" size="small">
+                //         منتشر نشده
+                //       </Button>
+                //     )}
+                //   </div>
+                //   <span className="text-gray-700 flex items-center gap-1">
+                //     <GrUserWorker />
+                //     {i.Worker.name}</span>
+                // </div>
+              ))}
+            </div>
+            <Pagination pager={data?.pages[0].pagination} />
+          </>
+          :
+          <DontData
+            text={"پروژه ای یافت نشد!"}
+          />
       }
-      <div>
-        <Pagination pager={data?.pages[0].paginate} />
-      </div>
     </div>
   );
 }

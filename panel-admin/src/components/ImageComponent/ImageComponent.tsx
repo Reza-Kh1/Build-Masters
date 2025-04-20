@@ -10,13 +10,13 @@ export default function ImageComponent({
   deleteHandler,
   editHandler,
 }: ImageComponentType) {
-  if (!img) return;
+  if (!img || !img.url) return;
   return (
     <div className="relative group">
       {img?.url?.search(/(jpg|jpeg|png|gif|webp|jfif)$/i) !== -1 ? (
         <img
           src={img.url}
-          alt={img.alt}
+          alt={img?.alt || ''}
           onError={({ currentTarget }) => {
             currentTarget.onerror = null;
             currentTarget.src = "/notfound.webp";

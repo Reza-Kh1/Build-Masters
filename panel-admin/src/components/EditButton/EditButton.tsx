@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { FaPen } from 'react-icons/fa6';
 import { MdClose, MdOutlineDataSaverOn } from 'react-icons/md';
 import FieldsInputs from '../FieldsInputs/FieldsInputs';
+import { FieldsType } from '../../type';
 const Transition = forwardRef(function Transition(
     props: TransitionProps & {
         children: React.ReactElement<unknown>;
@@ -13,16 +14,6 @@ const Transition = forwardRef(function Transition(
 ) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
-type FieldsType = {
-    required?: boolean
-    label: string
-    name: string
-    type: 'input' | 'select'
-    dataOptions?: {
-        name: string
-        value: string
-    }[] | []
-}
 type EditButtonType = {
     actionForm: (value: any) => void
     fields: FieldsType[]

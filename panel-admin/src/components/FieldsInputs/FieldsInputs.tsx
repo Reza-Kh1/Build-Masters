@@ -1,14 +1,25 @@
-import { FormControl, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, TextField, Theme, useTheme } from '@mui/material';
+import { FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, TextField, Theme, useTheme } from '@mui/material';
+import Switch from '@mui/material/Switch';
 import { FieldsType } from '../../type';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import DatePicker, { DateObject } from "react-multi-date-picker";
+import TimePicker from "react-multi-date-picker/plugins/time_picker";
+import "react-multi-date-picker/styles/colors/purple.css"
+import persian_fa from "react-date-object/locales/persian_fa";
+import persian from "react-date-object/calendars/persian";
+import gregorian from "react-date-object/calendars/gregorian";
+import persian_en from "react-date-object/locales/persian_en";
+import moment from "moment";
+import { UseFormSetValue } from 'react-hook-form';
 
 type FormComponentType = {
     data: FieldsType
     register: any,
     defualtVal?: any
+    setValue?: UseFormSetValue<any>
 }
 
-export default function FieldsInputs({ register, data, defualtVal }: FormComponentType) {
+export default function FieldsInputs({ register, data, defualtVal, setValue }: FormComponentType) {
     const getValueInputs = () => {
         if (data.type === 'autoComplate') {
             if (defualtVal) {
@@ -21,31 +32,72 @@ export default function FieldsInputs({ register, data, defualtVal }: FormCompone
         }
     }
     const [selector, setSelector] = useState<any>(getValueInputs())
-    const theme = useTheme();
-    const handleChange = (event: SelectChangeEvent<typeof selector>) => {
-        const {
-            target: { value },
-        } = event;
-        setSelector(
-            typeof value === 'string' ? value.split(',') : value,
-        );
-    };
-    function getStyles(name: string, personName: string[], theme: Theme) {
-        return {
-            fontWeight: personName.includes(name)
-                ? theme.typography.fontWeightMedium
-                : theme.typography.fontWeightRegular,
-        };
-    }
+
+
+    // useEffect(() => {
+    //     if (date) {
+    //         setDayCount(moment(date).diff(moment(), "days"))
+    //     }
+    // }, [date])
     switch (data.type) {
-        case 'input':
+        case 'text':
             return (
                 <TextField
+                    InputProps={data?.icon ? {
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                {data?.icon}
+                            </InputAdornment>
+                        ),
+                    } : null}
                     autoComplete='off'
                     className={`shadow-md ${data?.className}`}
                     label={data.label}
                     fullWidth
                     {...register(data.name, { required: data.required || false })}
+                />
+            )
+        case 'text-multiline':
+            return (
+                <div className={`w-full col-span-4 gap-4 grid grid-cols-4`}>
+                    <TextField
+                        InputProps={data?.icon ? {
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    {data?.icon}
+                                </InputAdornment>
+                            ),
+                        } : null}
+                        multiline
+                        rows={4}
+                        autoComplete='off'
+                        className={`shadow-md ${data?.className}`}
+                        label={data.label}
+                        fullWidth
+                        {...register(data.name, { required: data.required || false })}
+                    />
+                </div>
+            )
+        case 'number':
+            return (
+                <TextField
+                    {...register(data.name, { required: data.required || false })}
+                    onChange={({ target }) => {
+                        target.value = Number(
+                            target.value.replace(/[^0-9]/g, "")
+                        ).toLocaleString();
+                    }}
+                    InputProps={data?.icon ? {
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                {data?.icon}
+                            </InputAdornment>
+                        ),
+                    } : null}
+                    autoComplete='off'
+                    className={`shadow-md ${data?.className}`}
+                    label={data.label}
+                    fullWidth
                 />
             )
         case 'select':
@@ -73,7 +125,66 @@ export default function FieldsInputs({ register, data, defualtVal }: FormCompone
                     </Select>
                 </FormControl>
             )
+        case 'date':
+            const changeHandler = (value: any) => {
+                const date = new DateObject({
+                    date: value,
+                    format: "YYYY/MM/DD HH:mm:ss",
+                    calendar: persian,
+                    locale: persian_fa,
+                });
+                date.convert(gregorian, persian_en);
+                const time = new Date(date.format())
+
+                if (setValue) {
+                    setValue(data.name, time.toISOString())
+                    return
+                }
+            }
+            return (
+                <div className="flex flex-col gap-2 items-start">
+                    <span>{data.label}</span>
+                    <DatePicker
+                        multiple={false}
+                        // value={date}
+                        format="YYYY/MM/DD"
+                        onChange={changeHandler}
+                        calendar={persian}
+                        className="teal"
+                        locale={persian_fa}
+                        calendarPosition="bottom-right"
+                    />
+                </div>
+            )
+        case 'checkBox':
+            return (
+                <div className={`flex flex-col gap-1 ${data?.className}`}>
+                    <span>{data.label}</span>
+                    <Switch
+                        {...register(data.name, { required: false })}
+                        // checked={checked}
+                        // onChange={handleChange}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                    />
+                </div>
+            )
         case 'autoComplate':
+            const theme = useTheme();
+            const handleChange = (event: SelectChangeEvent<typeof selector>) => {
+                const {
+                    target: { value },
+                } = event;
+                setSelector(
+                    typeof value === 'string' ? value.split(',') : value,
+                );
+            };
+            function getStyles(name: string, personName: string[], theme: Theme) {
+                return {
+                    fontWeight: personName.includes(name)
+                        ? theme.typography.fontWeightMedium
+                        : theme.typography.fontWeightRegular,
+                };
+            }
             return (
                 <FormControl className={`shadow-md ${data?.className}`}>
                     <InputLabel id="demo-multiple-name-label">Name</InputLabel>

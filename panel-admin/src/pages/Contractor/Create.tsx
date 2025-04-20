@@ -36,6 +36,8 @@ export default function Create({ id }: { id?: string }) {
     const [socialMedia, setSocialMedia] = useState<SocialMediaType[]>([])
     const [avatar, setAvatar] = useState<string>('')
     const query = useQueryClient();
+    const { setValue, register, handleSubmit, reset, } = useForm();
+
     const { data: singleData } = useQuery<ContractorType>({
         queryKey: ["GetSingleContractor", id],
         queryFn: () => fetchSingleContractor(id),
@@ -61,7 +63,6 @@ export default function Create({ id }: { id?: string }) {
         staleTime: 1000 * 60 * 60 * 24,
         gcTime: 1000 * 60 * 60 * 24,
     });
-    const { setValue, register, handleSubmit, reset, } = useForm();
 
     const dataUserInput = () => {
         if (dataUsers?.length && singleData?.userId) {
@@ -72,10 +73,10 @@ export default function Create({ id }: { id?: string }) {
         }
     }
     const fields: FieldsType[] = [
-        { label: 'نام', name: 'name', type: 'input', required: true },
-        { label: 'شماره تلفن', name: 'phone', type: 'input', required: true },
-        { label: 'ایمیل', name: 'email', type: 'input', required: true },
-        { label: 'بیو گرافی', name: 'bio', type: 'input', required: true },
+        { label: 'نام', name: 'name', type: 'text', required: true },
+        { label: 'شماره تلفن', name: 'phone', type: 'number', required: true },
+        { label: 'ایمیل', name: 'email', type: 'text', required: true },
+        { label: 'بیو گرافی', name: 'bio', type: 'text', required: true },
         {
             label: 'انتخاب دسته',
             name: 'categoryId',

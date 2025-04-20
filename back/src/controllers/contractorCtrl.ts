@@ -11,6 +11,7 @@ type QueryContractor = {
   tags?: string;
   search?: string;
   category?: number;
+  allContractorname?: string;
 };
 
 const getAllContractor = expressAsyncHandler(async (req, res) => {
@@ -20,12 +21,18 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
     tags,
     search,
     category,
+    allContractorname,
   }: QueryContractor = req.query;
   try {
     const cacheKey = `Contractors:${page}&${order}&${tags}&${search}&${category}`;
-    const cache = await getCache(cacheKey);
-    if (cache) {
-      res.send(cache);
+    // const cache = await getCache(cacheKey);
+    // if (cache) {
+    //   res.send(cache);
+    //   return;
+    // }
+    if (allContractorname === 'true') {
+      const data = await prisma.contractor.findMany({select:{name:true,id:true}});
+      res.send(data);
       return;
     }
     const tagFilter = tags

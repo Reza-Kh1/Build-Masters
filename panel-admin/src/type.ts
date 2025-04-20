@@ -165,13 +165,13 @@ type MediaType = {
   url: string;
   id: number;
   status: boolean;
-  uploader: 'ADMIN' | 'USER'
+  uploader: "ADMIN" | "USER";
   type: "VIDEO" | "IMAGE";
 };
 
 type DataMediaType = {
   url: string;
-  alt: string;
+  alt?: string;
 };
 
 type TagType = {
@@ -180,20 +180,20 @@ type TagType = {
 };
 
 type ContractorType = {
-  id: number,
-  name: string
-  phone: string
-  email: string
-  socialMedia: string|null
-  bio: string
-  avatar: string
-  totalComment: number,
-  rating: number,
-  createdAt: Date,
-  updatedAt: Date,
-  categoryId: number,
-  userId: string | null
-  Tags: TagType[]|[],
+  id: number;
+  name: string;
+  phone: string;
+  email: string;
+  socialMedia: string | null;
+  bio: string;
+  avatar: string;
+  totalComment: number;
+  rating: number;
+  createdAt: Date;
+  updatedAt: Date;
+  categoryId: number;
+  userId: string | null;
+  Tags: TagType[] | [];
 };
 
 type AllContractorType = {
@@ -227,9 +227,8 @@ type ProjectType = {
 };
 
 type AllProjectType = {
-  count: number;
-  rows: ProjectType[];
-  paginate: PaginationType;
+  data: ProjectType[];
+  pagination: PaginationType;
 };
 
 type BackUpAllType = {
@@ -242,18 +241,19 @@ type BackUpAllType = {
 };
 
 type FieldsType = {
-  className?: string
-  required?: boolean
-  label: string
-  name: string
-  type: 'input' | 'select' | 'autoComplate'
-  nameGetValue?: string
+  className?: string;
+  required?: boolean;
+  label: string;
+  name: string;
+  icon?: React.ReactNode;
+  type: "text" | "select" | "autoComplate" | "date" | "checkBox" | "number" | "text-multiline";
+  nameGetValue?: string;
   dataOptions?: {
-    name?: string | React.ReactNode
-    value?: string
-    id?: number | string
-  }[]
-}
+    name?: string | React.ReactNode;
+    value?: string;
+    id?: number | string;
+  }[];
+};
 
 export type {
   ReviewType,
@@ -280,5 +280,5 @@ export type {
   AllProjectType,
   ProjectType,
   BackUpAllType,
-  FieldsType
+  FieldsType,
 };

@@ -97,7 +97,7 @@ export default function FormSocialMedia({ socialMedia, setSocialMedia }: FormSoc
                     data={{
                         label: 'متن',
                         name: 'text-insert',
-                        type: 'input',
+                        type: 'text',
                         required: true,
                         className: '!w-2/5'
                     }}
@@ -107,7 +107,7 @@ export default function FormSocialMedia({ socialMedia, setSocialMedia }: FormSoc
                     data={{
                         label: 'لینک',
                         name: 'link-insert',
-                        type: 'input',
+                        type: 'text',
                         required: true,
                         className: '!w-2/5'
                     }}
@@ -135,14 +135,13 @@ export default function FormSocialMedia({ socialMedia, setSocialMedia }: FormSoc
                                     required: true,
                                     className: '!w-1/5'
                                 }}
-                                watch={watch}
                             />
                             <FieldsInputs
                                 register={register}
                                 data={{
                                     label: 'متن',
                                     name: 'text-update',
-                                    type: 'input',
+                                    type: 'text',
                                     required: true,
                                     className: '!w-2/5'
                                 }}
@@ -152,7 +151,7 @@ export default function FormSocialMedia({ socialMedia, setSocialMedia }: FormSoc
                                 data={{
                                     label: 'لینک',
                                     name: 'link-update',
-                                    type: 'input',
+                                    type: 'text',
                                     required: true,
                                     className: '!w-2/5'
                                 }}

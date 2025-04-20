@@ -106,7 +106,7 @@ export default function CreateProject() {
         status: getValues("status"),
         size: getValues("size").replace(/[^0-9]/g, ""),
         price: getValues("price").replace(/[^0-9]/g, ""),
-      };            
+      };
       await deleteCache({ path: `/project/${test.name}`, tag: "project" });
       return axios.put(`project/${data?.id}`, body);
     },
@@ -194,7 +194,7 @@ export default function CreateProject() {
             <div className="flex flex-col items-start w-1/2 gap-3">
               <span>تصویر پروژه</span>
               <SelectMedia
-              textHelp="ابعاد تصویر 450*1450"
+                textHelp="ابعاد تصویر 450*1450"
                 addMedia={(alt, image) => setImage({ alt, url: image.url })}
               />
             </div>
@@ -289,7 +289,7 @@ export default function CreateProject() {
             <div className="flex flex-col gap-3">
               <span>گالری پروژه</span>
               <SelectMedia
-              textHelp="ابعاد تصوری 288*384"
+                textHelp="ابعاد تصوری 288*384"
                 addMedia={(alt, image) => {
                   const newGallery = [
                     ...galleryProject,

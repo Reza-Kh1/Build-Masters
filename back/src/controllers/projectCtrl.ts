@@ -26,11 +26,11 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
   }: QueryProject = req.query;
   try {
     const keyCache = `Projects:${tags}&${page}&${order}&${category}&${search}&${isPublished}`;
-    const cache = await getCache(keyCache);
-    if (cache) {
-      res.send(cache);
-      return;
-    }
+    // const cache = await getCache(keyCache);
+    // if (cache) {
+    //   res.send(cache);
+    //   return;
+    // }
     const tagFilter = tags
       ? JSON.parse(tags).map((i: number) => Number(i))
       : [];
@@ -43,7 +43,7 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
               },
             }
           : undefined,
-      isPublished: isPublished === 'false' ? false : true,
+      isPublished: isPublished === 'false' ? false :isPublished==='true' ? true : undefined,
       categoryId: category ? Number(category) : undefined,
     } as any;
     if (search) {
@@ -144,7 +144,7 @@ const createProject = expressAsyncHandler(async (req, res) => {
     });
     deleteCahce('Projects:*');
     res.send({ success: true });
-  } catch (err) {
+  } catch (err) {    
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
@@ -153,11 +153,11 @@ const getSingleProject = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
     const keyCache = `Projects:${id}`;
-    const cache = await getCache(keyCache);
-    if (cache) {
-      res.send(cache);
-      return;
-    }
+    // const cache = await getCache(keyCache);
+    // if (cache) {
+    //   res.send(cache);
+    //   return;
+    // }
     const data = await prisma.project.findUnique({
       where: { slug: id },
       include: {
