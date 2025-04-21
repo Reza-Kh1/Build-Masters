@@ -64,6 +64,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     border: 0,
   },
 }));
+
 export default function OnlinePrice() {
   const [searchQuery, setSearchQuery] = useState<any>();
   const [open, setOpen] = useState<boolean>(false);
@@ -77,7 +78,7 @@ export default function OnlinePrice() {
     queryFn: () => fetchOnlinePrice(searchQuery),
     staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24,
-    getNextPageParam: (lastPage) => lastPage.paginate.nextPage || undefined,
+    getNextPageParam: (lastPage) => lastPage.pagination.nextPage || undefined,
     initialPageParam: "",
   });
   const { isPending: isUpdate, mutate: checkPrice } = useMutation({
@@ -129,17 +130,12 @@ export default function OnlinePrice() {
     const query = queryString.parse(search);
     setSearchQuery(query);
   }, [search]);
+
   return (
     <div className="w-full">
       {isLoading ? <PendingApi /> : null}
       <SearchBox checker notTag notSearch />
-      <DontData
-        text={
-          data?.pages[0].count
-            ? data?.pages[0].count + " درخواست"
-            : "هیچ درخواستی ثبت نشده است!"
-        }
-      />
+
       {data?.pages[0].rows.length ? (
         <div className="mt-3">
           <TableContainer component={Paper}>

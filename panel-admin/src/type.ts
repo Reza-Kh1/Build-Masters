@@ -125,9 +125,8 @@ type LinkSidebarType = {
 };
 
 type AllonlinePriceType = {
-  count: number;
-  rows: OnlinePriceType[];
-  paginate: PaginationType;
+  data: OnlinePriceType[];
+  pagination: PaginationType;
 };
 
 type OnlinePriceType = {
@@ -202,34 +201,33 @@ type AllContractorType = {
 };
 
 type ProjectType = {
-  id: number,
-  name: string,
-  slug: string,
-  address: string,
-  image: string,
-  gallery: string[]
-  video: string,
-  description: string,
-  stratDate: Date
-  endDate: Date
-  price: string,
-  isPublished: true,
-  categoryId: number,
-  contractorId: number,
-  createdAt: Date
-  updateAt: Date
+  id: number;
+  name: string;
+  slug: string;
+  address: string;
+  image: string;
+  gallery: string[];
+  video: string;
+  description: string;
+  stratDate: Date;
+  endDate: Date;
+  price: string;
+  isPublished: true;
+  categoryId: number;
+  contractorId: number;
+  createdAt: Date;
+  updateAt: Date;
   Category: {
-    name: string,
-    slug: string
-  },
+    name: string;
+    slug: string;
+  };
   Contractor: {
-    name: string,
-    rating: string,
-    phone: string,
-    createdAt: Date
-  },
-  Tags: { name: string, id: string }[]
-
+    name: string;
+    rating: string;
+    phone: string;
+    createdAt: Date;
+  };
+  Tags: { name: string; id: string }[];
 };
 
 type AllProjectType = {
@@ -252,7 +250,14 @@ type FieldsType = {
   label: string;
   name: string;
   icon?: React.ReactNode;
-  type: "text" | "select" | "autoComplate" | "date" | "checkBox" | "number" | "text-multiline";
+  type:
+    | "text"
+    | "select"
+    | "autoComplate"
+    | "date"
+    | "checkBox"
+    | "number"
+    | "text-multiline";
   nameGetValue?: string;
   dataOptions?: {
     name?: string | React.ReactNode;
