@@ -55,6 +55,23 @@ export default function Users() {
     },
   });
   const columnDefs: ColDef[] = [
+    { field: "name", headerName: "نام", flex: 2 },
+    { field: "email", headerName: "ایمیل" },
+    { field: "phone", headerName: "شماره تلفن" },
+    {
+      field: "role", headerName: "سطح کاربری", valueFormatter: (p) => {
+        if (p.value === "ADMIN") {
+          return 'ادمین'
+        } else if (p.value === "AUTHOR") {
+          return 'نویسنده'
+        } else {
+          return 'مجری'
+        }
+      }
+    },
+    {
+      field: "createdAt", headerName: "تاریخ", valueFormatter: p => new Date(p.value).toLocaleDateString("fa")
+    },
     {
       headerName: "عملیات",
       cellRenderer: (params: ICellRendererParams) => (
@@ -64,10 +81,10 @@ export default function Users() {
             actionForm={updateUser}
             values={params.data}
             fields={[
-              { label: "نام", name: "name", type: "input", required: true },
-              { label: "شماره تلفن", name: "phone", type: "input" },
-              { label: "ایمیل", name: "email", type: "input" },
-              { label: "پسورد", name: "password", type: "input" },
+              { label: "نام", name: "name", type: "text", required: true },
+              { label: "شماره تلفن", name: "phone", type: "number" },
+              { label: "ایمیل", name: "email", type: "text" },
+              { label: "پسورد", name: "password", type: "text" },
               {
                 label: "انتخاب موقعیت", name: "role", type: "select", required: true,
                 dataOptions: [
@@ -88,23 +105,6 @@ export default function Users() {
       filter: false,
       sortable: false,
     },
-    {
-      field: "createdAt", headerName: "تاریخ", valueFormatter: p => new Date(p.value).toLocaleDateString("fa")
-    },
-    {
-      field: "role", headerName: "سطح کاربری", valueFormatter: (p) => {
-        if (p.value === "ADMIN") {
-          return 'ادمین'
-        } else if (p.value === "AUTHOR") {
-          return 'نویسنده'
-        } else {
-          return 'مجری'
-        }
-      }
-    },
-    { field: "email", headerName: "ایمیل" },
-    { field: "phone", headerName: "شماره تلفن" },
-    { field: "name", headerName: "نام", flex: 2 },
 
   ]
   useEffect(() => {
@@ -125,10 +125,10 @@ export default function Users() {
             icon: <FaUser />
           }}
           fields={[
-            { label: "نام", name: "name", type: "input", required: true },
-            { label: "شماره تلفن", name: "phone", type: "input", required: true },
-            { label: "ایمیل", name: "email", type: "input", required: true },
-            { label: "پسورد", name: "password", type: "input", required: true },
+            { label: "نام", name: "name", type: "text", required: true },
+            { label: "شماره تلفن", name: "phone", type: "text", required: true },
+            { label: "ایمیل", name: "email", type: "text", required: true },
+            { label: "پسورد", name: "password", type: "text", required: true },
             {
               label: "انتخاب موقعیت", name: "role", type: "select", required: true,
               dataOptions: [

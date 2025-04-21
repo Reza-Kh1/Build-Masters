@@ -61,6 +61,8 @@ export default function Categorys() {
   }
 
   const columnDefs: ColDef[] = [
+    { field: "name", headerName: "نام", flex: 2 },
+    { field: "slug", headerName: "اسلاگ" },
     {
       headerName: "عملیات",
       cellRenderer: (params: ICellRendererParams) => (
@@ -83,7 +85,6 @@ export default function Categorys() {
         </div>
       ),
       field: "id",
-      pinned: 'left',
       width: 200,
       filter: false,
       sortable: false,
@@ -97,8 +98,7 @@ export default function Categorys() {
         }
       }
     },
-    { field: "slug", headerName: "اسلاگ" },
-    { field: "name", headerName: "نام", flex: 2 },
+
   ]
 
   return (

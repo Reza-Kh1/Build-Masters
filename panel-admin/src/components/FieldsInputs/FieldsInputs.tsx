@@ -1,15 +1,13 @@
 import { FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, TextField, Theme, useTheme } from '@mui/material';
 import Switch from '@mui/material/Switch';
 import { FieldsType } from '../../type';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import DatePicker, { DateObject } from "react-multi-date-picker";
-import TimePicker from "react-multi-date-picker/plugins/time_picker";
 import "react-multi-date-picker/styles/colors/purple.css"
 import persian_fa from "react-date-object/locales/persian_fa";
 import persian from "react-date-object/calendars/persian";
 import gregorian from "react-date-object/calendars/gregorian";
 import persian_en from "react-date-object/locales/persian_en";
-import moment from "moment";
 import { UseFormSetValue } from 'react-hook-form';
 
 type FormComponentType = {
@@ -32,13 +30,6 @@ export default function FieldsInputs({ register, data, defualtVal, setValue }: F
         }
     }
     const [selector, setSelector] = useState<any>(getValueInputs())
-
-
-    // useEffect(() => {
-    //     if (date) {
-    //         setDayCount(moment(date).diff(moment(), "days"))
-    //     }
-    // }, [date])
     switch (data.type) {
         case 'text':
             return (
@@ -146,7 +137,7 @@ export default function FieldsInputs({ register, data, defualtVal, setValue }: F
                     <span>{data.label}</span>
                     <DatePicker
                         multiple={false}
-                        // value={date}
+                        value={defualtVal && data?.name ? defualtVal[data?.name] : null}
                         format="YYYY/MM/DD"
                         onChange={changeHandler}
                         calendar={persian}
@@ -157,13 +148,14 @@ export default function FieldsInputs({ register, data, defualtVal, setValue }: F
                 </div>
             )
         case 'checkBox':
+            const [change, setChange] = useState<boolean>(defualtVal && data?.name ? defualtVal[data?.name] : false)
             return (
                 <div className={`flex flex-col gap-1 ${data?.className}`}>
                     <span>{data.label}</span>
                     <Switch
                         {...register(data.name, { required: false })}
-                        // checked={checked}
-                        // onChange={handleChange}
+                        checked={change}
+                        onChange={() => setChange(prev => !prev)}
                         inputProps={{ 'aria-label': 'controlled' }}
                     />
                 </div>
@@ -184,7 +176,7 @@ export default function FieldsInputs({ register, data, defualtVal, setValue }: F
                         ? theme.typography.fontWeightMedium
                         : theme.typography.fontWeightRegular,
                 };
-            }
+            }            
             return (
                 <FormControl className={`shadow-md ${data?.className}`}>
                     <InputLabel id="demo-multiple-name-label">Name</InputLabel>

@@ -31,7 +31,7 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
     //   return;
     // }
     if (allContractorname === 'true') {
-      const data = await prisma.contractor.findMany({select:{name:true,id:true}});
+      const data = await prisma.contractor.findMany({ select: { name: true, id: true } });
       res.send(data);
       return;
     }
@@ -42,16 +42,16 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
       Tags:
         tagFilter.length > 0
           ? {
-              some: {
-                id: { in: tagFilter },
-              },
-            }
+            some: {
+              id: { in: tagFilter },
+            },
+          }
           : undefined,
       name: search
         ? {
-            contains: search,
-            mode: 'insensitive',
-          }
+          contains: search,
+          mode: 'insensitive',
+        }
         : undefined,
       categoryId: category ? Number(category) : undefined,
     } as any;
@@ -112,9 +112,11 @@ const createContractor = expressAsyncHandler(async (req, res) => {
         User: {
           connect: { id: userId },
         },
-        Tags: {
-          connect: tagName.map((id: string) => ({ id })),
-        },
+        Tags: tagName?.length
+          ? {
+            connect: tagName.map((id: string) => ({ id })),
+          }
+          : undefined,
         Category: {
           connect: {
             id: categoryId,
@@ -154,11 +156,13 @@ const updateContractor = expressAsyncHandler(async (req, res) => {
         socialMedia,
         bio,
         avatar,
-        Tags: {
-          set: tagName.map((id: string) => ({ id })),
-        },
         userId: userId || undefined,
-        categoryId: categoryId || undefined,
+        categoryId: Number(categoryId) || undefined,
+        Tags: tagName?.length
+          ? {
+            set: tagName.map((id: string) => ({ id })),
+          }
+          : undefined,
       },
     });
     deleteCahce('Contractors:*');

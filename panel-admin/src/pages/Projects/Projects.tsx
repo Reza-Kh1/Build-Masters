@@ -1,19 +1,17 @@
-import { Button } from "@mui/material";
-import { PiStackPlusFill } from "react-icons/pi";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Pagination from "../../components/Pagination/Pagination";
 import queryString from "query-string";
 import { useEffect, useState } from "react";
 import { fetchProject } from "../../services/project";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { AllProjectType } from "../../type";
-import { FaCheck, FaPlay } from "react-icons/fa6";
-import { FaCalendarAlt } from "react-icons/fa";
-import { MdAddHomeWork, MdClose } from "react-icons/md";
 import SearchBox from "../../components/SearchBox/SearchBox";
 import DontData from "../../components/DontData/DontData";
-import { GrUserWorker } from "react-icons/gr";
 import Create from "./Create";
+import { myThemeTable } from "../../main";
+import { AgGridReact } from "ag-grid-react";
+import DeleteButton from "../../components/DeleteButton/DeleteButton";
+import { ColDef, ICellRendererParams } from "ag-grid-community";
 export default function Projects() {
   const [searchQuery, setSearchQuery] = useState<any>();
   const { search } = useLocation();
@@ -29,79 +27,63 @@ export default function Projects() {
     const query = queryString.parse(search);
     setSearchQuery(query);
   }, [search]);
+  const columnDefs: ColDef[] = [
+    { field: "name", headerName: "نام", flex: 2 },
+    { field: "slug", headerName: "اسلاگ", flex: 2 },
+    { field: "image", headerName: "عکس", flex: 2, cellRenderer: (params: ICellRendererParams) => (<img src={params.value} alt="project" className="w-12 h-12 shadow-md rounded-full" />) },
+    { field: "isPublished", headerName: "وضعیت انتشار", flex: 1 },
+    { field: "Contractor", headerName: "نام مجری", flex: 1, valueFormatter: (p) => p.value?.name || '----' },
+    { field: "Category", headerName: "نام دسته", flex: 1, valueFormatter: (p) => p.value?.name || '----' },
+    {
+      field: "Tags", headerName: "تگ ها", flex: 2, cellRenderer: (params: ICellRendererParams) => (
+        <div className="flex gap-1 items-center">
+          {params.value.length ? params.value.map((tag: any, index: number) => (
+            <span key={index} className="ml-1">
+              {tag?.name || ''},
+            </span>))
+            : null}
+        </div>
+      ),
+    },
+    { field: "updateAt", headerName: "اخرین آپدیت", flex: 1, valueFormatter: p => new Date(p.value).toLocaleDateString("fa") },
+    {
+      headerName: "عملیات",
+      field: "id",
+      width: 200,
+      filter: false,
+      sortable: false,
+      cellRenderer: (params: ICellRendererParams) => (
+        <div className="flex gap-2 h-full items-center justify-center">
+          <Create id={params.data.slug} />
+          <DeleteButton id={params.value} keyQuery="GetUsers" urlAction="user" headerText="حذف کاربران" />
+        </div>
+      ),
+    },
+  ]
   return (
     <div className="w-full">
-      <Link to={"create-project"}>
-        <Button
-          endIcon={<PiStackPlusFill />}
-          startIcon={<PiStackPlusFill />}
-          color="primary"
-          fullWidth
-          variant="contained"
-        >
-          ایجاد پروژه
-        </Button>
-      </Link>
       <Create />
       <div>
-        {/* <SearchBox status nameWorker /> */}
+        <SearchBox status nameWorker />
       </div>
       {
         data?.pages[0].data.length ?
           <>
-            <div className="w-full my-3 grid grid-cols-3 gap-3">
-              {data?.pages[0].data.map((i, index) => (
-                <></>
-                // <div key={index} className="shadow-md p-2 rounded-md">
-                //   <figure className="relative group overflow-hidden">
-                //     <img
-                //       src={i.image || "/notfound.webp"}
-                //       onError={({ currentTarget }) => {
-                //         currentTarget.onerror = null;
-                //         currentTarget.src = "/notfound.webp";
-                //       }}
-                //       alt={i.alt}
-                //       className="object-cover w-full h-64 rounded-md"
-                //     />
-                //     <Link
-                //       to={"create-project?name=" + i.name.replace(/ /g, "-")}
-                //       className="absolute opacity-0 text-white bg-black/30 group-hover:opacity-100 transition-customer backdrop-blur-md p-5 shadow-md text-2xl rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                //     >
-                //       <FaPlay />
-                //     </Link>
-                //     <div className="-bottom-[100%] text-sm transition-customer box-shadow-customer absolute rounded-md w-full text-center bg-black/70 text-white py-2 group-hover:bottom-[0%]">
-                //       <span>عنوان عکس :{i.alt}</span>
-                //       <p>آدرس :{i.address}</p>
-                //     </div>
-                //     <div className="left-2 text-sm flex items-center gap-3 bg-black/50 px-3 py-1 text-white rounded-md top-2 absolute">
-                //       <i>
-                //         <FaCalendarAlt />
-                //       </i>
-                //       <span className="pt-1">
-                //         {new Date(i.updatedAt).toLocaleDateString("fa")}
-                //       </span>
-                //     </div>
-                //   </figure>
-                //   <div className="flex justify-between px-2 mt-3 items-center">
-                //     <p className="text-base font-semibold flex items-center gap-1">
-                //       <MdAddHomeWork />
-                //       {i.name}
-                //     </p>
-                //     {i.status ? (
-                //       <Button endIcon={<FaCheck />} color="success" size="small">
-                //         منتشر شده
-                //       </Button>
-                //     ) : (
-                //       <Button endIcon={<MdClose />} color="error" size="small">
-                //         منتشر نشده
-                //       </Button>
-                //     )}
-                //   </div>
-                //   <span className="text-gray-700 flex items-center gap-1">
-                //     <GrUserWorker />
-                //     {i.Worker.name}</span>
-                // </div>
-              ))}
+            <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
+              <AgGridReact
+                enableRtl
+                rowData={data?.pages[0]?.data}
+                columnDefs={columnDefs}
+                rowHeight={55}
+                theme={myThemeTable}
+                defaultColDef={{
+                  cellStyle: { direction: 'rtl' },
+                  headerStyle: { direction: 'rtl' },
+                  filter: true,
+                  sortable: true,
+                  resizable: true,
+                }}
+              />
             </div>
             <Pagination pager={data?.pages[0].pagination} />
           </>
@@ -109,6 +91,7 @@ export default function Projects() {
           <DontData
             text={"پروژه ای یافت نشد!"}
           />
+
       }
     </div>
   );

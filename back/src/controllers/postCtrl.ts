@@ -38,10 +38,10 @@ const getAllPost = expressAsyncHandler(async (req, res) => {
       Tags:
         tagFilter.length > 0
           ? {
-              some: {
-                id: { in: tagFilter },
-              },
-            }
+            some: {
+              id: { in: tagFilter },
+            },
+          }
           : undefined,
       isPublished: isPublished === 'false' ? false : true,
       categoryId: category ? Number(category) : undefined,
@@ -134,9 +134,11 @@ const createPost = expressAsyncHandler(async (req, res) => {
         image,
         description,
         isPublished,
-        Tags: {
-          connect: tags.map((id: string) => ({ id })),
-        },
+        Tags: tags?.length
+          ? {
+            connect: tags.map((id: string) => ({ id })),
+          }
+          : undefined,
         user: {
           connect: { id: userId },
         },
@@ -165,11 +167,13 @@ const updatePost = expressAsyncHandler(async (req, res) => {
         image,
         description,
         isPublished,
-        Tags: {
-          set: tags.map((id: string) => ({ id })),
-        },
-        userId,
-        categoryId,
+        Tags: tags?.length
+          ? {
+            set: tags.map((id: string) => ({ id })),
+          }
+          : undefined,
+        userId: userId || undefined,
+        categoryId: Number(categoryId) || undefined,
       },
       where: {
         id: Number(id),

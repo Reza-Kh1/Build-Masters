@@ -35,7 +35,7 @@ model Contractor {
   id           Int      @id @default(autoincrement())
   name         String   @unique
   phone        String   @unique
-  email        String   @unique
+  email        String?   @unique
   socialMedia  Json?
   bio          String?  @db.Text
   avatar       String?
@@ -79,7 +79,7 @@ model Category {
 model Post {
   id           Int      @id @default(autoincrement())
   name         String   @unique
-  image        String
+  image        String?
   description  String   @db.Text
   isPublished  Boolean
   totalComment Float?   @default(0)
@@ -103,7 +103,7 @@ model Post {
 model DetailPost {
   id      Int      @id @default(autoincrement())
   content String   @db.Text
-  title   String
+  title   String?
   keyword String[]
   postId  Int      @unique
   Post    Post     @relation(fields: [postId], references: [id])
@@ -149,11 +149,11 @@ model Project {
   id          Int       @id @default(autoincrement())
   name        String
   slug        String    @unique
-  address     String
-  image       String
+  address     String?
+  image       String?
   gallery     String[]
-  video       String
-  description String
+  video       String?
+  description String?
   stratDate   DateTime?
   endDate     DateTime?
   price       String?
@@ -202,7 +202,7 @@ model onlinePrice {
   price       String?
   subject     String
   images      String[]
-  size        String
+  size        String?
   isStatus    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updateAt    DateTime @updatedAt
@@ -216,10 +216,10 @@ model PageData {
   page         String   @unique
   conetent     Json
   keyword      String[]
-  description  String
-  title        String
-  name         String
-  canonicalUrl String
+  description  String?
+  title        String?
+  name         String?
+  canonicalUrl String?
 
   @@index([page])
 }

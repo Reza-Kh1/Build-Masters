@@ -202,28 +202,34 @@ type AllContractorType = {
 };
 
 type ProjectType = {
-  id: number;
-  name: string;
-  size: string;
-  price: string;
-  address: string;
-  image: string;
-  gallery: {
-    alt: string;
-    url: string;
-  }[];
-  video: string;
-  alt: string;
-  description: string;
-  status: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  workerId: number;
-  Worker: {
-    name: string;
-    id: number;
-  };
-  Tags: { name: string; id: number }[];
+  id: number,
+  name: string,
+  slug: string,
+  address: string,
+  image: string,
+  gallery: string[]
+  video: string,
+  description: string,
+  stratDate: Date
+  endDate: Date
+  price: string,
+  isPublished: true,
+  categoryId: number,
+  contractorId: number,
+  createdAt: Date
+  updateAt: Date
+  Category: {
+    name: string,
+    slug: string
+  },
+  Contractor: {
+    name: string,
+    rating: string,
+    phone: string,
+    createdAt: Date
+  },
+  Tags: { name: string, id: string }[]
+
 };
 
 type AllProjectType = {

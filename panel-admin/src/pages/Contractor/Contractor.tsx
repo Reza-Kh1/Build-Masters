@@ -35,20 +35,13 @@ export default function Contractor() {
   }, [search]);
   const columnDefs: ColDef[] = [
     {
-      headerName: "عملیات",
-      cellRenderer: (params: ICellRendererParams) => (
-        <div className="flex gap-2 h-full items-center justify-center">
-          <Create id={params.data.name} />
-          <DeleteButton id={params.value} keyQuery="AllContractor" urlAction="contractor" headerText="حذف مجری" />
-        </div>
-      ),
-      field: "id",
-      pinned: 'left',
-      width: 200,
-      filter: false,
-      sortable: false,
+      field: "avatar", headerName: "عکس", flex: 1,
+      cellRenderer: (params: ICellRendererParams) => (<img src={params.value} alt="project" className="w-12 h-12 shadow-md rounded-full" />)
     },
-    { field: "createdAt", width: 120, headerName: "تاریخ", valueFormatter: p => new Date(p.value).toLocaleDateString("fa") },
+    { field: "name", headerName: "نام" },
+    { field: "rating", width: 120, headerName: "امتیاز" },
+    { field: "totalComment", width: 120, headerName: "کامنت" },
+    { field: "Category", headerName: "دسته", valueFormatter: p => p.value?.name, flex: 1 },
     {
       field: "Tags",
       headerName: "تگ",
@@ -62,14 +55,19 @@ export default function Contractor() {
         </div>
       ), flex: 1
     },
-    { field: "Category", headerName: "دسته", valueFormatter: p => p.value?.name, flex: 1 },
-    { field: "totalComment", width: 120, headerName: "کامنت" },
-    { field: "rating", width: 120, headerName: "امتیاز" },
-    { field: "name", headerName: "نام" },
+    { field: "createdAt", width: 120, headerName: "تاریخ", valueFormatter: p => new Date(p.value).toLocaleDateString("fa") },
     {
-      field: "avatar", headerName: "عکس",
-      cellRenderer: (params: ICellRendererParams) => (<img src={params.value} alt="project" className="w-12 h-12 shadow-md rounded-full" />
-      ), flex: 1
+      headerName: "عملیات",
+      cellRenderer: (params: ICellRendererParams) => (
+        <div className="flex gap-2 h-full items-center justify-center">
+          <Create id={params.data.name} />
+          <DeleteButton id={params.value} keyQuery="AllContractor" urlAction="contractor" headerText="حذف مجری" />
+        </div>
+      ),
+      field: "id",
+      width: 200,
+      filter: false,
+      sortable: false,
     },
   ]
   return (
@@ -86,6 +84,7 @@ export default function Contractor() {
               columnDefs={columnDefs}
               rowHeight={55}
               theme={myThemeTable}
+              enableRtl
               defaultColDef={{
                 cellStyle: { direction: 'rtl' },
                 headerStyle: { direction: 'rtl' },

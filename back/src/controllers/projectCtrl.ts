@@ -38,12 +38,12 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
       Tags:
         tagFilter.length > 0
           ? {
-              some: {
-                id: { in: tagFilter },
-              },
-            }
+            some: {
+              id: { in: tagFilter },
+            },
+          }
           : undefined,
-      isPublished: isPublished === 'false' ? false :isPublished==='true' ? true : undefined,
+      isPublished: isPublished === 'false' ? false : isPublished === 'true' ? true : undefined,
       categoryId: category ? Number(category) : undefined,
     } as any;
     if (search) {
@@ -74,6 +74,7 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
         Tags: {
           select: {
             name: true,
+            id: true
           },
         },
         Contractor: {
@@ -94,7 +95,6 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
       skip: (Number(page) - 1) * pageLimit,
       take: pageLimit,
     });
-
     setCache(keyCache, data);
     const count = await prisma.post.count({ where: searchFilter });
     const pager = pagination(count, Number(page), pageLimit);
@@ -135,16 +135,24 @@ const createProject = expressAsyncHandler(async (req, res) => {
         endDate,
         price,
         isPublished,
-        categoryId,
-        Tags: {
-          connect: tags.map((id: string) => ({ id })),
+        Category: {
+          connect: { id: Number(categoryId) }
         },
-        contractorId,
+        Contractor: {
+          connect: { id: Number(contractorId) }
+        },
+        Tags: tags?.length
+          ? {
+            connect: tags.map((id: string | number) => ({ id: Number(id) })),
+          }
+          : undefined,
       },
     });
     deleteCahce('Projects:*');
     res.send({ success: true });
-  } catch (err) {    
+  } catch (err) {
+    console.log(err);
+
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
@@ -177,6 +185,7 @@ const getSingleProject = expressAsyncHandler(async (req, res) => {
         },
         Tags: {
           select: {
+            id: true,
             name: true,
           },
         },
@@ -205,6 +214,7 @@ const updateProject = expressAsyncHandler(async (req, res) => {
     categoryId,
     tags,
     contractorId,
+
   } = req.body;
   const { id } = req.params;
   try {
@@ -222,16 +232,20 @@ const updateProject = expressAsyncHandler(async (req, res) => {
         endDate,
         price,
         isPublished,
-        categoryId,
-        Tags: {
-          set: tags.map((id: string) => ({ id })),
-        },
-        contractorId,
+        categoryId: Number(categoryId),
+        contractorId: Number(contractorId),
+        Tags: tags?.length
+          ? {
+            set: tags.map((id: string | number) => ({ id: Number(id) })),
+          }
+          : undefined,
       },
     });
     deleteCahce('Projects:*');
     res.send({ success: true });
   } catch (err) {
+    console.log(err);
+
     throw customError('خطا در دیتابیس', 500, err);
   }
 });

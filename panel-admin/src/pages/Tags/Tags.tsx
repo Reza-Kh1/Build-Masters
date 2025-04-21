@@ -53,7 +53,7 @@ export default function Tags() {
   });
 
   const columnDefs: ColDef[] = [
-    {
+    { field: "name", headerName: "نام", flex: 2 }, {
       headerName: "عملیات",
       cellRenderer: (params: ICellRendererParams) => (
         <div className="flex gap-2 h-full items-center justify-center">
@@ -62,7 +62,7 @@ export default function Tags() {
             actionForm={updatetag}
             values={params.data}
             fields={[
-              { label: "نام", name: "name", type: "input", required: true },
+              { label: "نام", name: "name", type: "text", required: true },
             ]}
             title="ویرایش اطلاعات"
           />
@@ -70,12 +70,10 @@ export default function Tags() {
         </div>
       ),
       field: "id",
-      pinned: 'left',
       width: 200,
       filter: false,
       sortable: false,
     },
-    { field: "name", headerName: "نام", flex: 2 },
 
   ]
 
@@ -89,7 +87,7 @@ export default function Tags() {
           name: 'ایجاد تگ'
         }}
         fields={[
-          { label: 'نام تگ', name: 'name', type: 'input', required: true }
+          { label: 'نام تگ', name: 'name', type: 'text', required: true }
         ]}
         isSuccess={createSuccess}
         loadingBtn={pendingcreate}

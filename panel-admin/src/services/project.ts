@@ -5,9 +5,9 @@ const fetchProject = async (search: any) => {
     return data;
 };
 const fetchSingleProject = async (name?: string) => {
-    const url = name?.replace(/-/g, " ")
+    const url = name?.replace(/-/g, " ")    
     const { data } = await axios.get(`project/${url}`);    
-    return data?.data;
+    return data;
 };
 const fetchProjectWorker = async ({ pageParam, id }: any) => {    
     const { data } = await axios.get(`project?page=${pageParam || 1}&expert=${id}`);

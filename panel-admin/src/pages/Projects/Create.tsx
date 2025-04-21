@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { CategortType, ContractorType, DataMediaType, FieldsType, TagType } from '../../type';
+import { CategortType, ProjectType, FieldsType, TagType } from '../../type';
 import FieldsInputs from '../../components/FieldsInputs/FieldsInputs';
 import { fetchCategory } from '../../services/category';
 import SelectMedia from '../../components/SelectMedia/SelectMedia';
@@ -30,13 +30,12 @@ const Transition = forwardRef(function Transition(
 export default function Create({ id }: { id?: string }) {
     const query = useQueryClient();
     const [openDialog, setOpenDialog] = useState<boolean>(false)
-    const [avatar, setAvatar] = useState<string>('')
     const { setValue, register, handleSubmit, reset, } = useForm();
     const [image, setImage] = useState<string | null>(null)
     const [gallery, setGallery] = useState<string[]>([])
     const [video, setVideo] = useState<string | null>(null)
 
-    const { data: singleData } = useQuery<ContractorType>({
+    const { data: singleData } = useQuery<ProjectType>({
         queryKey: ["projectSingle", id],
         queryFn: () => fetchSingleProject(id),
         staleTime: 1000 * 60 * 60 * 24,
@@ -89,7 +88,6 @@ export default function Create({ id }: { id?: string }) {
             name: 'tags',
             type: 'autoComplate',
             nameGetValue: 'Tags',
-            required: true,
             dataOptions: dataTag?.length ? dataTag : [],
             className: 'col-span-2'
         },
@@ -123,11 +121,12 @@ export default function Create({ id }: { id?: string }) {
                 gallery,
                 video
             }
-            console.log(body);
+            body.contractorId === 's' ? body.contractorId = null : null
             return axios.post("project", body);
         },
         onSuccess: () => {
-            toast.success("مجری افزوده شد");
+            setOpenDialog(false)
+            toast.success("پروژه افزوده شد");
             query.invalidateQueries({ queryKey: ["AllProject"] });
         },
         onError: (err) => {
@@ -139,14 +138,19 @@ export default function Create({ id }: { id?: string }) {
         mutationFn: async (form: any) => {
             const body = {
                 ...form,
-                avatar,
+                image,
+                gallery,
+                video
             }
-            return axios.put("contractor/" + singleData?.id, body);
+            body.contractorId === 's' ? body.contractorId = null : null
+            console.log(body);
+
+            return axios.put("project/" + singleData?.id, body);
         },
         onSuccess: () => {
-            toast.success("اطلاعات مجری ویرایش شد");
+            toast.success("اطلاعات پروژه ویرایش شد");
             query.invalidateQueries({ queryKey: ["AllProject"] });
-            query.invalidateQueries({ queryKey: ["projectSingle", singleData?.name] });
+            query.invalidateQueries({ queryKey: ["projectSingle", id] });
         },
         onError: (err) => {
             toast.success("خطا در اجرای عملیات");
@@ -156,16 +160,20 @@ export default function Create({ id }: { id?: string }) {
 
     useEffect(() => {
         if (id && singleData) {
-            setValue('email', singleData.email)
             setValue('name', singleData.name)
-            setValue('bio', singleData.bio)
-            setValue('phone', singleData.phone)
-            setValue('userId', singleData.userId)
-            setValue('categoryId', singleData.categoryId)
-            setValue('tagName', singleData.Tags)
-            setAvatar(singleData.avatar)
+            setValue('slug', singleData.slug)
+            setValue('address', singleData.address)
+            setValue('price', singleData.price)
+            setValue('stratDate', singleData.stratDate)
+            setValue('tags', singleData.Tags?.map((i) => i.id) || [])
+            setValue('endDate', singleData.endDate)
+            setValue('description', singleData.description)
+            setValue('isPublished', singleData.isPublished)
+            setGallery(singleData.gallery || [])
+            setImage(singleData.image)
+            setVideo(singleData.video)
         }
-    }, [singleData])
+    }, [singleData, openDialog])
 
     return (
         <>
