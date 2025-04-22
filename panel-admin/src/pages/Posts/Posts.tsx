@@ -19,7 +19,7 @@ export default function Posts() {
     queryFn: () => fetchPost(searchQuery),
     staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24,
-    getNextPageParam: (lastPage) => lastPage.paginate.nextPage || undefined,
+    getNextPageParam: (lastPage) => lastPage.pagination.nextPage || undefined,
     initialPageParam: "",
   });
   useEffect(() => {
@@ -34,24 +34,18 @@ export default function Posts() {
         </Button>
       </Link>
       <SearchBox status />
-      <DontData
-        text={
-          data?.pages[0].count
-            ? data?.pages[0].count + " پست"
-            : "پستی یافت نشد!"
-        }
-      />
+
       <div className="flex flex-col gap-3 mt-3">
-        {data?.pages[0].rows.length ? (
-          data.pages[0].rows.map((i, index) => (
+        {data?.pages[0].data.length ? (
+          data.pages[0].data.map((i, index) => (
             <Link
-              to={i.title.replace(/ /g, "-")}
+              to={i.name.replace(/ /g, "-")}
               key={index}
               className="bg-gray-200 p-2 shadow-md flex rounded-md"
             >
               <div className="w-5/6 flex ">
                 <div className="grid grid-cols-2 w-4/6">
-                  <span className="cutline cutline-2">نام : {i.title}</span>
+                  <span className="cutline cutline-2">نام : {i.name}</span>
                   <span className="cutline cutline-2">
                     دسته : {i.Category?.name}
                   </span>
@@ -63,18 +57,15 @@ export default function Posts() {
                   <span>
                     آپدیت : {new Date(i.updatedAt).toLocaleDateString("fa")}
                   </span>
-                  <span>تعداد کامنت ها : {i.totalComments || 0}</span>
-                  <span className="cutline cutline-2">
-                    نویسنده : {i.User.name}
-                  </span>
+                  <span>تعداد کامنت ها : {i.totalComment || 0}</span>
                   <div>
                     <Button
-                      color={i.status ? "success" : "error"}
-                      endIcon={i.status ? <FaCheck /> : <MdClose />}
+                      color={i.isPublished ? "success" : "error"}
+                      endIcon={i.isPublished ? <FaCheck /> : <MdClose />}
                       className="!cursor-default"
                       variant="outlined"
                     >
-                      {i.status ? "منتشر شده" : "منتشر نشده"}
+                      {i.isPublished ? "منتشر شده" : "منتشر نشده"}
                     </Button>
                   </div>
                 </div>
@@ -92,9 +83,9 @@ export default function Posts() {
               </figure>
             </Link>
           ))
-        ) : null}
+        ) : <DontData text="پستی یافت نشد!" />}
       </div>
-      <Pagination pager={data?.pages[0].paginate} />
+      <Pagination pager={data?.pages[0].pagination} />
     </div>
   );
 }

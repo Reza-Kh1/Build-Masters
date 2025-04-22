@@ -45,27 +45,25 @@ type FormDetailType = {
 };
 
 type AllPostType = {
-  count: number;
-  rows: PostType[];
-  paginate: PaginationType;
+  data: PostType[];
+  pagination: PaginationType;
 };
 
 type PostType = {
-  id: number;
-  title: string;
-  image: null;
-  slug: string;
-  description: string;
-  totalComments: null;
-  status: true;
-  updatedAt: Date;
+  id: number,
+  name: string,
+  image: string | null,
+  description: string,
+  isPublished: true,
+  totalComment: number,
+  createdAt: Date,
+  updatedAt: Date,
+  userId: string,
+  categoryId: number,
   Category: {
-    slug: string;
-    name: string;
-  };
-  User: {
-    name: string;
-  };
+    name: string,
+    slug: string
+  }
 };
 
 type SinglePostType = {

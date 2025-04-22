@@ -1,7 +1,7 @@
 import axios from "axios";
 const fetchPost = async (search: any) => {
   const url = new URLSearchParams(search);
-  const { data } = await axios.get(`post/admin?${url}`);
+  const { data } = await axios.get(`post?${url}`);
   return data;
 };
 
