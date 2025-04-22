@@ -91,7 +91,6 @@ export default function Projects() {
           <DontData
             text={"پروژه ای یافت نشد!"}
           />
-
       }
     </div>
   );

@@ -22,6 +22,7 @@ export default function Categorys() {
     staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24,
   });
+
   const { isPending: createPending, mutate: createCategory, isSuccess: successCreate } = useMutation({
     mutationFn: async (form) => {
       await deleteCache({ tag: "category" });
@@ -50,6 +51,7 @@ export default function Categorys() {
       console.log(err);
     },
   });
+
   const dataOptions = () => {
     if (!data || !data?.length) return []
     return data.map((row) => {
@@ -63,6 +65,15 @@ export default function Categorys() {
   const columnDefs: ColDef[] = [
     { field: "name", headerName: "نام", flex: 2 },
     { field: "slug", headerName: "اسلاگ" },
+    {
+      field: "SubCategoryTo", headerName: "زیر مجموعه", valueFormatter: (params) => {
+        if (params?.value === null) {
+          return "-------"
+        } else {
+          return params?.value?.name
+        }
+      }
+    },
     {
       headerName: "عملیات",
       cellRenderer: (params: ICellRendererParams) => (
@@ -88,15 +99,6 @@ export default function Categorys() {
       width: 200,
       filter: false,
       sortable: false,
-    },
-    {
-      field: "SubCategoryTo", headerName: "زیر مجموعه", valueFormatter: (params) => {
-        if (params?.value === null) {
-          return "-------"
-        } else {
-          return params?.value?.name
-        }
-      }
     },
 
   ]
@@ -124,6 +126,7 @@ export default function Categorys() {
           {data?.length ? (
             <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
               <AgGridReact
+                enableRtl
                 rowData={data}
                 columnDefs={columnDefs}
                 rowHeight={55}

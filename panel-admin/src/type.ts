@@ -97,21 +97,22 @@ type SinglePostType = {
 };
 
 type AllReviewType = {
-  count: number;
-  rows: ReviewType[];
-  paginate: PaginationType;
+  data: ReviewType[];
+  pagination: PaginationType;
 };
 
 type ReviewType = {
   id: number;
-  position: "USER" | "AUTHOR" | "ADMIN";
-  name: string | null;
-  text: string | null;
-  email: string | null;
-  phone: string | null;
-  parentId: number | null;
-  status: boolean;
+  isPublished: boolean;
+  name: string;
+  phone: string;
+  content: string;
+  rating: string | null;
+  postId: null | number;
+  contractorId: null | number;
+  commentReply: null | number;
   createdAt: Date;
+  roleType: "USER" | "CONTRACTOR" | "AUTHOR" | "ADMIN";
   Post?: {
     id: string;
     title?: string;
@@ -138,7 +139,7 @@ type OnlinePriceType = {
   subject: string;
   images: string[];
   size: string;
-  status: boolean;
+  isStatus: boolean;
   createdAt: Date;
   updatedAt: Date;
 };

@@ -43,7 +43,7 @@ const getAllOnlinePrice = expressAsyncHandler(async (req, res) => {
     //   return;
     // }
     const searchFilter = {
-      isStatus: status === 'false' ? false : true,
+      isStatus: status === 'true' ? true : false,
     };
     const data = await prisma.onlinePrice.findMany({
       where: searchFilter,
@@ -62,19 +62,11 @@ const getAllOnlinePrice = expressAsyncHandler(async (req, res) => {
 });
 
 const updateOnlinePrice = expressAsyncHandler(async (req, res) => {
-  const { name, phone, description, price, subject, images, size, isStatus } =
-    req.body;
+  const { isStatus } = req.body;
   const { id } = req.params;
   try {
     await prisma.onlinePrice.update({
       data: {
-        name,
-        phone,
-        description,
-        price,
-        subject,
-        images,
-        size,
         isStatus,
       },
       where: {

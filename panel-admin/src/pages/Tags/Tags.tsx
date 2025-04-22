@@ -53,8 +53,13 @@ export default function Tags() {
   });
 
   const columnDefs: ColDef[] = [
-    { field: "name", headerName: "نام", flex: 2 }, {
+    { field: "name", headerName: "نام", flex: 2 },
+    {
       headerName: "عملیات",
+      field: "id",
+      width: 200,
+      filter: false,
+      sortable: false,
       cellRenderer: (params: ICellRendererParams) => (
         <div className="flex gap-2 h-full items-center justify-center">
           <EditButton
@@ -68,11 +73,7 @@ export default function Tags() {
           />
           <DeleteButton keyCacheNext={{ tag: "tag" }} id={params.value} keyQuery="TagsName" urlAction="tag" headerText="حذف تگ" />
         </div>
-      ),
-      field: "id",
-      width: 200,
-      filter: false,
-      sortable: false,
+      )
     },
 
   ]
@@ -96,6 +97,7 @@ export default function Tags() {
       {data?.length ? (
         <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
           <AgGridReact
+          enableRtl
             rowData={data}
             columnDefs={columnDefs}
             rowHeight={55}

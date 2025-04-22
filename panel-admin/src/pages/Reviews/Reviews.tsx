@@ -81,7 +81,7 @@ export default function Reviews() {
     queryFn: () => fetchReview(searchQuery),
     staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24,
-    getNextPageParam: (lastPage) => lastPage.paginate.nextPage || undefined,
+    getNextPageParam: (lastPage) => lastPage.pagination.nextPage || undefined,
     initialPageParam: "",
   });
   const { isPending: isPendingUpdate, mutate: reviewUpdate } = useMutation({
@@ -200,11 +200,12 @@ export default function Reviews() {
       toast.warning("دوباره تلاش کنید");
     },
   });
+  console.log(data);
+  
   const openUpdate = (value: ReviewType) => {
-    setValue("email", value.email || "");
     setValue("name", value.name || "");
     setValue("phone", value.phone || "");
-    setValue("text", value.text || "");
+    setValue("text", value.content || "");
     setReview({
       data: value,
       position: true,
@@ -222,6 +223,7 @@ export default function Reviews() {
     const query = queryString.parse(search);
     setSearchQuery(query);
   }, [search]);
+
   return (
     <>
       <div className="w-full">
@@ -229,14 +231,7 @@ export default function Reviews() {
           isPendingCheck ||
           (isPendingMinus && <PendingApi />)}
         <SearchBox notTag checker />
-        <DontData
-          text={
-            data?.pages[0].count
-              ? data?.pages[0].count + " کامنت"
-              : "کامنتی یافت نشد!"
-          }
-        />
-        {data?.pages[0].rows.length ? (
+        {data?.pages[0].data.length ? (
           <>
             <TableContainer className="my-6" component={Paper}>
               <Table sx={{ minWidth: 700 }} aria-label="customized table">
@@ -256,7 +251,7 @@ export default function Reviews() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {data?.pages[0]?.rows.map((i, index) => (
+                  {data?.pages[0]?.data.map((i, index) => (
                     <StyledTableRow key={index}>
                       <StyledTableCell align="center">
                         <Checkbox checked={i.Post?.title === cachePage} onChange={() => setCachepage(cachePage === i.Post?.title ? "" : i.Post?.title || "")} />
@@ -266,16 +261,16 @@ export default function Reviews() {
                       </StyledTableCell>
                       <StyledTableCell align="center">
                         <p className="text-sm cutline cutline-2">
-                          {i?.position}
+                          {i?.roleType}
                         </p>
                       </StyledTableCell>
                       <StyledTableCell align="center">
                         <p className="text-sm cutline cutline-2">
-                          {i?.phone || i?.email}
+                          {i?.phone}
                         </p>
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        <p className="text-sm cutline cutline-3">{i.text}</p>
+                        <p className="text-sm cutline cutline-3">{i.content}</p>
                       </StyledTableCell>
                       <StyledTableCell align="center">
                         {i.Post?.id ? (
@@ -306,13 +301,13 @@ export default function Reviews() {
                         {new Date(i?.createdAt).toLocaleDateString("fa")}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        <IconButton color={i.status ? "success" : "error"}>
-                          {i.status ? <FaCheck /> : <MdClose />}
+                        <IconButton color={i.isPublished ? "success" : "error"}>
+                          {i.isPublished ? <FaCheck /> : <MdClose />}
                         </IconButton>
                       </StyledTableCell>
                       <StyledTableCell align="center">
                         <div className="flex justify-evenly gap-2">
-                          {i.status ? (
+                          {i.isPublished ? (
                             <Button
                               onClick={() => reviewMinus(i)}
                               color="warning"
@@ -368,7 +363,7 @@ export default function Reviews() {
                 </TableBody>
               </Table>
             </TableContainer>
-            <Pagination pager={data?.pages[0].paginate} />
+            <Pagination pager={data?.pages[0].pagination} />
           </>
         ) : null}
       </div>
@@ -398,11 +393,11 @@ export default function Reviews() {
                         {review?.data.name}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {review?.data?.phone || review?.data?.email}
+                        {review?.data?.phone }
                       </StyledTableCell>
                       <StyledTableCell align="center">
                         <p className="text-sm cutline cutline-3">
-                          {review?.data.text}
+                          {review?.data.content}
                         </p>
                       </StyledTableCell>
                     </StyledTableRow>

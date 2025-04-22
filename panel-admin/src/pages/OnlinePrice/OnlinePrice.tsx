@@ -1,8 +1,4 @@
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { forwardRef, useEffect, useState } from "react";
 import { fetchOnlinePrice } from "../../services/onlinePrice";
 import { AllonlinePriceType, OnlinePriceType } from "../../type";
@@ -10,26 +6,9 @@ import Pagination from "../../components/Pagination/Pagination";
 import { GiPencilRuler } from "react-icons/gi";
 import queryString from "query-string";
 import { useLocation } from "react-router-dom";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Paper,
-  Slide,
-  styled,
-  Table,
-  TableBody,
-  TableCell,
-  tableCellClasses,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Slide } from "@mui/material";
 import { MdClose } from "react-icons/md";
-import { FaCheck, FaPhone, FaSackDollar } from "react-icons/fa6";
+import { FaCheck, FaEye, FaPhone, FaSackDollar } from "react-icons/fa6";
 import { IoEye, IoTrashBin } from "react-icons/io5";
 import { TransitionProps } from "@mui/material/transitions";
 import axios from "axios";
@@ -39,6 +18,11 @@ import { SiSubtitleedit } from "react-icons/si";
 import { FaCalendarAlt } from "react-icons/fa";
 import DontData from "../../components/DontData/DontData";
 import SearchBox from "../../components/SearchBox/SearchBox";
+import { AgGridReact } from "ag-grid-react";
+import { myThemeTable } from "../../main";
+import DeleteButton from "../../components/DeleteButton/DeleteButton";
+import { ColDef, ICellRendererParams } from "ag-grid-community";
+
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement<any, any>;
@@ -47,29 +31,11 @@ const Transition = forwardRef(function Transition(
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-}));
 
 export default function OnlinePrice() {
   const [searchQuery, setSearchQuery] = useState<any>();
   const [open, setOpen] = useState<boolean>(false);
   const [singleData, setSingleData] = useState<OnlinePriceType>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showImg, setShowImg] = useState<string>("")
   const { search } = useLocation();
   const queryClient = useQueryClient();
@@ -81,9 +47,10 @@ export default function OnlinePrice() {
     getNextPageParam: (lastPage) => lastPage.pagination.nextPage || undefined,
     initialPageParam: "",
   });
-  const { isPending: isUpdate, mutate: checkPrice } = useMutation({
+
+  const { isPending: pendingupdate, mutate: checkPrice } = useMutation({
     mutationFn: () => {
-      return axios.put(`onlineprice/${singleData?.id}`);
+      return axios.put(`onlineprice/${singleData?.id}`, { isStatus: !singleData?.isStatus });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["Onlineprice"] });
@@ -98,7 +65,7 @@ export default function OnlinePrice() {
   });
   const { isPending: isDelete, mutate: deletePrice } = useMutation({
     mutationFn: () => {
-      return axios.delete(`onlineprice/${singleData?.id}`);
+      return axios.delete(`onlinePrice/${singleData?.id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["Onlineprice"] });
@@ -111,82 +78,57 @@ export default function OnlinePrice() {
       setOpen(false);
     },
   });
-  const getSingleData = (id: number) => {
-    setIsLoading(true);
-    axios
-      .get(`onlineprice/${id}`)
-      .then(({ data }) => {
-        setSingleData(data?.data);
-      })
-      .catch(() => {
-        toast.error("با خطا مواجه شدیم!");
-      })
-      .finally(() => {
-        setOpen(true);
-        setIsLoading(false);
-      });
-  };
+
   useEffect(() => {
     const query = queryString.parse(search);
     setSearchQuery(query);
   }, [search]);
-
+  const columnDefs: ColDef[] = [
+    { field: "name", headerName: "نام", flex: 1 },
+    { field: "phone", headerName: "شماره تلفن", flex: 1 },
+    { field: "subject", headerName: "دسته", flex: 1 },
+    { field: "price", headerName: "قیمت", valueFormatter: (param) => param?.value ? Number(param.value).toLocaleString("fa") : 'ثبت نشده', flex: 1 },
+    { field: "isStatus", headerName: "تایید شده", flex: 1 },
+    { field: "createdAt", headerName: "تاریخ", valueFormatter: p => new Date(p.value).toLocaleDateString("fa"), flex: 1 },
+    {
+      headerName: "عملیات",
+      field: "id",
+      width: 200,
+      filter: false,
+      sortable: false,
+      cellRenderer: (params: ICellRendererParams) => (
+        <div className="flex gap-2 h-full items-center justify-center">
+          <Button onClick={() => { setSingleData(params.data), setOpen(true) }} color="success" endIcon={<FaEye />} variant="contained">نمایش</Button>
+          <DeleteButton id={params.value} keyQuery="Onlineprice" urlAction="onlinePrice" headerText="حذف درخواست" />
+        </div>
+      ),
+    },
+  ]
   return (
     <div className="w-full">
-      {isLoading ? <PendingApi /> : null}
+      {pendingupdate && <PendingApi />}
       <SearchBox checker notTag notSearch />
-
-      {data?.pages[0].rows.length ? (
-        <div className="mt-3">
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 700 }} aria-label="customized table">
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell align="center">نام</StyledTableCell>
-                  <StyledTableCell align="center">شماره تلفن</StyledTableCell>
-                  <StyledTableCell align="center">موضوع</StyledTableCell>
-                  <StyledTableCell align="center">تاریخ</StyledTableCell>
-                  <StyledTableCell align="center">وضعیت</StyledTableCell>
-                  <StyledTableCell align="center">نمایش</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data.pages[0].rows?.map((row, index) => (
-                  <StyledTableRow key={index}>
-                    <StyledTableCell align="center">{row.name}</StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row.phone}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row.subject}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      <IconButton color={row.status ? "success" : "error"}>
-                        {row.status ? <FaCheck /> : <MdClose />}
-                      </IconButton>
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {new Date(row.createdAt).toLocaleString("fa")}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      <Button
-                        color={"success"}
-                        endIcon={<IoEye />}
-                        variant="contained"
-                        onClick={() => getSingleData(row.id)}
-                        disabled={isLoading || isDelete || isUpdate}
-                      >
-                        نمایش اطلاعات
-                      </Button>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+      {data?.pages[0].data.length ? (
+        <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
+          <AgGridReact
+            enableRtl
+            rowData={data?.pages[0]?.data}
+            columnDefs={columnDefs}
+            rowHeight={55}
+            theme={myThemeTable}
+            defaultColDef={{
+              cellStyle: { direction: 'rtl' },
+              headerStyle: { direction: 'rtl' },
+              filter: true,
+              sortable: true,
+              resizable: true,
+            }}
+          />
         </div>
-      ) : null}
-      <Pagination pager={data?.pages[0].paginate} />
+      ) :
+        <DontData text="هیچ درخواستی موجود نیست" />
+      }
+      <Pagination pager={data?.pages[0].pagination} />
       <Dialog
         maxWidth="lg"
         fullWidth
@@ -246,8 +188,8 @@ export default function OnlinePrice() {
             <div className="flex flex-col gap-3">
               <span className="flex items-center gap-3">
                 وضعیت
-                <IconButton color={singleData?.status ? "success" : "error"}>
-                  {singleData?.status ? <FaCheck /> : <MdClose />}
+                <IconButton color={singleData?.isStatus ? "success" : "error"}>
+                  {singleData?.isStatus ? <FaCheck /> : <MdClose />}
                 </IconButton>
               </span>
             </div>
@@ -282,16 +224,16 @@ export default function OnlinePrice() {
         <DialogActions>
           <div className="flex items-center justify-between w-full">
             <Button
-              disabled={isDelete || isUpdate}
+              disabled={isDelete || pendingupdate}
               variant="contained"
-              color={singleData?.status ? "warning" : "primary"}
+              color={singleData?.isStatus ? "warning" : "primary"}
               onClick={() => checkPrice()}
               endIcon={<FaCheck />}
             >
-              {singleData?.status ? "لغو تایید" : "تایید شود"}
+              {singleData?.isStatus ? "لغو تایید" : "تایید شود"}
             </Button>
             <Button
-              disabled={isDelete || isUpdate}
+              disabled={isDelete || pendingupdate}
               variant="contained"
               color="error"
               onClick={() => deletePrice()}

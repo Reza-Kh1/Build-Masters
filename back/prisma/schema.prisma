@@ -35,7 +35,7 @@ model Contractor {
   id           Int      @id @default(autoincrement())
   name         String   @unique
   phone        String   @unique
-  email        String?   @unique
+  email        String?  @unique
   socialMedia  Json?
   bio          String?  @db.Text
   avatar       String?
@@ -125,12 +125,13 @@ model Tag {
 
 /////////////////////////////       Model Comment         /////////////////////////////
 model Comment {
-  id          Int     @id @default(autoincrement())
-  isPublished Boolean @default(false)
+  id          Int      @id @default(autoincrement())
+  isPublished Boolean  @default(false)
   name        String
   phone       String
-  content     String  @db.Text
+  content     String   @db.Text
   rating      Int?
+  roleType    RoleType @default(USER)
 
   postId         Int?
   Post           Post?       @relation(fields: [postId], references: [id])
@@ -142,6 +143,13 @@ model Comment {
   createdAt      DateTime    @default(now())
 
   @@index([isPublished, commentReply])
+}
+
+enum RoleType {
+  USER
+  CONTRACTOR
+  AUTHOR
+  ADMIN
 }
 
 /////////////////////////////       Model Project         /////////////////////////////

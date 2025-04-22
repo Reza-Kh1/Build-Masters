@@ -15,7 +15,6 @@ import OnlinePrice from "../pages/OnlinePrice/OnlinePrice";
 import Contractor from "../pages/Contractor/Contractor";
 import Projects from "../pages/Projects/Projects";
 import PageInfo from "../pages/PageInfo/PageInfo";
-import Message from "../pages/Message/Message";
 import CreateProject from "../components/CreateProject/CreateProject";
 import Tags from "../pages/Tags/Tags";
 import CreateWorker from "../components/CreateWorker/CreateWorker";
@@ -35,7 +34,6 @@ export default [
       { path: "projects", element: <Projects /> },
       { path: "projects/create-project", element: <CreateProject /> },
       { path: "page-info", element: <PageInfo /> },
-      { path: "message", element: <Message /> },
       { path: "dashboard", element: <Dashboard /> },
       { path: "reviews", element: <Reviews /> },
       { path: "categorys", element: <Categorys /> },

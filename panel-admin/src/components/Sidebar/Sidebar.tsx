@@ -5,17 +5,9 @@ import { FaSearchDollar } from "react-icons/fa";
 import { FaPaintbrush, FaUsers } from "react-icons/fa6";
 import { GrUserWorker } from "react-icons/gr";
 import { TiMessages } from "react-icons/ti";
-import { BiSolidMessageRoundedError } from "react-icons/bi";
-import {
-  MdImage,
-  MdOutlineCategory,
-  MdOutlinePostAdd,
-  MdSettings,
-} from "react-icons/md";
+import { MdImage, MdOutlineCategory, MdOutlinePostAdd, MdSettings } from "react-icons/md";
 import { BsDatabaseCheck, BsFillBuildingsFill } from "react-icons/bs";
 import { BiSolidDashboard } from "react-icons/bi";
-import axios from "axios";
-import { toast } from "react-toastify";
 import { useState } from "react";
 import PendingApi from "../PendingApi/PendingApi";
 import { LinkSidebarType } from "../../type";
@@ -51,11 +43,6 @@ const dataLink = [
     icon: <GrUserWorker />,
   },
   {
-    name: "پیام ها",
-    url: "/home/message?page=1&order=desc&status=false",
-    icon: <BiSolidMessageRoundedError />,
-  },
-  {
     name: "تعیین قیمت",
     url: "/home/online-price?page=1&order=desc&status=false",
     icon: <FaSearchDollar />,
@@ -74,20 +61,6 @@ export default function Sidebar() {
     navigate("/");
     localStorage.setItem(cookieKey, "");
     Cookies.remove(cookieKey);
-    // axios
-    //   .get("/user/logout")
-    //   .then(() => {
-    //     toast.success("با موفقیت از حساب خارج شدید");
-    //     navigate("/");
-    //     localStorage.setItem("user", "");
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     toast.error("دوباره تلاش کنید!");
-    //   })
-    //   .finally(() => {
-    //     setLaod(false);
-    //   });
   };
   const LinkSidebar = ({ url, name, icon }: LinkSidebarType) => {
     return (
