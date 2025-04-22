@@ -34,7 +34,7 @@ export default function Posts() {
         </Button>
       </Link>
       <SearchBox status />
-
+      
       <div className="flex flex-col gap-3 mt-3">
         {data?.pages[0].data.length ? (
           data.pages[0].data.map((i, index) => (
