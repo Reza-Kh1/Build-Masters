@@ -26,11 +26,11 @@ const getAllPost = expressAsyncHandler(async (req, res) => {
   }: QueryPost = req.query;
   try {
     const keyCache = `Posts:${tags}&${isPublished}&${search}&${category}&${order}&${page}`;
-    const cache = await getCache(keyCache);
-    if (cache) {
-      res.send(cache);
-      return;
-    }
+    // const cache = await getCache(keyCache);
+    // if (cache) {
+    //   res.send(cache);
+    //   return;
+    // }
     const tagFilter = tags
       ? JSON.parse(tags).map((i: number) => Number(i))
       : [];
@@ -38,10 +38,10 @@ const getAllPost = expressAsyncHandler(async (req, res) => {
       Tags:
         tagFilter.length > 0
           ? {
-            some: {
-              id: { in: tagFilter },
-            },
-          }
+              some: {
+                id: { in: tagFilter },
+              },
+            }
           : undefined,
       isPublished: isPublished === 'false' ? false : true,
       categoryId: category ? Number(category) : undefined,
@@ -89,16 +89,17 @@ const getSinglePost = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
     const keyCache = `Posts:${id}`;
-    const cache = await getCache(keyCache);
-    if (cache) {
-      res.send(cache);
-      return;
-    }
+    // const cache = await getCache(keyCache);
+    // if (cache) {
+    //   res.send(cache);
+    //   return;
+    // }
     const data = await prisma.post.findUnique({
       where: { name: id },
       include: {
         Category: {
           select: {
+            id: true,
             name: true,
             slug: true,
           },
@@ -128,7 +129,7 @@ const createPost = expressAsyncHandler(async (req, res) => {
   const { name, image, description, isPublished, tags, userId, categoryId } =
     req.body;
   try {
-    await prisma.post.create({
+    const data = await prisma.post.create({
       data: {
         name,
         image,
@@ -136,8 +137,8 @@ const createPost = expressAsyncHandler(async (req, res) => {
         isPublished,
         Tags: tags?.length
           ? {
-            connect: tags.map((id: string) => ({ id })),
-          }
+              connect: tags.map((id: string) => ({ id })),
+            }
           : undefined,
         user: {
           connect: { id: userId },
@@ -148,10 +149,9 @@ const createPost = expressAsyncHandler(async (req, res) => {
       },
     });
     deleteCahce('Posts:*');
-    res.send({ success: true });
+    res.send({ id: data.id });
   } catch (err) {
     console.log(err);
-
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
@@ -169,8 +169,8 @@ const updatePost = expressAsyncHandler(async (req, res) => {
         isPublished,
         Tags: tags?.length
           ? {
-            set: tags.map((id: string) => ({ id })),
-          }
+              set: tags.map((id: string) => ({ id })),
+            }
           : undefined,
         userId: userId || undefined,
         categoryId: Number(categoryId) || undefined,

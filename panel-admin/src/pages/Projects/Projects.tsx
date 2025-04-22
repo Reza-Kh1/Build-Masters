@@ -64,7 +64,7 @@ export default function Projects() {
     <div className="w-full">
       <Create />
       <div>
-        <SearchBox status nameWorker />
+        <SearchBox isPublished nameWorker />
       </div>
       {
         data?.pages[0].data.length ?

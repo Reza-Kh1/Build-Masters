@@ -199,9 +199,7 @@ export default function Reviews() {
       console.log(err);
       toast.warning("دوباره تلاش کنید");
     },
-  });
-  console.log(data);
-  
+  });  
   const openUpdate = (value: ReviewType) => {
     setValue("name", value.name || "");
     setValue("phone", value.phone || "");

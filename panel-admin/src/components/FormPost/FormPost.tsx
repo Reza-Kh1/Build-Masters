@@ -1,12 +1,4 @@
-import {
-  Autocomplete,
-  Button,
-  Chip,
-  FormControlLabel,
-  MenuItem,
-  Switch,
-  TextField,
-} from "@mui/material";
+import { Autocomplete, Button, Chip, FormControlLabel, MenuItem, Switch, TextField, } from "@mui/material";
 import { SiReaddotcv } from "react-icons/si";
 import { RiFileEditLine } from "react-icons/ri";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -26,19 +18,21 @@ import ImageComponent from "../ImageComponent/ImageComponent";
 import DeleteButton from "../DeleteButtonEx/DeleteButton";
 import PendingApi from "../PendingApi/PendingApi";
 import deleteCache from "../../services/revalidate";
-export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {  
+export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
+  const userInfo = JSON.parse(localStorage.getItem(import.meta.env.VITE_PUBLIC_COOKIE_KEY) || '')
+  if (!userInfo) return
   const { register, handleSubmit, watch, setValue, getValues } =
     useForm<FormPostType>({
       defaultValues: {
         categoryId: dataPost?.Category?.id || "s",
-        status: dataPost?.status || false,
+        isPublished: dataPost?.isPublished || false,
       },
     });
   const { pathname } = useLocation();
   const [tagPost, setTagPost] = useState<{ name: string }[]>([])
   const slug = pathname.split("/home/posts/")[1];
   const categoryValue = watch("categoryId");
-  const statusValue = watch("status");
+  const statusValue = watch("isPublished");
   const queryClient = useQueryClient();
   const [imagePost, setImagePost] = useState<DataMediaType | null>(null);
   const [keyword, setKeyword] = useState<string[]>([]);
@@ -57,10 +51,11 @@ export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
       const body = {
         image: imagePost?.url,
         ...form,
-        tags: tagPost || []
+        tags: tagPost.map((row: any) => row.id) || [],
+        userId: userInfo.id
       };
-      await deleteCache({ tag: `category` });
-      await deleteCache({ tag: "post" });
+      // await deleteCache({ tag: `category` });
+      // await deleteCache({ tag: "post" });
       return axios.post("post", body);
     },
     onSuccess: ({ data }) => {
@@ -79,7 +74,7 @@ export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
       const body = {
         image: imagePost?.url,
         ...form,
-        tags: tagPost || []
+        tags: tagPost.map((row: any) => row.id) || []
       };
       await deleteCache({ tag: `category` });
       await deleteCache({ tag: "post" });
@@ -120,10 +115,11 @@ export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
       const body = {
         keyword,
         title: getValues("titleDetail"),
-        text: editorText,
+        content: editorText,
+        postId
       };
-      await deleteCache({ path: `/post/${slug}` });
-      return axios.post(`detail/${postId}`, body);
+      // await deleteCache({ path: `/post/${slug}` });
+      return axios.post(`detailPost`, body);
     },
     onSuccess: () => {
       toast.success("اطلاعات با موفقیت دخیره شد");
@@ -141,10 +137,11 @@ export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
       const body = {
         keyword,
         title: getValues("titleDetail"),
-        text: editorText,
+        content: editorText,
+        postId
       };
-      await deleteCache({ path: `/post/${slug}` });
-      return axios.put(`detail/${postId}`, body);
+      // await deleteCache({ path: `/post/${slug}` });
+      return axios.put(`detailPost`, body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["siglePost", slug] });
@@ -158,19 +155,19 @@ export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
   );
   const syncData = () => {
     if (!dataPost) return;
-    setValue("title", dataPost.title);
+    setValue("name", dataPost.name);
     setValue("description", dataPost.description);
-    setValue("status",dataPost.status ? true : false)
-    setImagePost(dataPost.image ? { url: dataPost.image, alt: dataPost.title } : null);
+    setValue("isPublished", dataPost.isPublished ? true : false)
+    setImagePost(dataPost.image ? { url: dataPost.image, alt: dataPost.name } : null);
     setPostId(dataPost.id);
     setTagPost(dataPost.Tags)
     if (
       dataPost?.DetailPost?.title ||
-      dataPost?.DetailPost?.text ||
+      dataPost?.DetailPost?.content ||
       dataPost?.DetailPost?.keyword
     ) {
       setKeyword(dataPost.DetailPost.keyword || []);
-      setEditorText(dataPost.DetailPost.text || "");
+      setEditorText(dataPost.DetailPost.content || "");
       setValue("titleDetail", dataPost?.DetailPost?.title || "");
       setIsUpdateDetail(true);
     }
@@ -193,7 +190,7 @@ export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
             autoComplete="off"
             label={"نام پست"}
             fullWidth
-            {...register("title", { required: true })}
+            {...register("name", { required: true })}
             helperText="نام تکراری وارد نکنید!"
           />
           <TagAutocomplete setTags={setTagPost} tags={tagPost} name="تگ های مربوط به پست" />
@@ -271,7 +268,7 @@ export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
                 color="secondary"
                 // value={statusValue}
                 checked={statusValue ? true : false}
-                onChange={() => setValue("status", !getValues("status"))}
+                onChange={() => setValue("isPublished", !getValues("isPublished"))}
               />
             }
             label="انتشار پست"

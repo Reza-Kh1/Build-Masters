@@ -1,19 +1,20 @@
 import { Button } from "@mui/material";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { FaCheck } from "react-icons/fa6";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { fetchPost } from "../../services/post";
 import { useEffect, useState } from "react";
 import { AllPostType } from "../../type";
 import Pagination from "../../components/Pagination/Pagination";
 import queryString from "query-string";
 import { MdClose } from "react-icons/md";
-import { LuCopyPlus } from "react-icons/lu";
 import SearchBox from "../../components/SearchBox/SearchBox";
 import DontData from "../../components/DontData/DontData";
+import Create from "./Create";
 export default function Posts() {
   const [searchQuery, setSearchQuery] = useState<any>();
   const { search } = useLocation();
+  const [namePost, setNamePost] = useState<string>('')
   const { data } = useInfiniteQuery<AllPostType>({
     queryKey: ["AllPost", searchQuery],
     queryFn: () => fetchPost(searchQuery),
@@ -28,22 +29,16 @@ export default function Posts() {
   }, [search]);
   return (
     <div>
-      <Link to={"create-post"} className="w-full">
-        <Button color="info" variant="contained" fullWidth startIcon={<LuCopyPlus />} endIcon={<LuCopyPlus />}>
-          ایجاد پست
-        </Button>
-      </Link>
-      <SearchBox status />
-      
+      <Create name={namePost} setName={setNamePost} />
+      <SearchBox isPublished />
       <div className="flex flex-col gap-3 mt-3">
         {data?.pages[0].data.length ? (
           data.pages[0].data.map((i, index) => (
-            <Link
-              to={i.name.replace(/ /g, "-")}
-              key={index}
-              className="bg-gray-200 p-2 shadow-md flex rounded-md"
+            <div
+              onClick={() => setNamePost(i.name)}
+              className="bg-gray-200 p-2 shadow-md flex rounded-md cursor-pointer" key={index}
             >
-              <div className="w-5/6 flex ">
+              <div className="w-5/6 flex">
                 <div className="grid grid-cols-2 w-4/6">
                   <span className="cutline cutline-2">نام : {i.name}</span>
                   <span className="cutline cutline-2">
@@ -81,7 +76,7 @@ export default function Posts() {
                   alt="test"
                 />
               </figure>
-            </Link>
+            </div>
           ))
         ) : <DontData text="پستی یافت نشد!" />}
       </div>

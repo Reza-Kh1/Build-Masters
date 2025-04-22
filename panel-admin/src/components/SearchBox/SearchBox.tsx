@@ -1,12 +1,7 @@
 import { Button, MenuItem, TextField } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  dataOrder,
-  dataStatus,
-  dataCheck,
-  dataRole,
-} from "../../data/selectData";
+import {dataOrder,dataStatus,dataCheck,dataRole,} from "../../data/selectData";
 import TagAutocomplete from "../TagAutocomplete/TagAutocomplete";
 import { useEffect, useState } from "react";
 import queryString from "query-string";
@@ -14,13 +9,13 @@ import { GrSearchAdvanced } from "react-icons/gr";
 import WorkerSelector from "../WorkerSelector/WorkerSelector";
 type SearchFormType = {
   search?: string;
-  status?: string;
+  isPublished?: string;
   order?: string;
   role?: string;
 };
 type SearchBoxType = {
   checker?: boolean;
-  status?: boolean;
+  isPublished?: boolean;
   notTag?: boolean;
   isUser?: boolean;
   notSearch?: boolean;
@@ -28,7 +23,7 @@ type SearchBoxType = {
 };
 export default function SearchBox({
   checker,
-  status,
+  isPublished,
   notTag,
   isUser,
   notSearch, nameWorker
@@ -37,14 +32,14 @@ export default function SearchBox({
   const [workerId, setWorkerId] = useState<number>(0)
   const { register, setValue, handleSubmit, watch } = useForm<SearchFormType>({
     defaultValues: {
-      status: "all",
+      isPublished: "all",
       order: "desc",
       role: "all",
     },
   });
   const navigate = useNavigate();
   const { search } = useLocation();
-  const searchUser = ({ status, ...other }: SearchFormType) => {
+  const searchUser = ({ isPublished, ...other }: SearchFormType) => {
     let newTags = "";
     for (const key in tags) {
       if (Number(key) + 1 === tags.length) {
@@ -59,13 +54,13 @@ export default function SearchBox({
       tags: newTags,
     } as any;
     if (workerId) body.expert = workerId
-    if (status !== "all") body.status = status;
+    if (isPublished !== "all") body.isPublished = isPublished;
     const url = "?" + new URLSearchParams(body);
     navigate(url);
   };
   const setQueryInput = (form: any) => {
     if (form?.search) setValue("search", form?.search);
-    if (form?.status) setValue("status", form?.status || "all");
+    if (form?.status) setValue("isPublished", form?.isPublished || "all");
     if (form?.order) setValue("order", form?.order);
     if (form?.expert) setWorkerId(form.expert)
     if (form?.tags) {
@@ -79,7 +74,7 @@ export default function SearchBox({
       setQueryInput(query);
     }
   }, []);
-  const valueStatus = watch("status");
+  const valueStatus = watch("isPublished");
   const orderValue = watch("order");
   const valueUser = watch("role");
   return (
@@ -134,7 +129,7 @@ export default function SearchBox({
           </MenuItem>
         ))}
       </TextField>
-      {!checker && !status ? null : (
+      {!checker && !isPublished ? null : (
         <TextField
           fullWidth
           autoComplete="off"
@@ -143,9 +138,9 @@ export default function SearchBox({
           label="وضعیت"
           id="evaluationField"
           value={valueStatus}
-          onChange={(e) => setValue("status", e.target.value)}
+          onChange={(e) => setValue("isPublished", e.target.value)}
         >
-          {status &&
+          {isPublished &&
             dataStatus.map((i) => (
               <MenuItem key={i.value} value={i.value}>
                 {i.name}

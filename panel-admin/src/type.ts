@@ -30,9 +30,9 @@ type UserType = {
 };
 
 type FormPostType = {
-  title: string;
+  name: string;
   description: string;
-  status: boolean;
+  isPublished: boolean;
   categoryId: string;
   titleDetail: string;
 };
@@ -68,19 +68,19 @@ type PostType = {
 
 type SinglePostType = {
   id: string;
-  title: string;
+  name: string;
   image: string;
   slug: string;
   description: string;
-  totalComments: null | number;
-  status: boolean;
+  totalComment: null | number;
+  isPublished: boolean;
   updatedAt: Date;
   DetailPost: {
-    text: string | null;
     title: string | null;
+    content: string | null;
     keyword: null | string[];
   };
-  User: {
+  user: {
     name: string;
   };
   Category?: {

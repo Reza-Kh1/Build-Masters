@@ -5,8 +5,8 @@ const fetchPost = async (search: any) => {
   return data;
 };
 
-const fetchSinglePost = async (slug: string) => {
-  const url = slug?.replace(/-/g, " ")  
+const fetchSinglePost = async (slug?: string) => {
+  const url = slug?.replace(/-/g, " ");
   const { data } = await axios.get(`post/${url}`);
   return data;
 };
