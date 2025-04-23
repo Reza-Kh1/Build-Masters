@@ -1,19 +1,13 @@
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { fetchReview } from "../../services/review";
 import Pagination from "../../components/Pagination/Pagination";
 import {
   Button,
-  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   FormControlLabel,
-  IconButton,
   Paper,
   Switch,
   Table,
@@ -28,8 +22,8 @@ import {
   tableCellClasses,
 } from "@mui/material";
 import { AllReviewType, ReviewType } from "../../type";
-import { FaCheck, FaEye, FaPen, FaTrash } from "react-icons/fa6";
-import { Link, useLocation } from "react-router-dom";
+import { FaCheck, FaEye, FaPen } from "react-icons/fa6";
+import { useLocation } from "react-router-dom";
 import { MdClose, MdDataSaverOn } from "react-icons/md";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -38,8 +32,11 @@ import queryString from "query-string";
 import DontData from "../../components/DontData/DontData";
 import SearchBox from "../../components/SearchBox/SearchBox";
 import PendingApi from "../../components/PendingApi/PendingApi";
-import { BiSolidMessageAltCheck } from "react-icons/bi";
 import deleteCache from "../../services/revalidate";
+import { AgGridReact } from "ag-grid-react";
+import { myThemeTable } from "../../main";
+import DeleteButton from "../../components/DeleteButton/DeleteButton";
+import { ColDef, ICellRendererParams } from "ag-grid-community";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -130,76 +127,26 @@ export default function Reviews() {
       toast.warning("با خطا روبرو شدیم");
     },
   });
-  const { isPending: isPendingDelete, mutate: reviewDelete } = useMutation({
-    mutationFn: async () => {
-      if (cachePage) {
-        await deleteCache({ path: `/post/${cachePage.replace(/ /g, "-")}` });
-        setCachepage("")
-      }
-      if (!review?.data.Post) {
-        await deleteCache({ tag: "comment" });
-      }
-      return axios.delete(`comment/${review?.data?.id}`);
-    },
-    onSuccess: () => {
-      query.invalidateQueries({ queryKey: ["AllReview"] });
-      toast.success("کامنت حذف شد");
-      closeHandler();
-    },
-    onError: (err) => {
-      console.log(err);
-      closeHandler();
-      toast.warning("دوباره تلاش کنید");
-    },
-  });
-  const { isPending: isPendingCheck, mutate: reviewCheck } = useMutation({
+  const { isPending: isPendingCheck, mutate: publishedHandler } = useMutation({
     mutationFn: async (form: ReviewType) => {
-      if (cachePage) {
-        await deleteCache({ path: `/post/${cachePage.replace(/ /g, "-")}` });
-        setCachepage("")
-      }
-      if (!form.Post) {
-        await deleteCache({ tag: "comment" });
-      }
       const body = {
-        postId: form.Post?.id,
-        status: true,
+        id: form.id,
+        rating: form.rating,
+        postId: form.postId,
+        isPublished: !form.isPublished,
+        contractorId: form.contractorId
       };
-      return axios.put(`comment/${form?.id}`, body);
+      return axios.put('comment', body);
     },
     onSuccess: () => {
       query.invalidateQueries({ queryKey: ["AllReview"] });
-      toast.success("کامنت تایید شد");
+      toast.success("کامنت آپدیت شد");
     },
     onError: (err) => {
       console.log(err);
       toast.warning("دوباره تلاش کنید");
     },
   });
-  const { isPending: isPendingMinus, mutate: reviewMinus } = useMutation({
-    mutationFn: async (form: ReviewType) => {
-      if (cachePage) {
-        await deleteCache({ path: `/post/${cachePage.replace(/ /g, "-")}` });
-        setCachepage("")
-      }
-      if (!form.Post) {
-        await deleteCache({ tag: "comment" });
-      }
-      const body = {
-        postId: form.Post?.id,
-        status: false,
-      };
-      return axios.put(`comment/${form?.id}`, body);
-    },
-    onSuccess: () => {
-      query.invalidateQueries({ queryKey: ["AllReview"] });
-      toast.success("کامنت رد شد");
-    },
-    onError: (err) => {
-      console.log(err);
-      toast.warning("دوباره تلاش کنید");
-    },
-  });  
   const openUpdate = (value: ReviewType) => {
     setValue("name", value.name || "");
     setValue("phone", value.phone || "");
@@ -221,149 +168,128 @@ export default function Reviews() {
     const query = queryString.parse(search);
     setSearchQuery(query);
   }, [search]);
-
+  const columnDefs: ColDef[] = [
+    { field: "name", headerName: "نام", flex: 1 },
+    { field: "content", headerName: "متن", flex: 2 },
+    {
+      field: "id", headerName: "برای", flex: 1, cellRenderer: ({ data }: ICellRendererParams) => {
+        return data.postId ? (
+          <Tooltip title={data.Post?.name} placement="top" arrow>
+            <Button
+              color="primary"
+              variant="outlined"
+              endIcon={<FaEye size={13} />}
+              size="small"
+            >
+              پست
+            </Button>
+          </Tooltip>
+        ) : data.contractorId ? (
+          <Tooltip title={data?.name} placement="top" arrow>
+            <Button
+              color="success"
+              variant="outlined"
+              endIcon={<FaEye size={13} />}
+              size="small"
+            >
+              مجری
+            </Button>
+          </Tooltip>
+        ) :
+          <Button
+            color="info"
+            variant="outlined"
+            endIcon={<FaEye size={13} />}
+            size="small"
+          >
+            پاسخ
+          </Button>
+      }
+    },
+    {
+      field: "role", flex: 1, headerName: "سطح کاربری", valueFormatter: (p) => {
+        if (p.value === "ADMIN") {
+          return 'ادمین'
+        } else if (p.value === "AUTHOR") {
+          return 'نویسنده'
+        } else if (p.value === 'CONTRACTOR') {
+          return 'مجری'
+        } else {
+          return 'کاربر'
+        }
+      }
+    },
+    { field: "createdAt", headerName: "تاریخ", flex: 1, valueFormatter: p => new Date(p.value).toLocaleDateString("fa") },
+    { field: "id", headerName: "وضعیت", flex: 1, valueFormatter: ({ data }) => data.isPublished ? '✅' : '❌' },
+    {
+      headerName: "عملیات",
+      cellRenderer: (params: ICellRendererParams) => (
+        <div className="flex gap-2 h-full items-center justify-center">
+          {params.data.isPublished ? (
+            <Button
+              onClick={() => publishedHandler(params.data)}
+              color="warning"
+              variant="contained"
+              endIcon={<MdClose size={12} />}
+              disabled={isPendingCheck}
+            >
+              رد
+            </Button>
+          ) : (
+            <Button
+              onClick={() => publishedHandler(params.data)}
+              color="success"
+              variant="contained"
+              endIcon={<FaCheck size={12} />}
+              disabled={isPendingCheck}
+            >
+              تایید
+            </Button>
+          )}
+          <Button
+            onClick={() => openUpdate(params.data)}
+            color="primary"
+            variant="contained"
+            endIcon={<FaPen size={12} />}
+            disabled={isPendingUpdate}
+          >
+            ویرایش
+          </Button>
+          <DeleteButton id={params.value} keyQuery="GetUsers" urlAction="comment" headerText="حذف کامنت" />
+        </div>
+      ),
+      field: "id",
+      width: 200,
+      filter: false,
+      sortable: false, flex: 2
+    },
+  ]
   return (
     <>
       <div className="w-full">
-        {isPendingDelete ||
-          isPendingCheck ||
-          (isPendingMinus && <PendingApi />)}
+        {isPendingCheck && <PendingApi />}
         <SearchBox notTag checker />
         {data?.pages[0].data.length ? (
           <>
-            <TableContainer className="my-6" component={Paper}>
-              <Table sx={{ minWidth: 700 }} aria-label="customized table">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell align="center">حذف کش</StyledTableCell>
-                    <StyledTableCell align="center">نام</StyledTableCell>
-                    <StyledTableCell align="center">موقعیت</StyledTableCell>
-                    <StyledTableCell align="center">
-                      شماره تلفن / ایمیل
-                    </StyledTableCell>
-                    <StyledTableCell align="center">کامنت</StyledTableCell>
-                    <StyledTableCell align="center">آدرس پست</StyledTableCell>
-                    <StyledTableCell align="center">تاریخ</StyledTableCell>
-                    <StyledTableCell align="center">وضعیت</StyledTableCell>
-                    <StyledTableCell align="center">عملیات</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data?.pages[0]?.data.map((i, index) => (
-                    <StyledTableRow key={index}>
-                      <StyledTableCell align="center">
-                        <Checkbox checked={i.Post?.title === cachePage} onChange={() => setCachepage(cachePage === i.Post?.title ? "" : i.Post?.title || "")} />
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <p className="text-sm cutline cutline-2">{i?.name}</p>
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <p className="text-sm cutline cutline-2">
-                          {i?.roleType}
-                        </p>
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <p className="text-sm cutline cutline-2">
-                          {i?.phone}
-                        </p>
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <p className="text-sm cutline cutline-3">{i.content}</p>
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {i.Post?.id ? (
-                          <Tooltip title={i.Post?.title} placement="top" arrow>
-                            <Link to={`/home/posts/${i?.Post?.title}`}>
-                              <Button
-                                color="primary"
-                                variant="outlined"
-                                endIcon={<FaEye size={13} />}
-                                size="small"
-                              >
-                                پست
-                              </Button>
-                            </Link>
-                          </Tooltip>
-                        ) : (
-                          <Button
-                            color="success"
-                            variant="outlined"
-                            endIcon={<BiSolidMessageAltCheck size={13} />}
-                            size="small"
-                          >
-                            نظر
-                          </Button>
-                        )}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {new Date(i?.createdAt).toLocaleDateString("fa")}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <IconButton color={i.isPublished ? "success" : "error"}>
-                          {i.isPublished ? <FaCheck /> : <MdClose />}
-                        </IconButton>
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <div className="flex justify-evenly gap-2">
-                          {i.isPublished ? (
-                            <Button
-                              onClick={() => reviewMinus(i)}
-                              color="warning"
-                              variant="outlined"
-                              endIcon={<MdClose size={12} />}
-                              size="small"
-                              disabled={isPendingMinus}
-                            >
-                              رد
-                            </Button>
-                          ) : (
-                            <Button
-                              onClick={() => reviewCheck(i)}
-                              color="success"
-                              variant="outlined"
-                              endIcon={<FaCheck size={12} />}
-                              size="small"
-                              disabled={isPendingCheck}
-                            >
-                              تایید
-                            </Button>
-                          )}
-                          <Button
-                            onClick={() => {
-                              setOpen(true),
-                                setReview({
-                                  data: i,
-                                  position: false,
-                                });
-                            }}
-                            color="error"
-                            variant="outlined"
-                            endIcon={<FaTrash size={12} />}
-                            size="small"
-                            disabled={isPendingDelete}
-                          >
-                            حذف
-                          </Button>
-                          <Button
-                            onClick={() => openUpdate(i)}
-                            color="success"
-                            variant="outlined"
-                            endIcon={<FaPen size={12} />}
-                            size="small"
-                            disabled={isPendingUpdate}
-                          >
-                            ویرایش
-                          </Button>
-                        </div>
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
+              <AgGridReact
+                enableRtl
+                rowData={data?.pages[0]?.data}
+                columnDefs={columnDefs}
+                rowHeight={55}
+                theme={myThemeTable}
+                defaultColDef={{
+                  cellStyle: { direction: 'rtl' },
+                  headerStyle: { direction: 'rtl' },
+                  filter: true,
+                  sortable: true,
+                  resizable: true,
+                }}
+              />
+            </div>
             <Pagination pager={data?.pages[0].pagination} />
           </>
-        ) : null}
+        ) : <DontData text="هیچ کامنتی یافت نشد" />}
       </div>
       <Dialog
         fullWidth={true}
@@ -391,7 +317,7 @@ export default function Reviews() {
                         {review?.data.name}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {review?.data?.phone }
+                        {review?.data?.phone}
                       </StyledTableCell>
                       <StyledTableCell align="center">
                         <p className="text-sm cutline cutline-3">
@@ -477,18 +403,7 @@ export default function Reviews() {
                   label="ویرایش اطلاعات کاربر"
                 />
               </>
-            ) : (
-              <Button
-                variant="contained"
-                endIcon={<FaTrash />}
-                color="error"
-                onClick={() => reviewDelete()}
-                className="w-2/12"
-                disabled={isPendingDelete}
-              >
-                حذف
-              </Button>
-            )}
+            ) : null}
             <Button
               variant="contained"
               color="warning"

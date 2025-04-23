@@ -100,21 +100,17 @@ type AllReviewType = {
 };
 
 type ReviewType = {
-  id: number;
-  isPublished: boolean;
-  name: string;
-  phone: string;
-  content: string;
-  rating: string | null;
-  postId: null | number;
-  contractorId: null | number;
-  commentReply: null | number;
-  createdAt: Date;
-  roleType: "USER" | "CONTRACTOR" | "AUTHOR" | "ADMIN";
-  Post?: {
-    id: string;
-    title?: string;
-  };
+  id: number,
+  isPublished: boolean,
+  name: string,
+  phone: string,
+  content: string,
+  rating: null | number,
+  postId: null | number,
+  contractorId: null | number,
+  commentReply: null | number,
+  createdAt: Date
+  roleType: 'USER' | 'ADMIN' | 'CONTRACTOR' | 'AUTHOR'
 };
 
 type LinkSidebarType = {
@@ -250,13 +246,13 @@ type FieldsType = {
   name: string;
   icon?: React.ReactNode;
   type:
-    | "text"
-    | "select"
-    | "autoComplate"
-    | "date"
-    | "checkBox"
-    | "number"
-    | "text-multiline";
+  | "text"
+  | "select"
+  | "autoComplate"
+  | "date"
+  | "checkBox"
+  | "number"
+  | "text-multiline";
   nameGetValue?: string;
   dataOptions?: {
     name?: string | React.ReactNode;
