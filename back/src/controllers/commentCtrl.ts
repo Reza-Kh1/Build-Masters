@@ -14,7 +14,7 @@ type QueryComment = {
   type?: 'post' | 'contractor';
   name?: string;
   order?: 'desc' | 'asc';
-  isAdmin?: 'true' | 'false'
+  isAdmin?: 'true' | 'false';
 };
 
 const getAllComment = expressAsyncHandler(async (req, res) => {
@@ -25,7 +25,7 @@ const getAllComment = expressAsyncHandler(async (req, res) => {
     isPublished,
     type,
     order,
-    isAdmin
+    isAdmin,
   }: QueryComment = req.query;
   let search = {
     isPublished: isPublished === 'true' ? true : false,
@@ -36,14 +36,14 @@ const getAllComment = expressAsyncHandler(async (req, res) => {
       Post: {
         select: {
           name: true,
-        }
+        },
       },
       Contractor: {
         select: {
-          name: true
-        }
+          name: true,
+        },
       },
-    }
+    };
   }
   if (postId) {
     search = {
@@ -61,11 +61,11 @@ const getAllComment = expressAsyncHandler(async (req, res) => {
     search =
       type === 'post'
         ? {
-          contractorId: null,
-        }
+            contractorId: null,
+          }
         : {
-          postId: null,
-        };
+            postId: null,
+          };
   }
   try {
     const data = await prisma.comment.findMany({
@@ -89,13 +89,18 @@ const createComment = expressAsyncHandler(async (req, res) => {
     req.body;
   try {
     let isPublished = false;
+    let roleType = 'USER' as any;
     const cookieKey = process.env.COOKIE_KEY as string;
     const cookie = req.cookies[cookieKey];
     if (cookie && postId && commentReply) {
-      token.verify(cookie, process.env.TOKEN_SECURITY as string) as {
+      const userInfo = token.verify(
+        cookie,
+        process.env.TOKEN_SECURITY as string
+      ) as {
         id: string;
         role: 'ADMIN' | 'CONSTARCTOR' | 'AUTHOR';
       };
+      roleType = userInfo.role;
       isPublished = true;
       await prisma.post.update({
         where: { id: postId },
@@ -106,6 +111,7 @@ const createComment = expressAsyncHandler(async (req, res) => {
       data: {
         isPublished,
         name,
+        roleType: roleType || undefined,
         phone,
         content,
         rating,
@@ -122,7 +128,7 @@ const createComment = expressAsyncHandler(async (req, res) => {
 });
 
 const updateComment = expressAsyncHandler(async (req, res) => {
-  const { name, phone, content, rating, commentReply } = req.body;
+  const { name, phone, content, rating, commentReply, isPublished } = req.body;
   const { id } = req.params;
   try {
     await prisma.comment.update({
@@ -131,6 +137,7 @@ const updateComment = expressAsyncHandler(async (req, res) => {
       },
       data: {
         name,
+        isPublished,
         phone,
         content,
         rating,
@@ -208,8 +215,33 @@ const publishedComment = expressAsyncHandler(async (req, res) => {
 });
 
 const deleteComment = expressAsyncHandler(async (req, res) => {
-  const { id } = req.params;
+  const { id, rating, postId, isPublished, contractorId } = req.body;
   try {
+    if (isPublished) {
+      if (postId) {
+        await prisma.post.update({
+          where: { id: postId },
+          data: { totalComment: { decrement: 1 } },
+        });
+      } else {
+        const data = await prisma.contractor.findUnique({
+          where: { id: contractorId },
+          select: { rating: true, totalComment: true },
+        });
+        const currentRating = Number(data?.rating) * Number(data?.totalComment);
+        const newRating =
+          (currentRating - Number(rating)) / (Number(data?.totalComment) - 1);
+        await prisma.contractor.update({
+          data: {
+            rating: Number(newRating.toFixed(2)),
+            totalComment: { decrement: 1 },
+          },
+          where: {
+            id: contractorId,
+          },
+        });
+      }
+    }
     await prisma.comment.delete({
       where: {
         id: Number(id),

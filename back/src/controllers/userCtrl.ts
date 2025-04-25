@@ -18,9 +18,12 @@ const getUsers = expressAsyncHandler(async (req, res) => {
   // }
   try {
     if (contractor === 'true') {
-      const data = await prisma.user.findMany({ where: { role: 'CONTRACTOR', Contractor: null }, select: { id: true, name: true } })
-      res.send(data)
-      return
+      const data = await prisma.user.findMany({
+        where: { role: 'CONTRACTOR', Contractor: null },
+        select: { id: true, name: true },
+      });
+      res.send(data);
+      return;
     }
     const search = {} as any;
     if (email || phone) {
@@ -91,6 +94,7 @@ const signUpUser = expressAsyncHandler(async (req, res) => {
       id: data.id,
       name: data.name,
       role: data.role,
+      phone: data.phone,
     });
     delete data.password;
     res.send({ token, data });
@@ -124,6 +128,7 @@ const updateUser = expressAsyncHandler(async (req, res) => {
       id: data.id,
       name: data.name,
       role: data.role,
+      phone: data.phone,
     });
     res.send({ token, data });
   } catch (err) {
@@ -164,6 +169,7 @@ const signInUser = expressAsyncHandler(async (req, res) => {
       id: data.id,
       name: data.name,
       role: data.role,
+      phone: data.phone,
     });
     res.send({ token, data });
   } catch (err) {

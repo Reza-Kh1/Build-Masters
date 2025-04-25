@@ -2,25 +2,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import { useEffect, useState } from "react";
 import { fetchReview } from "../../services/review";
 import Pagination from "../../components/Pagination/Pagination";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  FormControlLabel,
-  Paper,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Tooltip,
-  styled,
-  tableCellClasses,
-} from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, FormControlLabel, Switch, TextField, Tooltip } from "@mui/material";
 import { AllReviewType, ReviewType } from "../../type";
 import { FaCheck, FaEye, FaPen } from "react-icons/fa6";
 import { useLocation } from "react-router-dom";
@@ -32,47 +14,29 @@ import queryString from "query-string";
 import DontData from "../../components/DontData/DontData";
 import SearchBox from "../../components/SearchBox/SearchBox";
 import PendingApi from "../../components/PendingApi/PendingApi";
-import deleteCache from "../../services/revalidate";
 import { AgGridReact } from "ag-grid-react";
 import { myThemeTable } from "../../main";
 import DeleteButton from "../../components/DeleteButton/DeleteButton";
 import { ColDef, ICellRendererParams } from "ag-grid-community";
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-}));
+import { IoMdTrash } from "react-icons/io";
 type FormReviewType = {
   name: string;
-  text: string;
-  email: string;
+  content: string;
   phone?: string;
   replie: string;
+  rating: number
 };
 export default function Reviews() {
+  const jsonData = localStorage.getItem(import.meta.env.VITE_PUBLIC_COOKIE_KEY)
+  if (!jsonData) return
+  const local = JSON.parse(jsonData)
   const [searchQuery, setSearchQuery] = useState<any>();
   const [open, setOpen] = useState<boolean>(false);
-  const { handleSubmit, register, setValue } = useForm<FormReviewType>();
+  const { handleSubmit, register, setValue, getValues } = useForm<FormReviewType>();
   const [isUpdate, setIsUpdate] = useState<boolean>(false);
-  const [cachePage, setCachepage] = useState<string>("");
+  const [review, setReview] = useState<ReviewType | null>(null);
   const query = useQueryClient();
   const { search } = useLocation();
-  const [review, setReview] = useState<{
-    position: boolean;
-    data: ReviewType;
-  } | null>(null);
   const { data } = useInfiniteQuery<AllReviewType>({
     queryKey: ["AllReview", searchQuery],
     queryFn: () => fetchReview(searchQuery),
@@ -83,35 +47,32 @@ export default function Reviews() {
   });
   const { isPending: isPendingUpdate, mutate: reviewUpdate } = useMutation({
     mutationFn: async ({ replie, ...other }: FormReviewType) => {
-      if (!review?.data.Post) {
-        await deleteCache({ tag: "comment" });
-      }
-      if (cachePage) {
-        await deleteCache({ path: `/post/${cachePage.replace(/ /g, "-")}` });
-        setCachepage("")
-      }
       try {
         if (isUpdate) {
           const body = {
             ...other,
-            status: true,
-            postId: review?.data.Post?.id,
           };
-          await axios.put(`comment/${review?.data.id}`, body);
+          body.rating = Number(getValues('rating'))
+          await axios.put(`comment/${review?.id}`, body);
         }
         if (replie) {
           const body = {
-            text: replie,
-            replies: review?.data.id,
-            postId: review?.data.Post?.id,
+            name: local?.name,
+            phone: local?.phone || '',
+            content: replie,
+            postId: review?.postId,
+            commentReply: review?.id
           };
           await axios.post(`comment`, body);
         }
-        const check = {
-          status: true,
-          postId: review?.data.Post?.id,
+        const accept = {
+          id: review?.id,
+          postId: review?.postId,
+          rating: Number(getValues('rating')),
+          isPublished: true,
+          contractorId: review?.contractorId
         };
-        return axios.put(`comment/${review?.data?.id}`, check);
+        return axios.put(`comment`, accept);
       } catch (err: any) {
         throw new Error(err);
       }
@@ -147,22 +108,36 @@ export default function Reviews() {
       toast.warning("دوباره تلاش کنید");
     },
   });
+  const { isPending: isPendingDelete, mutate: reviewDelete } = useMutation({
+    mutationFn: async (form: ReviewType) => {
+      const body = {
+        id: form.id,
+        rating: form.rating,
+        postId: form.postId,
+        isPublished: form.isPublished,
+        contractorId: form.contractorId
+      };
+      return axios.post('comment/delete', body);
+    },
+    onSuccess: () => {
+      query.invalidateQueries({ queryKey: ["AllReview"] });
+      toast.success("کامنت آپدیت شد");
+    },
+    onError: (err) => {
+      console.log(err);
+      toast.warning("دوباره تلاش کنید");
+    },
+  });
   const openUpdate = (value: ReviewType) => {
     setValue("name", value.name || "");
     setValue("phone", value.phone || "");
-    setValue("text", value.content || "");
-    setReview({
-      data: value,
-      position: true,
-    });
+    setValue("content", value.content || "");
+    setReview(value);
     setOpen(true);
   };
   const closeHandler = () => {
     setOpen(false);
     setIsUpdate(false)
-    setCachepage("")
-    setIsUpdate(false);
-    // setReview(null);
   };
   useEffect(() => {
     const query = queryString.parse(search);
@@ -207,7 +182,7 @@ export default function Reviews() {
       }
     },
     {
-      field: "role", flex: 1, headerName: "سطح کاربری", valueFormatter: (p) => {
+      field: "roleType", flex: 1, headerName: "سطح کاربری", valueFormatter: (p) => {
         if (p.value === "ADMIN") {
           return 'ادمین'
         } else if (p.value === "AUTHOR") {
@@ -229,6 +204,7 @@ export default function Reviews() {
             <Button
               onClick={() => publishedHandler(params.data)}
               color="warning"
+              loading={isPendingDelete}
               variant="contained"
               endIcon={<MdClose size={12} />}
               disabled={isPendingCheck}
@@ -240,6 +216,7 @@ export default function Reviews() {
               onClick={() => publishedHandler(params.data)}
               color="success"
               variant="contained"
+              loading={isPendingDelete}
               endIcon={<FaCheck size={12} />}
               disabled={isPendingCheck}
             >
@@ -255,7 +232,17 @@ export default function Reviews() {
           >
             ویرایش
           </Button>
-          <DeleteButton id={params.value} keyQuery="GetUsers" urlAction="comment" headerText="حذف کامنت" />
+          <Button
+            disabled={isPendingDelete}
+            onClick={() => reviewDelete(params.data)}
+            color="error"
+            loading={isPendingDelete}
+            endIcon={<IoMdTrash />}
+            variant="contained"
+          >
+            حذف
+          </Button>
+          {/* <DeleteButton id={params.value} keyQuery="AllReview" urlAction="comment" headerText="حذف کامنت" /> */}
         </div>
       ),
       field: "id",
@@ -293,117 +280,85 @@ export default function Reviews() {
       </div>
       <Dialog
         fullWidth={true}
-        maxWidth={review?.position ? "lg" : "md"}
+        maxWidth={"lg"}
         open={open}
         onClose={closeHandler}
       >
         <DialogContent>
-          {review ? (
-            !review?.position ? (
-              <TableContainer component={Paper}>
-                <Table aria-label="customized table">
-                  <TableHead>
-                    <TableRow>
-                      <StyledTableCell align="center">نام</StyledTableCell>
-                      <StyledTableCell align="center">
-                        تلفن / ایمیل
-                      </StyledTableCell>
-                      <StyledTableCell align="center">کامنت</StyledTableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <StyledTableRow>
-                      <StyledTableCell align="center">
-                        {review?.data.name}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {review?.data?.phone}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <p className="text-sm cutline cutline-3">
-                          {review?.data.content}
-                        </p>
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            ) : (
-              <div className="flex gap-2">
-                <form className="w-1/2">
-                  <TextField
-                    className="shadow-md"
-                    autoComplete="off"
-                    label={"پاسخ کامنت"}
-                    fullWidth
-                    multiline
-                    rows={9}
-                    {...register("replie")}
-                  />
-                </form>
-                <form className="w-1/2">
-                  <div className="grid grid-cols-3 gap-2 mb-3">
-                    <TextField
-                      disabled={!isUpdate}
-                      className="shadow-md"
-                      autoComplete="off"
-                      label={"اسم کاربر"}
-                      fullWidth
-                      {...register("name")}
-                    />
-                    <TextField
-                      disabled={!isUpdate}
-                      className="shadow-md"
-                      autoComplete="off"
-                      label={"ایمیل"}
-                      fullWidth
-                      {...register("email")}
-                    />
-                    <TextField
-                      disabled={!isUpdate}
-                      className="shadow-md"
-                      autoComplete="off"
-                      label={"شماره تلفن"}
-                      fullWidth
-                      {...register("phone")}
-                    />
-                  </div>
-                  <TextField
-                    disabled={!isUpdate}
-                    className="shadow-md"
-                    autoComplete="off"
-                    label={"متن کامنت"}
-                    fullWidth
-                    multiline
-                    rows={6}
-                    {...register("text")}
-                  />
-                </form>
+          <div className="flex gap-2">
+            <form className="w-1/2">
+              <TextField
+                className="shadow-md"
+                autoComplete="off"
+                label={"پاسخ کامنت"}
+                fullWidth
+                multiline
+                rows={9}
+                {...register("replie")}
+              />
+            </form>
+            <form className="w-1/2">
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                <TextField
+                  disabled={!isUpdate}
+                  className="shadow-md"
+                  autoComplete="off"
+                  label={"اسم کاربر"}
+                  fullWidth
+                  {...register("name")}
+                />
+                <TextField
+                  disabled={!isUpdate}
+                  className="shadow-md"
+                  autoComplete="off"
+                  label={"شماره تلفن"}
+                  fullWidth
+                  {...register("phone")}
+                />
+                <TextField
+                  disabled={!isUpdate}
+                  className="shadow-md"
+                  autoComplete="off"
+                  label={"امتیاز"}
+                  fullWidth
+                  {...register("rating")}
+                  onChange={({ target }) => {
+                    target.value = Number(
+                      target.value.replace(/[^0-9]/g, "")
+                    ).toLocaleString()
+                  }}
+                />
               </div>
-            )
-          ) : null}
+              <TextField
+                disabled={!isUpdate}
+                className="shadow-md"
+                autoComplete="off"
+                label={"متن کامنت"}
+                fullWidth
+                multiline
+                rows={6}
+                {...register("content")}
+              />
+            </form>
+          </div>
         </DialogContent>
         <DialogActions>
           <div className="w-full flex justify-between">
-            {review?.position ? (
-              <>
-                <Button
-                  variant="contained"
-                  endIcon={<MdDataSaverOn />}
-                  className="w-2/12"
-                  color="success"
-                  onClick={handleSubmit((data) => reviewUpdate(data))}
-                  disabled={isPendingUpdate}
-                >
-                  ذخیره
-                </Button>
-                <FormControlLabel
-                  control={<Switch value={isUpdate} />}
-                  onChange={() => setIsUpdate((prev) => !prev)}
-                  label="ویرایش اطلاعات کاربر"
-                />
-              </>
-            ) : null}
+            <Button
+              variant="contained"
+              endIcon={<MdDataSaverOn />}
+              className="w-2/12"
+              color="success"
+              onClick={handleSubmit((data) => reviewUpdate(data))}
+              disabled={isPendingUpdate}
+            >
+              ذخیره
+            </Button>
+            <FormControlLabel
+              control={<Switch value={isUpdate} />}
+              onChange={() => setIsUpdate((prev) => !prev)}
+              label="ویرایش اطلاعات کاربر"
+            />
             <Button
               variant="contained"
               color="warning"
