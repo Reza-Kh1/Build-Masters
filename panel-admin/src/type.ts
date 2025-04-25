@@ -50,20 +50,20 @@ type AllPostType = {
 };
 
 type PostType = {
-  id: number,
-  name: string,
-  image: string | null,
-  description: string,
-  isPublished: true,
-  totalComment: number,
-  createdAt: Date,
-  updatedAt: Date,
-  userId: string,
-  categoryId: number,
+  id: number;
+  name: string;
+  image: string | null;
+  description: string;
+  isPublished: true;
+  totalComment: number;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  categoryId: number;
   Category: {
-    name: string,
-    slug: string
-  }
+    name: string;
+    slug: string;
+  };
 };
 
 type SinglePostType = {
@@ -100,17 +100,17 @@ type AllReviewType = {
 };
 
 type ReviewType = {
-  id: number,
-  isPublished: boolean,
-  name: string,
-  phone: string,
-  content: string,
-  rating: null | number,
-  postId: null | number,
-  contractorId: null | number,
-  commentReply: null | number,
-  createdAt: Date
-  roleType: 'USER' | 'ADMIN' | 'CONTRACTOR' | 'AUTHOR'
+  id: number;
+  isPublished: boolean;
+  name: string;
+  phone: string;
+  content: string;
+  rating: null | number;
+  postId: null | number;
+  contractorId: null | number;
+  commentReply: null | number;
+  createdAt: Date;
+  roleType: "USER" | "ADMIN" | "CONTRACTOR" | "AUTHOR";
 };
 
 type LinkSidebarType = {
@@ -231,12 +231,9 @@ type AllProjectType = {
 };
 
 type BackUpAllType = {
-  success: boolean;
-  backups: {
-    key: string;
-    url: string;
-    lastModified: Date;
-  }[];
+  url: string;
+  id: string;
+  createdAt: Date;
 };
 
 type FieldsType = {
@@ -246,13 +243,13 @@ type FieldsType = {
   name: string;
   icon?: React.ReactNode;
   type:
-  | "text"
-  | "select"
-  | "autoComplate"
-  | "date"
-  | "checkBox"
-  | "number"
-  | "text-multiline";
+    | "text"
+    | "select"
+    | "autoComplate"
+    | "date"
+    | "checkBox"
+    | "number"
+    | "text-multiline";
   nameGetValue?: string;
   dataOptions?: {
     name?: string | React.ReactNode;

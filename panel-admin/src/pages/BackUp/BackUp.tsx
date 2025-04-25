@@ -6,7 +6,6 @@ import { fetchBackUp } from "../../services/backUp";
 import { BackUpAllType } from "../../type";
 import { BsDatabaseSlash } from "react-icons/bs";
 import { LuDatabaseBackup } from "react-icons/lu";
-import DeleteButton from "../../components/DeleteButtonEx/DeleteButton";
 import { IoMdDownload } from "react-icons/io";
 import PendingApi from "../../components/PendingApi/PendingApi";
 import DontData from "../../components/DontData/DontData";
@@ -17,7 +16,7 @@ import { useState } from "react";
 export default function BackUp() {
   const query = useQueryClient();
   let pending = false;
-  const { data } = useQuery<BackUpAllType>({
+  const { data } = useQuery<BackUpAllType[]>({
     queryKey: ["BackUp"],
     queryFn: fetchBackUp,
     staleTime: 1000 * 60 * 60 * 24,
@@ -154,52 +153,43 @@ export default function BackUp() {
           >
             گرفتن بک آپ
           </Button>
-          <DeleteButton
-            endIcon={<BsDatabaseSlash />}
-            deletePost={() => deleteBackUp()}
-            pendingDelete={pendingDelete}
-            text="حذف کامل دیتابیس"
-          />
+
         </div>
       </div>
-      {data?.backups.length ? 
-      <>
-        <span>مرتب سازی بر اساس جدید ترین</span>
-        <div className="grid grid-cols-5 gap-3 mt-3">
-          {data.backups.map((i, index) => (
-            <section
-              key={index}
-              className="bg-blue-200 rounded-md p-3 shadow-md flex flex-col gap-5 items-center justify-center relative"
-            >
-              <div className="bg-slate-100 w-12 h-12 flex justify-center items-center rounded-full shadow-md">
-                <span className="">{index + 1}</span>
-              </div>
-              <time className="text-gray-700" dir="ltr">
-                {new Date(i.lastModified).toLocaleString("fa")}
-              </time>
-              <div className="w-full flex items-center justify-evenly">
-                <Button
-                  color="info"
-                  className="!p-1 !px-3"
-                  endIcon={<IoMdDownload />}
-                  variant="contained"
-                  onClick={() => downloadBackUp(i.url, i.lastModified)}
-                >
-                  دانلود
-                </Button>
-                <DeleteButton
-                  text="حذف"
-                  deletePost={() => deleteSingleBackUp(i.key)}
-                  pendingDelete={pendingFile}
-                />
-              </div>
-            </section>
-          ))}
-        </div>
-      </>
+      {data?.length ?
+        <>
+          <span>مرتب سازی بر اساس جدید ترین</span>
+          <div className="grid grid-cols-5 gap-3 mt-3">
+            {data.map((i, index) => (
+              <section
+                key={index}
+                className="bg-blue-200 rounded-md p-3 shadow-md flex flex-col gap-5 items-center justify-center relative"
+              >
+                <div className="bg-slate-100 w-12 h-12 flex justify-center items-center rounded-full shadow-md">
+                  <span className="">{index + 1}</span>
+                </div>
+                <time className="text-gray-700" dir="ltr">
+                  {new Date(i.createdAt).toLocaleString("fa")}
+                </time>
+                <div className="w-full flex items-center justify-evenly">
+                  <Button
+                    color="info"
+                    className="!p-1 !px-3"
+                    endIcon={<IoMdDownload />}
+                    variant="contained"
+                    onClick={() => downloadBackUp(i.url, i.createdAt)}
+                  >
+                    دانلود
+                  </Button>
+
+                </div>
+              </section>
+            ))}
+          </div>
+        </>
         : <div className="flex flex-col w-full gap-5">
           <DontData text="تا به حال بک آپ گرفته نشده است" />
-          <span>پیشنهاد میشود هر چه سریع تر بک آپ پشتیبانی کرفته شود.</span>
+          <span>پیشنهاد میشود هر چه سریع تر بک آپ پشتیبانی گرفته شود.</span>
         </div>
       }
 

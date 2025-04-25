@@ -94,3 +94,13 @@ https://github.com/microsoftarchive/redis/releases
 OK → OK → OK برای ذخیره تغییرات.
 برای تست :
 redis-cli ping
+
+15_ برای استفاده از بک اپ 
+ویندوز + R را بزنید و sysdm.cpl را وارد کنید → OK.
+
+به تب Advanced بروید → Environment Variables....
+
+در بخش System variables، متغیر Path را انتخاب و Edit کنید.
+نسبت به ورژن دیتابیس خود عدد رو تغییر میدهید مثلا 15 یا 16 
+C:\Program Files\PostgreSQL\17\bin
+OK → OK → OK برای ذخیره تغییرات.

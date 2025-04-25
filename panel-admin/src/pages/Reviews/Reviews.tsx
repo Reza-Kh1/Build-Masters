@@ -16,7 +16,6 @@ import SearchBox from "../../components/SearchBox/SearchBox";
 import PendingApi from "../../components/PendingApi/PendingApi";
 import { AgGridReact } from "ag-grid-react";
 import { myThemeTable } from "../../main";
-import DeleteButton from "../../components/DeleteButton/DeleteButton";
 import { ColDef, ICellRendererParams } from "ag-grid-community";
 import { IoMdTrash } from "react-icons/io";
 type FormReviewType = {
@@ -24,7 +23,7 @@ type FormReviewType = {
   content: string;
   phone?: string;
   replie: string;
-  rating: number
+  rating: number | null
 };
 export default function Reviews() {
   const jsonData = localStorage.getItem(import.meta.env.VITE_PUBLIC_COOKIE_KEY)
@@ -129,6 +128,7 @@ export default function Reviews() {
     },
   });
   const openUpdate = (value: ReviewType) => {
+    setValue("rating", value?.rating || null)
     setValue("name", value.name || "");
     setValue("phone", value.phone || "");
     setValue("content", value.content || "");
@@ -160,7 +160,7 @@ export default function Reviews() {
             </Button>
           </Tooltip>
         ) : data.contractorId ? (
-          <Tooltip title={data?.name} placement="top" arrow>
+          <Tooltip title={data?.Contractor?.name} placement="top" arrow>
             <Button
               color="success"
               variant="outlined"
@@ -207,22 +207,23 @@ export default function Reviews() {
               loading={isPendingDelete}
               variant="contained"
               endIcon={<MdClose size={12} />}
-              disabled={isPendingCheck}
+              disabled={params.data.roleType !== 'USER' || isPendingCheck}
             >
               رد
             </Button>
-          ) : (
-            <Button
-              onClick={() => publishedHandler(params.data)}
-              color="success"
-              variant="contained"
-              loading={isPendingDelete}
-              endIcon={<FaCheck size={12} />}
-              disabled={isPendingCheck}
-            >
-              تایید
-            </Button>
-          )}
+          )
+            : (
+              <Button
+                onClick={() => publishedHandler(params.data)}
+                color="success"
+                variant="contained"
+                loading={isPendingDelete}
+                endIcon={<FaCheck size={12} />}
+                disabled={isPendingCheck}
+              >
+                تایید
+              </Button>
+            )}
           <Button
             onClick={() => openUpdate(params.data)}
             color="primary"

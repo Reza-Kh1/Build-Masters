@@ -5,21 +5,37 @@ import { deleteCahce, getCache, setCache } from '../utils/deleteCache';
 const prisma = new PrismaClient();
 
 type QueryPageData = {
-  conetent: string
-  keyword: string[]
-  description: string
-  title: string
-  name: string
-  canonicalUrl: string
-  page: string
-}
+  conetent: string;
+  keyword: string[];
+  description: string;
+  title: string;
+  name: string;
+  canonicalUrl: string;
+  page: string;
+};
 
 const savePageData = expressAsyncHandler(async (req, res) => {
-  const { conetent, keyword, description, title, name, page, canonicalUrl }: QueryPageData = req.body;
+  const {
+    conetent,
+    keyword,
+    description,
+    title,
+    name,
+    page,
+    canonicalUrl,
+  }: QueryPageData = req.body;
   try {
     await prisma.pageData.upsert({
       where: { page },
-      create: { conetent, keyword, description, title, name, page, canonicalUrl },
+      create: {
+        conetent,
+        keyword,
+        description,
+        title,
+        name,
+        page,
+        canonicalUrl,
+      },
       update: { conetent, keyword, description, title, name, canonicalUrl },
     });
     deleteCahce('PageData:*');

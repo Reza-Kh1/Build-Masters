@@ -38,12 +38,17 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
       Tags:
         tagFilter.length > 0
           ? {
-            some: {
-              id: { in: tagFilter },
-            },
-          }
+              some: {
+                id: { in: tagFilter },
+              },
+            }
           : undefined,
-      isPublished: isPublished === 'false' ? false : isPublished === 'true' ? true : undefined,
+      isPublished:
+        isPublished === 'false'
+          ? false
+          : isPublished === 'true'
+            ? true
+            : undefined,
       categoryId: category ? Number(category) : undefined,
     } as any;
     if (search) {
@@ -74,7 +79,7 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
         Tags: {
           select: {
             name: true,
-            id: true
+            id: true,
           },
         },
         Contractor: {
@@ -136,15 +141,15 @@ const createProject = expressAsyncHandler(async (req, res) => {
         price,
         isPublished,
         Category: {
-          connect: { id: Number(categoryId) }
+          connect: { id: Number(categoryId) },
         },
         Contractor: {
-          connect: { id: Number(contractorId) }
+          connect: { id: Number(contractorId) },
         },
         Tags: tags?.length
           ? {
-            connect: tags.map((id: string | number) => ({ id: Number(id) })),
-          }
+              connect: tags.map((id: string | number) => ({ id: Number(id) })),
+            }
           : undefined,
       },
     });
@@ -214,7 +219,6 @@ const updateProject = expressAsyncHandler(async (req, res) => {
     categoryId,
     tags,
     contractorId,
-
   } = req.body;
   const { id } = req.params;
   try {
@@ -236,8 +240,8 @@ const updateProject = expressAsyncHandler(async (req, res) => {
         contractorId: Number(contractorId),
         Tags: tags?.length
           ? {
-            set: tags.map((id: string | number) => ({ id: Number(id) })),
-          }
+              set: tags.map((id: string | number) => ({ id: Number(id) })),
+            }
           : undefined,
       },
     });

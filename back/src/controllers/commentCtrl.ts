@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { deleteCahce, getCache, setCache } from '../utils/deleteCache';
 import pagination from '../utils/pagination';
 import token from 'jsonwebtoken';
+import path from 'path';
 const prisma = new PrismaClient();
 const pageLimit = Number(process.env.PAGE_LIMITE);
 type QueryComment = {
@@ -92,7 +93,7 @@ const createComment = expressAsyncHandler(async (req, res) => {
     let roleType = 'USER' as any;
     const cookieKey = process.env.COOKIE_KEY as string;
     const cookie = req.cookies[cookieKey];
-    if (cookie && postId && commentReply) {
+    if (cookie && commentReply) {
       const userInfo = token.verify(
         cookie,
         process.env.TOKEN_SECURITY as string
@@ -102,10 +103,12 @@ const createComment = expressAsyncHandler(async (req, res) => {
       };
       roleType = userInfo.role;
       isPublished = true;
-      await prisma.post.update({
-        where: { id: postId },
-        data: { totalComment: { increment: 1 } },
-      });
+      if (postId) {
+        await prisma.post.update({
+          where: { id: postId },
+          data: { totalComment: { increment: 1 } },
+        });
+      }
     }
     await prisma.comment.create({
       data: {
@@ -168,17 +171,17 @@ const publishedComment = expressAsyncHandler(async (req, res) => {
       }
     }
     if (contractorId) {
+      const data = await prisma.contractor.findUnique({
+        where: { id: contractorId },
+        select: { rating: true, totalComment: true },
+      });
+      const currentRating = Number(data?.rating) * Number(data?.totalComment);
       if (isPublished) {
-        const data = await prisma.contractor.findUnique({
-          where: { id: contractorId },
-          select: { rating: true, totalComment: true },
-        });
-        const currentRating = Number(data?.rating) * Number(data?.totalComment);
         const newRating =
           (currentRating + Number(rating)) / (Number(data?.totalComment) + 1);
         await prisma.contractor.update({
           data: {
-            rating: Number(newRating.toFixed(2)),
+            rating: Number(newRating.toFixed(1)),
             totalComment: { increment: 1 },
           },
           where: {
@@ -186,16 +189,11 @@ const publishedComment = expressAsyncHandler(async (req, res) => {
           },
         });
       } else {
-        const data = await prisma.contractor.findUnique({
-          where: { id: contractorId },
-          select: { rating: true, totalComment: true },
-        });
-        const currentRating = Number(data?.rating) * Number(data?.totalComment);
         const newRating =
           (currentRating - Number(rating)) / (Number(data?.totalComment) - 1);
         await prisma.contractor.update({
           data: {
-            rating: Number(newRating.toFixed(2)),
+            rating: Number(newRating.toFixed(1)),
             totalComment: { decrement: 1 },
           },
           where: {
@@ -233,7 +231,7 @@ const deleteComment = expressAsyncHandler(async (req, res) => {
           (currentRating - Number(rating)) / (Number(data?.totalComment) - 1);
         await prisma.contractor.update({
           data: {
-            rating: Number(newRating.toFixed(2)),
+            rating: Number(newRating.toFixed(1)),
             totalComment: { decrement: 1 },
           },
           where: {

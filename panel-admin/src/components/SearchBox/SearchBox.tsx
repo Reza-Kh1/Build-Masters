@@ -1,12 +1,15 @@
-import { Button, MenuItem, TextField } from "@mui/material";
+import { Autocomplete, Button, MenuItem, TextField } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { useLocation, useNavigate } from "react-router-dom";
-import {dataOrder,dataStatus,dataCheck,dataRole,} from "../../data/selectData";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { dataOrder, dataStatus, dataCheck, dataRole, } from "../../data/selectData";
 import TagAutocomplete from "../TagAutocomplete/TagAutocomplete";
 import { useEffect, useState } from "react";
 import queryString from "query-string";
 import { GrSearchAdvanced } from "react-icons/gr";
-import WorkerSelector from "../WorkerSelector/WorkerSelector";
+import { useQuery } from "@tanstack/react-query";
+import { TagType } from "../../type";
+import { fetchContractorName } from "../../services/contractor";
+import { FaShare } from "react-icons/fa6";
 type SearchFormType = {
   search?: string;
   isPublished?: string;
@@ -29,13 +32,19 @@ export default function SearchBox({
   notSearch, nameWorker
 }: SearchBoxType) {
   const [tags, setTags] = useState<{ name: string }[]>([]);
-  const [workerId, setWorkerId] = useState<number>(0)
+  const [workerId, setWorkerId] = useState<TagType>()
   const { register, setValue, handleSubmit, watch } = useForm<SearchFormType>({
     defaultValues: {
       isPublished: "all",
       order: "desc",
       role: "all",
     },
+  });
+  const { data: dataContractor } = useQuery<TagType[]>({
+    queryKey: ["ContractorName"],
+    queryFn: fetchContractorName,
+    staleTime: 1000 * 60 * 60 * 24,
+    gcTime: 1000 * 60 * 60 * 24,
   });
   const navigate = useNavigate();
   const { search } = useLocation();
@@ -53,10 +62,11 @@ export default function SearchBox({
       ...other,
       tags: newTags,
     } as any;
-    if (workerId) body.expert = workerId
+    if (workerId) body.contractor = workerId.id
     if (isPublished !== "all") body.isPublished = isPublished;
     const url = "?" + new URLSearchParams(body);
     navigate(url);
+    
   };
   const setQueryInput = (form: any) => {
     if (form?.search) setValue("search", form?.search);
@@ -110,9 +120,29 @@ export default function SearchBox({
           ))}
         </TextField>
       )}
-      {nameWorker && (
-        <WorkerSelector setWorker={setWorkerId} worker={workerId} />
-      )}
+      {
+        nameWorker && dataContractor?.length ? (
+          <Autocomplete
+            className="shadow-md"
+            id="tags-outlined"
+            options={dataContractor}
+            getOptionLabel={(option) => option.name}
+            isOptionEqualToValue={(option, value) => option.name === value.name}
+            value={workerId}
+            filterSelectedOptions
+            renderInput={(params) => (
+              <TextField autoComplete="off" {...params} label={"مجری خود را انتخاب کنید"} />
+            )}
+            onChange={(_, newValue) => newValue && setWorkerId({ id: newValue?.id, name: newValue?.name })}
+          />
+        ) : (
+          <Link to={"/home/tags"}>
+            <Button endIcon={<FaShare />} variant="outlined">
+              هیچ تگ در دیتابیس ذخیره نشده لطفا تگ جدید ایجاد کنید!
+            </Button>
+          </Link>
+        )
+      }
       <TextField
         fullWidth
         autoComplete="off"

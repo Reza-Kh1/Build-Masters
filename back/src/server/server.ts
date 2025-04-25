@@ -17,6 +17,7 @@ import commentRoute from '../routes/commentRoute';
 import onlinePriceRoute from '../routes/onlinePriceRoute';
 import pageDataRoute from '../routes/pageDataRoute';
 import mediaRoute from '../routes/mediaRoute';
+import backUpRoute from '../routes/backUpRoute';
 ///////////// config Security
 dotenv.config();
 const app = express();
@@ -44,9 +45,9 @@ app.use(defualtApi + 'detailPost', detailPost);
 app.use(defualtApi + 'project', projectRoute);
 app.use(defualtApi + 'onlinePrice', onlinePriceRoute);
 app.use(defualtApi + 'pages', pageDataRoute);
-
 app.use(defualtApi + 'comment', commentRoute);
 app.use(defualtApi + 'media', mediaRoute);
+app.use(defualtApi + 'backup', backUpRoute);
 
 app.use(globalHandler);
 app.use(notFound);

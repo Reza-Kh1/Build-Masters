@@ -151,7 +151,6 @@ const createPost = expressAsyncHandler(async (req, res) => {
     deleteCahce('Posts:*');
     res.send({ id: data.id });
   } catch (err) {
-    console.log(err);
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
@@ -193,6 +192,8 @@ const deletePost = expressAsyncHandler(async (req, res) => {
     deleteCahce('Posts:*');
     res.send({ success: true });
   } catch (err) {
+    console.log(err);
+    
     throw customError('خطا در دیتابیس', 500, err);
   }
 });

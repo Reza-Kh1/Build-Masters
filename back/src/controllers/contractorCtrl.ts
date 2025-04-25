@@ -31,7 +31,9 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
     //   return;
     // }
     if (allContractorname === 'true') {
-      const data = await prisma.contractor.findMany({ select: { name: true, id: true } });
+      const data = await prisma.contractor.findMany({
+        select: { name: true, id: true },
+      });
       res.send(data);
       return;
     }
@@ -42,16 +44,16 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
       Tags:
         tagFilter.length > 0
           ? {
-            some: {
-              id: { in: tagFilter },
-            },
-          }
+              some: {
+                id: { in: tagFilter },
+              },
+            }
           : undefined,
       name: search
         ? {
-          contains: search,
-          mode: 'insensitive',
-        }
+            contains: search,
+            mode: 'insensitive',
+          }
         : undefined,
       categoryId: category ? Number(category) : undefined,
     } as any;
@@ -114,8 +116,8 @@ const createContractor = expressAsyncHandler(async (req, res) => {
         },
         Tags: tagName?.length
           ? {
-            connect: tagName.map((id: string) => ({ id })),
-          }
+              connect: tagName.map((id: string) => ({ id })),
+            }
           : undefined,
         Category: {
           connect: {
@@ -160,8 +162,8 @@ const updateContractor = expressAsyncHandler(async (req, res) => {
         categoryId: Number(categoryId) || undefined,
         Tags: tagName?.length
           ? {
-            set: tagName.map((id: string) => ({ id })),
-          }
+              set: tagName.map((id: string) => ({ id })),
+            }
           : undefined,
       },
     });

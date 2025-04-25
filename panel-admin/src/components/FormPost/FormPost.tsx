@@ -10,14 +10,14 @@ import { FaShare } from "react-icons/fa6";
 import { MdEditNote, MdPostAdd } from "react-icons/md";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import JoditForm from "../JoditEditor/JoditEditor";
 import TagAutocomplete from "../TagAutocomplete/TagAutocomplete";
 import SelectMedia from "../SelectMedia/SelectMedia";
 import ImageComponent from "../ImageComponent/ImageComponent";
-import DeleteButton from "../DeleteButtonEx/DeleteButton";
 import PendingApi from "../PendingApi/PendingApi";
 import deleteCache from "../../services/revalidate";
+import DeleteButton from "../DeleteButton/DeleteButton";
 export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
   const userInfo = JSON.parse(localStorage.getItem(import.meta.env.VITE_PUBLIC_COOKIE_KEY) || '')
   if (!userInfo) return
@@ -39,7 +39,6 @@ export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
   const [editorText, setEditorText] = useState<string>("");
   const [postId, setPostId] = useState<string>("");
   const [isUpdateDetail, setIsUpdateDetail] = useState<boolean>(false);
-  const navigate = useNavigate()
   const { data: dataCategory } = useQuery<CategortType[]>({
     initialData: () => queryClient.getQueryData(["getCategory"]),
     queryKey: ["getCategory"],
@@ -90,26 +89,6 @@ export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
       console.log(err);
     },
   });
-  const { isPending: pendingDelete, mutate: deletePost } = useMutation({
-    mutationFn: async () => {
-      if (!postId) {
-        throw new Error("آیدی پست یافت نشد!")
-      }
-      await deleteCache({ tag: `category` });
-      await deleteCache({ tag: "post" });
-      return axios.delete(`post/${postId}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["AllPost", slug] });
-      navigate("/home/posts")
-      toast.success("اطلاعات با موفقیت آپدیت شد");
-    },
-    onError: (err: any) => {
-      toast.warning(err?.response?.data?.message || "با خطا مواجه شدیم");
-      console.log(err);
-    },
-  }
-  );
   const { isPending: isPendingDetail1, mutate: createDetailPost } = useMutation({
     mutationFn: async () => {
       const body = {
@@ -179,8 +158,7 @@ export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
   if (isPendingPost1 ||
     isPendingPost2 ||
     isPendingDetail1 ||
-    isPendingDetail2 ||
-    pendingDelete) truePending = true
+    isPendingDetail2 ) truePending = true
   return (
     <div>
       {truePending && <PendingApi />}
@@ -342,7 +320,9 @@ export default function FormPost({ dataPost }: { dataPost?: SinglePostType }) {
                 ذخیره اطلاعات پست
               </Button>
             )}
-            <DeleteButton deletePost={deletePost} pendingDelete={pendingDelete} text="حذف پست" />
+            {dataPost?.id && (
+              <DeleteButton keyQuery="AllPost" id={dataPost?.id} urlAction="post" btnText="حذف پست" headerText="حذف پست" />
+            )}
           </div>
         </form>
       )}

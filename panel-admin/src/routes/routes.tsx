@@ -8,16 +8,13 @@ import NotFound from "../pages/NotFound/NotFound";
 import Posts from "../pages/Posts/Posts";
 import Reviews from "../pages/Reviews/Reviews";
 import Setting from "../pages/Setting/Setting";
-import SinglePost from "../pages/SinglePost/SinglePost";
 import Users from "../pages/Users/Users";
 import ForgetPassword from "../pages/ForgetPassword/ForgetPassword";
 import OnlinePrice from "../pages/OnlinePrice/OnlinePrice";
 import Contractor from "../pages/Contractor/Contractor";
 import Projects from "../pages/Projects/Projects";
 import PageInfo from "../pages/PageInfo/PageInfo";
-import CreateProject from "../components/CreateProject/CreateProject";
 import Tags from "../pages/Tags/Tags";
-import CreateWorker from "../components/CreateWorker/CreateWorker";
 import BackUp from "../pages/BackUp/BackUp";
 
 export default [
@@ -30,9 +27,7 @@ export default [
       { path: "users", element: <Users /> },
       { path: "online-price", element: <OnlinePrice /> },
       { path: "contractor", element: <Contractor /> },
-      { path: "worker/create-worker", element: <CreateWorker /> },
       { path: "projects", element: <Projects /> },
-      { path: "projects/create-project", element: <CreateProject /> },
       { path: "page-info", element: <PageInfo /> },
       { path: "dashboard", element: <Dashboard /> },
       { path: "reviews", element: <Reviews /> },
@@ -43,7 +38,6 @@ export default [
       { path: "back-up", element: <BackUp /> },
       { path: "posts", element: <Posts /> },
       { path: "posts/create-post", element: <CreatePost /> },
-      { path: "posts/*", element: <SinglePost /> },
     ],
   },
   { path: "/*", element: <NotFound /> },

@@ -106,7 +106,7 @@ model DetailPost {
   title   String?
   keyword String[]
   postId  Int      @unique
-  Post    Post     @relation(fields: [postId], references: [id])
+  Post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@index([postId])
 }
@@ -134,11 +134,11 @@ model Comment {
   roleType    RoleType @default(USER)
 
   postId         Int?
-  Post           Post?       @relation(fields: [postId], references: [id])
+  Post           Post?       @relation(fields: [postId], references: [id], onDelete: Cascade)
   contractorId   Int?
-  Contractor     Contractor? @relation(fields: [contractorId], references: [id])
+  Contractor     Contractor? @relation(fields: [contractorId], references: [id], onDelete: Cascade)
   commentReply   Int?
-  CommentReplyTo Comment?    @relation("commentReplys", fields: [commentReply], references: [id])
+  CommentReplyTo Comment?    @relation("commentReplys", fields: [commentReply], references: [id], onDelete: Cascade)
   CommentReplys  Comment[]   @relation("commentReplys")
   createdAt      DateTime    @default(now())
 
@@ -230,4 +230,11 @@ model PageData {
   canonicalUrl String?
 
   @@index([page])
+}
+
+/////////////////////////////       Model PageData         /////////////////////////////
+model BackUp {
+  id        Int      @id @default(autoincrement())
+  url       String   @unique
+  createdAt DateTime @default(now())
 }
