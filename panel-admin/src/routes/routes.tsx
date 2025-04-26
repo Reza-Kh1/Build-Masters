@@ -1,6 +1,5 @@
 import Auth from "../pages/Auth/Auth";
 import Categorys from "../pages/Categorys/Categorys";
-import CreatePost from "../pages/CreatePost/CreatePost";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Home from "../pages/Home/Home";
 import Images from "../pages/Images/Images";
@@ -37,7 +36,6 @@ export default [
       { path: "setting", element: <Setting /> },
       { path: "back-up", element: <BackUp /> },
       { path: "posts", element: <Posts /> },
-      { path: "posts/create-post", element: <CreatePost /> },
     ],
   },
   { path: "/*", element: <NotFound /> },

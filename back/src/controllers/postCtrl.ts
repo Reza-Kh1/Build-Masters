@@ -3,6 +3,7 @@ import expressAsyncHandler from 'express-async-handler';
 import { PrismaClient } from '@prisma/client';
 import { deleteCahce, getCache, setCache } from '../utils/deleteCache';
 import pagination from '../utils/pagination';
+import { convertToNumberArray } from './contractorCtrl';
 const prisma = new PrismaClient();
 const pageLimit = Number(process.env.PAGE_LIMITE);
 
@@ -31,17 +32,15 @@ const getAllPost = expressAsyncHandler(async (req, res) => {
     //   res.send(cache);
     //   return;
     // }
-    const tagFilter = tags
-      ? JSON.parse(tags).map((i: number) => Number(i))
-      : [];
+    const numberTags = convertToNumberArray(tags)
     const searchFilter = {
       Tags:
-        tagFilter.length > 0
+        numberTags.length > 0
           ? {
-              some: {
-                id: { in: tagFilter },
-              },
-            }
+            some: {
+              id: { in: numberTags },
+            },
+          }
           : undefined,
       isPublished: isPublished === 'false' ? false : true,
       categoryId: category ? Number(category) : undefined,
@@ -137,8 +136,8 @@ const createPost = expressAsyncHandler(async (req, res) => {
         isPublished,
         Tags: tags?.length
           ? {
-              connect: tags.map((id: string) => ({ id })),
-            }
+            connect: tags.map((id: string) => ({ id })),
+          }
           : undefined,
         user: {
           connect: { id: userId },
@@ -168,8 +167,8 @@ const updatePost = expressAsyncHandler(async (req, res) => {
         isPublished,
         Tags: tags?.length
           ? {
-              set: tags.map((id: string) => ({ id })),
-            }
+            set: tags.map((id: string) => ({ id })),
+          }
           : undefined,
         userId: userId || undefined,
         categoryId: Number(categoryId) || undefined,
@@ -193,7 +192,7 @@ const deletePost = expressAsyncHandler(async (req, res) => {
     res.send({ success: true });
   } catch (err) {
     console.log(err);
-    
+
     throw customError('خطا در دیتابیس', 500, err);
   }
 });

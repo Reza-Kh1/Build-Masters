@@ -64,7 +64,7 @@ export default function Projects() {
     <div className="w-full">
       <Create />
       <div>
-        <SearchBox isPublished nameWorker />
+        <SearchBox isPublished searchText category order tag contractor />
       </div>
       {
         data?.pages[0].data.length ?

@@ -140,7 +140,7 @@ export default function Users() {
           ]}
           title="افزودن کاربر جدید"
         />
-        <SearchBox isUser notTag />
+        <SearchBox searchText roleUSer order  />
         {data?.pages[0]?.data.length ? (
           <>
             <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">

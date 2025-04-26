@@ -1,13 +1,10 @@
-import { Button } from "@mui/material";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { MdOutlinePersonAdd } from "react-icons/md";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { fetchContractor } from "../../services/contractor";
 import queryString from "query-string";
 import { AllContractorType } from "../../type";
 import Pagination from "../../components/Pagination/Pagination";
-import { FaShare } from "react-icons/fa6";
 import SearchBox from "../../components/SearchBox/SearchBox";
 import DontData from "../../components/DontData/DontData";
 import Create from "./Create";
@@ -19,7 +16,6 @@ import DeleteButton from "../../components/DeleteButton/DeleteButton";
 export default function Contractor() {
   const [searchQuery, setSearchQuery] = useState<any>();
   const { search } = useLocation();
-
   const { data } = useInfiniteQuery<AllContractorType>({
     queryKey: ["AllContractor", searchQuery],
     queryFn: () => fetchContractor(searchQuery),
@@ -74,7 +70,7 @@ export default function Contractor() {
     <div className="w-full">
       <Create />
       <div>
-        <SearchBox />
+        <SearchBox order searchText tag category />
       </div>
       {data?.pages[0]?.data.length ? (
         <>

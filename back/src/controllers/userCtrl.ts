@@ -9,8 +9,8 @@ const prisma = new PrismaClient();
 const pageLimit = Number(process.env.PAGE_LIMITE);
 
 const getUsers = expressAsyncHandler(async (req, res) => {
-  const { email, phone, role, page = 1, contractor } = req.query;
-  const cacheKey = `Users:${email}:${phone}:${role}:${page}`;
+  const { search, role, page = 1, contractor, order }: any = req.query;
+  const cacheKey = `Users:${search}:${role}:${page}`;
   const cache = await getCache(cacheKey);
   // if (cache) {
   //   res.send(cache);
@@ -25,24 +25,20 @@ const getUsers = expressAsyncHandler(async (req, res) => {
       res.send(data);
       return;
     }
-    const search = {} as any;
-    if (email || phone) {
-      search.OR = [
+    const searchFilter = {} as any;
+    if (search) {
+      searchFilter.OR = [
         {
-          email: email
-            ? { contains: email.toString(), mode: 'insensitive' }
-            : undefined,
+          name: { contains: search.toString(), mode: 'insensitive' }
         },
         {
-          phone: phone
-            ? { contains: phone.toString(), mode: 'insensitive' }
-            : undefined,
+          phone: { contains: search.toString(), mode: 'insensitive' }
         },
       ];
     }
-    if (role) search.role = role.toString();
+    if (role) searchFilter.role = role.toString();
     const data = await prisma.user.findMany({
-      where: search,
+      where: searchFilter,
       select: {
         role: true,
         email: true,
@@ -51,10 +47,11 @@ const getUsers = expressAsyncHandler(async (req, res) => {
         createdAt: true,
         phone: true,
       },
+      orderBy: { createdAt: order || 'desc' },
       skip: (Number(page) - 1) * pageLimit,
       take: pageLimit,
     });
-    const count = await prisma.user.count({ where: search });
+    const count = await prisma.user.count({ where: searchFilter });
     const pages = pagination(count, Number(page), pageLimit);
     setCache(cacheKey, { data: data, pagination: pages });
     res.send({ data: data, pagination: pages });

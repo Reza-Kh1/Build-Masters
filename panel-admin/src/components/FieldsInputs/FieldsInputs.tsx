@@ -1,4 +1,4 @@
-import { FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, TextField, Theme, useTheme } from '@mui/material';
+import { Autocomplete, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, TextField, Theme, useTheme } from '@mui/material';
 import Switch from '@mui/material/Switch';
 import { FieldsType } from '../../type';
 import { useState } from 'react';
@@ -19,7 +19,7 @@ type FormComponentType = {
 
 export default function FieldsInputs({ register, data, defualtVal, setValue }: FormComponentType) {
     const getValueInputs = () => {
-        if (data.type === 'autoComplate') {
+        if (data.type === 'multiple') {
             if (defualtVal) {
                 return data?.nameGetValue ? defualtVal[data.nameGetValue].map((i: any) => i.id) : defualtVal[data.name].map((i: any) => i.id)
             } else {
@@ -160,7 +160,7 @@ export default function FieldsInputs({ register, data, defualtVal, setValue }: F
                     />
                 </div>
             )
-        case 'autoComplate':
+        case 'multiple':
             const theme = useTheme();
             const handleChange = (event: SelectChangeEvent<typeof selector>) => {
                 const {
@@ -176,10 +176,10 @@ export default function FieldsInputs({ register, data, defualtVal, setValue }: F
                         ? theme.typography.fontWeightMedium
                         : theme.typography.fontWeightRegular,
                 };
-            }            
+            }
             return (
                 <FormControl className={`shadow-md ${data?.className}`}>
-                    <InputLabel id="demo-multiple-name-label">Name</InputLabel>
+                    <InputLabel id="demo-multiple-name-label">{data.label}</InputLabel>
                     <Select
                         className={`shadow-md`}
                         labelId="demo-multiple-name-label"
@@ -188,7 +188,7 @@ export default function FieldsInputs({ register, data, defualtVal, setValue }: F
                         value={selector}
                         {...register(data.name, { required: data.required || false })}
                         onChange={handleChange}
-                        input={<OutlinedInput label="Name" />}
+                        input={<OutlinedInput label={data.label} />}
                         MenuProps={{
                             PaperProps: {
                                 style: {
@@ -208,6 +208,21 @@ export default function FieldsInputs({ register, data, defualtVal, setValue }: F
                             </MenuItem>
                         )) : null}
                     </Select>
+                </FormControl>
+            )
+        case 'autoComplate':
+            if (!data.dataOptions || !data.dataOptions.length) return
+            const dataAutocomplete = data.dataOptions.map((row) => { return { label: row.name, id: row.id } })
+            return (
+                <FormControl className={`shadow-md ${data?.className}`}>
+                    <Autocomplete
+                        disablePortal
+                        options={dataAutocomplete}
+                        className={`shadow-md ${data?.className}`}
+                        renderInput={(params) => <TextField
+                            {...register(data.name, { required: data.required || false })}
+                            {...params} label={data.label} />}
+                    />
                 </FormControl>
             )
         default:

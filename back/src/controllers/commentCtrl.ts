@@ -28,9 +28,7 @@ const getAllComment = expressAsyncHandler(async (req, res) => {
     order,
     isAdmin,
   }: QueryComment = req.query;
-  let search = {
-    isPublished: isPublished === 'true' ? true : false,
-  } as any;
+  let search = {} as any;
   let includeFilter = {} as any;
   if (isAdmin) {
     includeFilter = {
@@ -62,12 +60,13 @@ const getAllComment = expressAsyncHandler(async (req, res) => {
     search =
       type === 'post'
         ? {
-            contractorId: null,
-          }
+          contractorId: null,
+        }
         : {
-            postId: null,
-          };
+          postId: null,
+        };
   }
+  search.isPublished = isPublished === 'true' ? true : false
   try {
     const data = await prisma.comment.findMany({
       where: search,

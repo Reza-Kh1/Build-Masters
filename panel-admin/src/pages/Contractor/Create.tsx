@@ -16,7 +16,6 @@ import SelectMedia from '../../components/SelectMedia/SelectMedia';
 import { FaPen, FaUser } from 'react-icons/fa6';
 import { fetchTags } from '../../services/tag';
 import { fetchGetUserContractor } from '../../services/user';
-
 const Transition = forwardRef(function Transition(
     props: TransitionProps & {
         children: React.ReactElement<unknown>;
@@ -76,7 +75,6 @@ export default function Create({ id }: { id?: string }) {
         { label: 'نام', name: 'name', type: 'text', required: true },
         { label: 'شماره تلفن', name: 'phone', type: 'number', required: true },
         { label: 'ایمیل', name: 'email', type: 'text', required: true },
-        { label: 'بیو گرافی', name: 'bio', type: 'text', required: true },
         {
             label: 'انتخاب دسته',
             name: 'categoryId',
@@ -94,12 +92,13 @@ export default function Create({ id }: { id?: string }) {
         {
             label: 'انتخاب تگ',
             name: 'tagName',
-            type: 'autoComplate',
+            type: 'multiple',
             nameGetValue: 'Tags',
             required: true,
             dataOptions: dataTag?.length ? dataTag : [],
             className: 'col-span-2'
-        }
+        },
+        { label: 'بیو گرافی', name: 'bio', type: 'text-multiline', required: true },
     ]
 
     const { isPending: createPending, mutate: createContractor } = useMutation({
@@ -114,6 +113,7 @@ export default function Create({ id }: { id?: string }) {
         onSuccess: () => {
             toast.success("مجری افزوده شد");
             query.invalidateQueries({ queryKey: ["AllContractor"] });
+            query.invalidateQueries({ queryKey: ["ContractorName"] });
         },
         onError: (err) => {
             toast.success("خطا در اجرای عملیات");

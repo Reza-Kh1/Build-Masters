@@ -15,45 +15,46 @@ import { IoMdPricetags } from "react-icons/io";
 import Cookies from "js-cookie"
 const cookieKey = import.meta.env.VITE_PUBLIC_COOKIE_KEY
 const dataLink = [
-  { name: "داشبورد", url: "/home/dashboard", icon: <BiSolidDashboard /> },
-  { name: "صفحات سایت", url: "/home/page-info", icon: <FaPaintbrush /> },
+  { name: "داشبورد", url: "/home/dashboard", icon: <BiSolidDashboard />, type: 'ALL' },
+  { name: "صفحات سایت", url: "/home/page-info", icon: <FaPaintbrush />, type: 'ADMIN' },
   {
     name: "پست ها",
-    url: "/home/posts?page=1&order=desc&search=&tags=",
-    icon: <MdOutlinePostAdd />,
+    url: "/home/posts?page=1&order=desc",
+    icon: <MdOutlinePostAdd />, type: 'AUTHOR'
   },
   {
     name: "کامنت ها",
-    url: "/home/reviews?page=1&order=desc&search=&tags=",
-    icon: <TiMessages />,
+    url: "/home/reviews?page=1&order=desc",
+    icon: <TiMessages />, type: 'AUTHOR'
   },
   {
     name: "کاربران",
-    url: "/home/users?page=1&order=desc&role=all&search=&tags=",
-    icon: <FaUsers />,
+    url: "/home/users?page=1&order=desc",
+    icon: <FaUsers />, type: 'ADMIN'
   },
   {
     name: "پروژه ها",
-    url: "/home/projects?page=1&order=desc&search=&tags=",
-    icon: <BsFillBuildingsFill />,
+    url: "/home/projects?page=1&order=desc",
+    icon: <BsFillBuildingsFill />, type: 'CONTRACTOR'
   },
   {
     name: "مجری ها",
-    url: "/home/contractor?page=1&order=desc&role=all&search=&tags=",
-    icon: <GrUserWorker />,
+    url: "/home/contractor?page=1&order=desc",
+    icon: <GrUserWorker />, type: 'CONTRACTOR'
   },
   {
     name: "تعیین قیمت",
     url: "/home/online-price?page=1&order=desc&status=false",
-    icon: <FaSearchDollar />,
+    icon: <FaSearchDollar />, type: 'ADMIN'
   },
-  { name: "دسته بندی", url: "/home/categorys", icon: <MdOutlineCategory /> },
-  { name: "تگ ها", url: "/home/tags", icon: <IoMdPricetags /> },
-  { name: "رسانه ها", url: "/home/image", icon: <MdImage /> },
-  { name: "بک آپ", url: "/home/back-up", icon: <BsDatabaseCheck /> },
-  { name: "تنظیمات", url: "/home/setting", icon: <MdSettings /> },
+  { name: "دسته بندی", url: "/home/categorys", icon: <MdOutlineCategory />, type: 'AUTHOR' },
+  { name: "تگ ها", url: "/home/tags", icon: <IoMdPricetags />, type: 'AUTHOR' },
+  { name: "رسانه ها", url: "/home/image", icon: <MdImage />, type: 'AUTHOR' },
+  { name: "بک آپ", url: "/home/back-up", icon: <BsDatabaseCheck />, type: 'ADMIN' },
+  { name: "تنظیمات", url: "/home/setting", icon: <MdSettings />, type: 'ALL' },
 ];
 export default function Sidebar() {
+  if (!localStorage.getItem(cookieKey)) return
   const navigate = useNavigate();
   const [load, setLaod] = useState<Boolean>(false);
   const logOutUser = () => {
@@ -90,12 +91,11 @@ export default function Sidebar() {
           <img src="/logosite.png" className="w-40" alt="logo site" />
         </li>
         {dataLink.map((i, index) => {
-          if ((i.name === "کاربران" || i.name === "بک آپ") && role !== "ADMIN") return;
-          return (
-            <li key={index}>
+          if (role === i.type || i.type === 'ALL' || role === 'ADMIN') {
+            return <li key={index}>
               <LinkSidebar name={i.name} url={i.url} icon={i.icon} />
             </li>
-          );
+          }
         })}
         <li className="w-11/12">
           <Button

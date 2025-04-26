@@ -15,15 +15,15 @@ type AllMediaType = {
 };
 type SearchFilterType = {
     order: "desc" | "asc";
-    status: string;
-    type: "image" | "video" | "";
+    uploader: string;
+    type: "IMAGE" | "VIDEO" | "";
 }
 type MediaBoxType = {
     setUrlImg?: (value: MediaType) => void
 }
 export default function MediaBox({ setUrlImg }: MediaBoxType) {
-    const [searchQuery, setSearchQuery] = useState<SearchFilterType>({ order: "desc", type: "", status: "true" })
-    const [search, setSearch] = useState<SearchFilterType>({ order: "desc", type: "", status: "true" })
+    const [searchQuery, setSearchQuery] = useState<SearchFilterType>({ order: "desc", type: "", uploader: "ADMIN" })
+    const [search, setSearch] = useState<SearchFilterType>({ order: "desc", type: "", uploader: "ADMIN" })
     const query = useQueryClient();
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } =
         useInfiniteQuery<AllMediaType>({
@@ -59,8 +59,8 @@ export default function MediaBox({ setUrlImg }: MediaBoxType) {
                         aria-label="Disabled button group"
                     >
                         <Button color={search.type === "" ? "primary" : "inherit"} variant='contained' onClick={() => setSearch({ ...search, type: "" })}>همه</Button>
-                        <Button color={search.type === "image" ? "primary" : "inherit"} variant='contained' onClick={() => setSearch({ ...search, type: "image" })}>عکس ها</Button>
-                        <Button color={search.type === "video" ? "primary" : "inherit"} variant='contained' onClick={() => setSearch({ ...search, type: "video" })}>ویدئو ها</Button>
+                        <Button color={search.type === "IMAGE" ? "primary" : "inherit"} variant='contained' onClick={() => setSearch({ ...search, type: "IMAGE" })}>عکس ها</Button>
+                        <Button color={search.type === "VIDEO" ? "primary" : "inherit"} variant='contained' onClick={() => setSearch({ ...search, type: "VIDEO" })}>ویدئو ها</Button>
                     </ButtonGroup>
                 </div>
                 <div className='flex items-center gap-1'>
@@ -71,9 +71,9 @@ export default function MediaBox({ setUrlImg }: MediaBoxType) {
                         variant="contained"
                         aria-label="Disabled button group"
                     >
-                        <Button color={search.status === "true" ? "primary" : "inherit"} onClick={() => setSearch({ ...search, status: "true" })}>ادمین</Button>
-                        <Button color={search.status === "" ? "primary" : "inherit"} onClick={() => setSearch({ ...search, status: "" })}>همه</Button>
-                        <Button color={search.status === "false" ? "primary" : "inherit"} onClick={() => setSearch({ ...search, status: "false" })}>کاربر</Button>
+                        <Button color={search.uploader === "ADMIN" ? "primary" : "inherit"} onClick={() => setSearch({ ...search, uploader: "ADMIN" })}>ادمین</Button>
+                        <Button color={search.uploader === "" ? "primary" : "inherit"} onClick={() => setSearch({ ...search, uploader: "" })}>همه</Button>
+                        <Button color={search.uploader === "USER" ? "primary" : "inherit"} onClick={() => setSearch({ ...search, uploader: "USER" })}>کاربر</Button>
                     </ButtonGroup>
                 </div>
                 <div className='flex items-center gap-1'>

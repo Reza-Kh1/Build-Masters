@@ -1,3 +1,4 @@
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { useRoutes } from "react-router-dom";
 import routes from "./routes/routes";
 import { ToastContainer } from "react-toastify";
@@ -7,7 +8,6 @@ import "./index.css";
 import LoadingFetch from "./components/LoadingFetch/LoadingFetch";
 axios.defaults.baseURL = import.meta.env.VITE_PUBLIC_API;
 axios.defaults.withCredentials = true;
-import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 function App() {

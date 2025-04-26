@@ -14,7 +14,7 @@ export default function TagAutocomplete({ tags, setTags, name }: TagsBoxType) {
     staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24,
     queryFn: fetchTags,
-  });
+  });  
   return data?.length ? (
     <Autocomplete
       multiple

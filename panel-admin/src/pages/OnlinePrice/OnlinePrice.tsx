@@ -107,7 +107,7 @@ export default function OnlinePrice() {
   return (
     <div className="w-full">
       {pendingupdate && <PendingApi />}
-      <SearchBox checker notTag notSearch />
+      <SearchBox isPublished order />
       {data?.pages[0].data.length ? (
         <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
           <AgGridReact

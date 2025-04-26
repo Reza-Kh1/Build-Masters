@@ -3,6 +3,7 @@ import expressAsyncHandler from 'express-async-handler';
 import { PrismaClient } from '@prisma/client';
 import { deleteCahce, getCache, setCache } from '../utils/deleteCache';
 import pagination from '../utils/pagination';
+import { convertToNumberArray } from './contractorCtrl';
 const prisma = new PrismaClient();
 const pageLimit = Number(process.env.PAGE_LIMITE);
 
@@ -12,6 +13,7 @@ type QueryProject = {
   order?: 'asc' | 'desc';
   category?: string;
   search?: string;
+  contractor?: string;
   isPublished?: string;
 };
 
@@ -23,6 +25,7 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
     category,
     search,
     isPublished,
+    contractor
   }: QueryProject = req.query;
   try {
     const keyCache = `Projects:${tags}&${page}&${order}&${category}&${search}&${isPublished}`;
@@ -31,17 +34,15 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
     //   res.send(cache);
     //   return;
     // }
-    const tagFilter = tags
-      ? JSON.parse(tags).map((i: number) => Number(i))
-      : [];
+    const numberTags = convertToNumberArray(tags)
     const searchFilter = {
       Tags:
-        tagFilter.length > 0
+        numberTags.length > 0
           ? {
-              some: {
-                id: { in: tagFilter },
-              },
-            }
+            some: {
+              id: { in: numberTags },
+            },
+          }
           : undefined,
       isPublished:
         isPublished === 'false'
@@ -67,6 +68,13 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
         },
       ];
     }
+    if (contractor) {
+      searchFilter.Contractor = {
+        name: {
+          contains: contractor, mode: 'insensitive'
+        }
+      }
+    }
     const data = await prisma.project.findMany({
       where: searchFilter,
       select: {
@@ -85,6 +93,7 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
         Contractor: {
           select: {
             name: true,
+            id:true,
             avatar: true,
           },
         },
@@ -101,10 +110,12 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
       take: pageLimit,
     });
     setCache(keyCache, data);
-    const count = await prisma.post.count({ where: searchFilter });
+    const count = await prisma.project.count({ where: searchFilter });
     const pager = pagination(count, Number(page), pageLimit);
     res.send({ data, pagination: pager });
   } catch (err) {
+    console.log(err);
+
     throw customError('خطا در دیتابیس', 500, err);
   }
 });
@@ -148,8 +159,8 @@ const createProject = expressAsyncHandler(async (req, res) => {
         },
         Tags: tags?.length
           ? {
-              connect: tags.map((id: string | number) => ({ id: Number(id) })),
-            }
+            connect: tags.map((id: string | number) => ({ id: Number(id) })),
+          }
           : undefined,
       },
     });
@@ -240,8 +251,8 @@ const updateProject = expressAsyncHandler(async (req, res) => {
         contractorId: Number(contractorId),
         Tags: tags?.length
           ? {
-              set: tags.map((id: string | number) => ({ id: Number(id) })),
-            }
+            set: tags.map((id: string | number) => ({ id: Number(id) })),
+          }
           : undefined,
       },
     });

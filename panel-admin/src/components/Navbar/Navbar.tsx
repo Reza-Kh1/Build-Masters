@@ -5,6 +5,7 @@ import { MdOutlineArrowBackIos } from "react-icons/md";
 import { TbRefresh } from "react-icons/tb";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 const cookieKey = import.meta.env.VITE_PUBLIC_COOKIE_KEY
 
 export default function Navbar() {
@@ -14,8 +15,9 @@ export default function Navbar() {
   const queryClient = useQueryClient();
   const { pathname, search } = useLocation()
   useEffect(() => {
+    const cookieSet = Cookies.get(cookieKey)
     const localData = localStorage.getItem(cookieKey) as any;
-    if (!localData) {
+    if (!localData || !cookieSet) {
       toast.error("! اول وارد حساب کاربری خود شوید");
       navigate("/");
       localStorage.setItem(cookieKey, "");

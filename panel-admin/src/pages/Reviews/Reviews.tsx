@@ -243,7 +243,6 @@ export default function Reviews() {
           >
             حذف
           </Button>
-          {/* <DeleteButton id={params.value} keyQuery="AllReview" urlAction="comment" headerText="حذف کامنت" /> */}
         </div>
       ),
       field: "id",
@@ -256,7 +255,7 @@ export default function Reviews() {
     <>
       <div className="w-full">
         {isPendingCheck && <PendingApi />}
-        <SearchBox notTag checker />
+        <SearchBox isPublished order typeComment />
         {data?.pages[0].data.length ? (
           <>
             <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">

@@ -243,20 +243,21 @@ type FieldsType = {
   name: string;
   icon?: React.ReactNode;
   type:
-    | "text"
-    | "select"
-    | "autoComplate"
-    | "date"
-    | "checkBox"
-    | "number"
-    | "text-multiline";
+  | "text"
+  | "select"
+  | "autoComplate"
+  | "date"
+  | "checkBox"
+  | "number"
+  | "text-multiline"
+  | "multiple";
   nameGetValue?: string;
   dataOptions?: {
     name?: string | React.ReactNode;
     value?: string;
     id?: number | string;
   }[];
-};
+}
 
 export type {
   ReviewType,

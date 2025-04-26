@@ -68,7 +68,7 @@ const createBackUp = expressAsyncHandler(async (req, res) => {
 
       ////// اپلود بک اپ
       const remoteFilePath = `/public_html/uploads/${backupFileName}`;
-      const url = `http://${process.env.URL_IAMGE}/${backupFileName}`;
+      const url = `https://${process.env.URL_IAMGE}/${backupFileName}`;
       await client.access({
         host: process.env.FTP_ADDRESS,
         user: process.env.FTP_NAME,
@@ -92,6 +92,8 @@ const createBackUp = expressAsyncHandler(async (req, res) => {
       });
       res.send({ url });
     } catch (uploadError) {
+      console.log(uploadError);
+
       res.status(500).send({ error: `Upload failed: ${uploadError}` });
     }
   });
@@ -100,18 +102,19 @@ const createBackUp = expressAsyncHandler(async (req, res) => {
 const deleteBackUp = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
-    const key = id.split('/').pop();
     await client.access({
       host: process.env.FTP_ADDRESS,
       user: process.env.FTP_NAME,
       password: process.env.FTP_PASSWORD,
       secure: false,
     });
-    await client.remove(`/public_html/uploads/${key}`);
+    await client.remove(`/public_html/uploads/${id}`);
     client.close();
-    await prisma.backUp.delete({ where: { url: key?.toString() } });
+    await prisma.backUp.delete({ where: { url: 'https://' + process.env.URL_IAMGE + '/' + id?.toString() } });
     res.send({ success: true });
   } catch (err) {
+    console.log(err);
+    
     throw customError('خطا در ارتباط با دیتابیس', 400, err);
   }
 });

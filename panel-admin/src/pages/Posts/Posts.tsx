@@ -30,7 +30,7 @@ export default function Posts() {
   return (
     <div>
       <Create name={namePost} setName={setNamePost} />
-      <SearchBox isPublished />
+      <SearchBox category tag searchText order isPublished />
       <div className="flex flex-col gap-3 mt-3">
         {data?.pages[0].data.length ? (
           data.pages[0].data.map((i, index) => (

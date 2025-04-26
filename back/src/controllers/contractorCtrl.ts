@@ -13,7 +13,10 @@ type QueryContractor = {
   category?: number;
   allContractorname?: string;
 };
-
+const convertToNumberArray = (value?: string) => {
+  if (!value) return [];
+  return value.split(",").map(Number);
+};
 const getAllContractor = expressAsyncHandler(async (req, res) => {
   const {
     page = 1,
@@ -37,23 +40,21 @@ const getAllContractor = expressAsyncHandler(async (req, res) => {
       res.send(data);
       return;
     }
-    const tagFilter = tags
-      ? JSON.parse(tags).map((i: number) => Number(i))
-      : [];
+    const tagNumber = convertToNumberArray(tags)
     const searchFilter = {
       Tags:
-        tagFilter.length > 0
+        tagNumber.length > 0
           ? {
-              some: {
-                id: { in: tagFilter },
-              },
-            }
+            some: {
+              id: { in: tagNumber },
+            },
+          }
           : undefined,
       name: search
         ? {
-            contains: search,
-            mode: 'insensitive',
-          }
+          contains: search,
+          mode: 'insensitive',
+        }
         : undefined,
       categoryId: category ? Number(category) : undefined,
     } as any;
@@ -116,8 +117,8 @@ const createContractor = expressAsyncHandler(async (req, res) => {
         },
         Tags: tagName?.length
           ? {
-              connect: tagName.map((id: string) => ({ id })),
-            }
+            connect: tagName.map((id: string) => ({ id })),
+          }
           : undefined,
         Category: {
           connect: {
@@ -162,8 +163,8 @@ const updateContractor = expressAsyncHandler(async (req, res) => {
         categoryId: Number(categoryId) || undefined,
         Tags: tagName?.length
           ? {
-              set: tagName.map((id: string) => ({ id })),
-            }
+            set: tagName.map((id: string) => ({ id })),
+          }
           : undefined,
       },
     });
@@ -217,6 +218,7 @@ const getSingleContractor = expressAsyncHandler(async (req, res) => {
 });
 
 export {
+  convertToNumberArray,
   createContractor,
   getAllContractor,
   updateContractor,

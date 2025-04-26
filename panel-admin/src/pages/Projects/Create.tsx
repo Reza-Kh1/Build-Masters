@@ -86,7 +86,7 @@ export default function Create({ id }: { id?: string }) {
         {
             label: 'انتخاب تگ',
             name: 'tags',
-            type: 'autoComplate',
+            type: 'multiple',
             nameGetValue: 'Tags',
             dataOptions: dataTag?.length ? dataTag : [],
             className: 'col-span-2'
@@ -143,8 +143,6 @@ export default function Create({ id }: { id?: string }) {
                 video
             }
             body.contractorId === 's' ? body.contractorId = null : null
-            console.log(body);
-
             return axios.put("project/" + singleData?.id, body);
         },
         onSuccess: () => {

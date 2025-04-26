@@ -29,9 +29,7 @@ export default function Auth() {
         return axios.put("user", form);
       }
     },
-    onSuccess: ({ data }) => {
-      console.log(data);
-      
+    onSuccess: ({ data }) => {      
       Cookies.set(cookieKey, data.token, { expires: 7 });
       const body = {
         id: data.data.id,

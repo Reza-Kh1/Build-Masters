@@ -19,6 +19,7 @@ type EditButtonType = {
     fields: FieldsType[]
     loadingBtn: boolean
     values: any
+    idLimit?: string
     title: string
 }
 export default function EditButton(formData: EditButtonType) {
@@ -67,6 +68,7 @@ export default function EditButton(formData: EditButtonType) {
                         className="!min-w-40"
                         color="warning"
                         loadingPosition='end'
+                        disabled={true}
                         loading={loadingBtn}
                         onClick={handleSubmit((data) => {
                             reset()

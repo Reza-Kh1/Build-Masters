@@ -1,21 +1,20 @@
 export const dataRole = [
-  { value: "USER", name: "کاربر" },
-  { value: "AUTHOR", name: "نویسنده" },
-  { value: "ADMIN", name: "ادمین" },
+  { name: 'ادمین', value: 'ADMIN' },
+  { name: 'مجری', value: 'CONTRACTOR' },
+  { name: 'نویسنده', value: 'AUTHOR' },
+  { name: 'کاربر', value: 'USER' },
 ];
 export const dataOrder = [
-  { value: "desc", name: "جدید ترین" },
-  { value: "asc", name: "قدیمی ترین" },
+  { name: 'جدیدترین', value: 'desc' },
+  { name: 'قدیمی ترین', value: 'asc' },
+];
+export const dataTypeComment= [
+  { name: 'پست', value: 'post' },
+  { name: 'مجری', value: 'contractor' },
 ];
 export const dataStatus = [
-  { value: "all", name: "همه" },
-  { value: "true", name: "منتشر شده" },
-  { value: "false", name: "منتشر نشده" },
-];
-export const dataCheck = [
-  { value: "all", name: "همه" },
-  { value: "false", name: "تایید نشده" },
-  { value: "true", name: "تایید شده" },
+  { name: 'منتشر شده', value: 'true' },
+  { name: 'منشر نشده', value: 'false' },
 ];
 export const classImg = [
   "table",

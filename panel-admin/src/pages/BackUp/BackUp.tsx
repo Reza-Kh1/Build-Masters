@@ -4,7 +4,6 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { fetchBackUp } from "../../services/backUp";
 import { BackUpAllType } from "../../type";
-import { BsDatabaseSlash } from "react-icons/bs";
 import { LuDatabaseBackup } from "react-icons/lu";
 import { IoMdDownload } from "react-icons/io";
 import PendingApi from "../../components/PendingApi/PendingApi";
@@ -12,10 +11,10 @@ import DontData from "../../components/DontData/DontData";
 import { IoCloudUploadSharp } from "react-icons/io5";
 import { GiCloudUpload } from "react-icons/gi";
 import { useState } from "react";
+import DeleteButton from "../../components/DeleteButton/DeleteButton";
 
 export default function BackUp() {
   const query = useQueryClient();
-  let pending = false;
   const { data } = useQuery<BackUpAllType[]>({
     queryKey: ["BackUp"],
     queryFn: fetchBackUp,
@@ -32,7 +31,7 @@ export default function BackUp() {
         return Promise.reject(new Error("هیچ فایل انتخاب نشده است"));
       const formData = new FormData();
       formData.append("backUp", newFile[0]);
-      const { data } = await axios.post("backUp", formData, {
+      const { data } = await axios.put("backUp", formData, {
         onUploadProgress: (event) => {
           if (event.lengthComputable && event.total) {
             const percentComplete = Math.round(
@@ -54,34 +53,9 @@ export default function BackUp() {
       setLoading(false);
     },
   });
-  const { mutate: deleteSingleBackUp, isPending: pendingFile } = useMutation({
-    mutationFn: (key: string) => {
-      return axios.delete(`backUp/delete?key=${key}`);
-    },
-    onSuccess: () => {
-      toast.success("بک آپ حذف شد");
-      query.invalidateQueries({ queryKey: ["BackUp"] });
-    },
-    onError: (err) => {
-      toast.warning("با خطا روبرو شدیم!");
-      console.log(err);
-    },
-  });
-  const { mutate: deleteBackUp, isPending: pendingDelete } = useMutation({
-    mutationFn: () => {
-      return axios.delete("backUp");
-    },
-    onSuccess: () => {
-      toast.success("تمام اطلاعات دیتابیس حذف شد");
-    },
-    onError: (err) => {
-      toast.warning("با خطا روبرو شدیم!");
-      console.log(err);
-    },
-  });
   const { mutate: createBackUp, isPending: pendingCreate } = useMutation({
     mutationFn: () => {
-      return axios.get("backUp/create");
+      return axios.post("backUp");
     },
     onSuccess: () => {
       toast.success("با موفقیت بک آپ تهیه شد");
@@ -93,31 +67,19 @@ export default function BackUp() {
     },
   });
   const downloadBackUp = (url: string, time: Date) => {
-    axios
-      .get(url, { responseType: "blob" })
-      .then(({ data }) => {
-        const href = URL.createObjectURL(data);
-        const link = document.createElement("a");
-        link.href = href;
-        link.setAttribute(
-          "download",
-          `backUp${new Date(time).toLocaleDateString("fa")}.dump`
-        );
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(href);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute(
+      "download",
+      `backUp${new Date(time).toLocaleDateString("fa")}.dump`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
-  if (pendingCreate || pendingDelete || pendingFile) {
-    pending = true;
-  }
   return (
     <div className="w-full my-5">
-      {pending && <PendingApi />}
+      {pendingCreate && <PendingApi />}
       <div className="flex gap-5 mb-8">
         <div className="w-1/6">
           <span className="mb-2 block">آپلود بک آپ</span>
@@ -153,7 +115,6 @@ export default function BackUp() {
           >
             گرفتن بک آپ
           </Button>
-
         </div>
       </div>
       {data?.length ?
@@ -166,7 +127,7 @@ export default function BackUp() {
                 className="bg-blue-200 rounded-md p-3 shadow-md flex flex-col gap-5 items-center justify-center relative"
               >
                 <div className="bg-slate-100 w-12 h-12 flex justify-center items-center rounded-full shadow-md">
-                  <span className="">{index + 1}</span>
+                  <span className="">{i.id}</span>
                 </div>
                 <time className="text-gray-700" dir="ltr">
                   {new Date(i.createdAt).toLocaleString("fa")}
@@ -181,7 +142,7 @@ export default function BackUp() {
                   >
                     دانلود
                   </Button>
-
+                  <DeleteButton id={i.url.split('/').pop() as string} keyQuery="BackUp" urlAction="backup" headerText="حذف بک آپ" />
                 </div>
               </section>
             ))}
