@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--sahel-font), Arial, Helvetica, sans-serif !important;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+.cutline {
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+.cutline-1 {
+  -webkit-line-clamp: 1;
+  line-clamp: 1
+}
+
+.cutline-2 {
+  -webkit-line-clamp: 2;
+  line-clamp: 2
+}
+
+.cutline-3 {
+  -webkit-line-clamp: 3;
+  line-clamp: 3
+}
+
+.cutline-4 {
+  -webkit-line-clamp: 4;
+  line-clamp: 4
+}
+
+.hover-project {
+  transition: all ease-in 1s;
+}
+
+.hover-project:hover {
+  transition: all ease-in 4s;
+}
+
+.custom-rounded {
+  border-radius: 3% 3% 100% 100%;
+}
+
+.custom-rounded-reverse {
+  border-radius: 100% 100% 0% 0%;
+}
+
+.bg-image {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.video-container:hover {
+  transform: scale(1.01);
+}
+
+.video-player {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.video-player:fullscreen {
+  border-radius: 0;
+}
+
+.card-box:hover .custom-button-card:before {
+  height: 1px;
+  transform-origin: 100% 50%;
+  transform: scale3d(1, 1, 1);
+  transition: all ease-in-out 0.3s;
+}
+
+.not-found {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+
+.classDiv {
+  max-width: 80rem;
+  margin: 1rem auto;
+  width: 100%;
+  padding: 0 0.75rem;
+}
+
+@media (min-width: 1280px) {
+  .classDiv {
+    padding: 0;
+    margin: 1.5rem auto;
+  }
+}
+
+.dark .swiper-button-next,
+.dark .swiper-button-prev {
+  color: rgb(240, 237, 237) !important;
+}
+
+.bg-pagination {
+  background: linear-gradient(113deg, #91b4e9, #4186f5);
+}
+
+.bg-pagination:hover {
+  background: linear-gradient(113deg, #76a8f3, #025cec);
+}
+
+.dark .bg-pagination {
+  background: linear-gradient(292deg, #0c0e11, #3b4046);
+}

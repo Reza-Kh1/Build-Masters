@@ -1,0 +1,28 @@
+.link-contact-us:hover::after {
+    opacity: 1;
+    transition: all ease-in 0.2s;
+    scale: 1.1;
+
+}
+
+.link-contact-us {
+    transition: all ease-in 0.3s;
+}
+
+.link-contact-us::after {
+    opacity: 0;
+    position: absolute;
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    content: "";
+    top: 0px;
+    left: 0px;
+    padding: 0px;
+    scale: 0.9;
+    transition: all ease-in 0.2s;
+    outline: 2px solid #7da5f1;
+}
+.dark .link-contact-us::after {
+    outline: 2px solid #6b7280;
+}

@@ -1,0 +1,131 @@
+.sticky-menu {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #f8f9fa;
+  padding: 8px 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.sticky-menu ul {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sticky-menu li {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+}
+
+.sticky-menu li:hover {
+  color: #007bff;
+}
+
+.header-sticky {
+  transition: all ease 0.5s;
+  z-index: 50;
+  position: sticky;
+  display: flex;
+  top: 0;
+  right: 0;
+}
+
+.header-hidden {
+  top: -6rem !important;
+  transition: all ease 0.5s;
+}
+
+.header-show {
+  top: -1px;
+  transition: all ease 0.5s;
+  border-radius: 0 0 10px 10px;
+}
+
+.header-show::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  border-radius: 0 0 10px 10px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.menu-header ul li ul {
+  transition: all ease-in-out 0.3s;
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  top: 70%;
+  right: 0;
+  flex-direction: column;
+  width: 10rem;
+}
+
+.menu-header ul li:hover>ul {
+  transition: all ease-in-out 0.3s;
+  visibility: visible;
+  top: 100%;
+  opacity: 1;
+}
+
+.menu-header ul li ul li {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  background-color: #e2e8eecc;
+  transition: all ease-in 0.2s;
+  width: 100%;
+}
+
+.dark .menu-header ul li ul li {
+  background-color: #1a1a1dab;
+}
+
+.menu-header ul li ul {
+  border-top: 3px solid #3379e2;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+}
+
+.menu-header ul li ul li:hover {
+  background-color: #fcfcfc;
+  transition: all ease-in 0.2s;
+  padding-right: 0.3rem;
+}
+
+.dark .menu-header ul li ul li:hover {
+  background-color: #181715;
+}
+
+.menu-header ul li ul>li>ul {
+  transition: all ease-in-out 0.3s;
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  top: 50%;
+  right: 100%;
+  width: 10rem;
+}
+
+.menu-header ul li ul>li:hover>ul {
+  transition: all ease-in-out 0.3s;
+  visibility: visible;
+  opacity: 1;
+  top: 0%;
+}
+
+.header-sticky-shadow {
+  box-shadow: 0px 3px 2px 0px ;
+}
