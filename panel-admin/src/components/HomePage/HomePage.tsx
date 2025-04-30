@@ -1,15 +1,18 @@
+import { Accordion, AccordionActions, AccordionDetails, AccordionSummary, Autocomplete, Button, Chip, IconButton, TextField } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react'
 import { fetchPageInfo } from '../../services/pageInfo';
-import axios from 'axios';
 import deleteCache from '../../services/revalidate';
 import { toast } from 'react-toastify';
-import { MdClose, MdDataSaverOn } from 'react-icons/md';
+import { MdClose, MdDataSaverOn, MdOutlineDescription, MdReplyAll, MdTitle } from 'react-icons/md';
 import SelectMedia from '../SelectMedia/SelectMedia';
-import { Accordion, AccordionActions, AccordionDetails, AccordionSummary, Button, IconButton, TextField } from '@mui/material';
 import { IoIosArrowDown } from 'react-icons/io';
 import { IoTrashBinSharp } from 'react-icons/io5';
 import { FaPlus } from 'react-icons/fa6';
+import axios from 'axios';
+import FieldsInputs from '../FieldsInputs/FieldsInputs';
+import { useForm } from 'react-hook-form';
+
 type HeroDataType = {
   id: number
   img: string
@@ -23,13 +26,20 @@ type TabDataType = {
   title: string
 }
 type DataHomeType = {
-  text: {
+  keyword?: string[]
+  description?: string
+  title?: string
+  canonicalUrl?: string
+  content: {
     tabImage: { alt: string, url: string } | null,
     tabs: TabDataType[],
     heroData: HeroDataType[]
   }
 }
+
 export default function HomePage() {
+  const { register, getValues, setValue } = useForm()
+  const [keyword, setKeyword] = useState<string[]>([])
   const [heroData, setHeroData] = useState<HeroDataType[]>([{
     id: 1,
     img: "",
@@ -70,15 +80,19 @@ export default function HomePage() {
   const { isPending, mutate: saveHandler } = useMutation({
     mutationFn: async () => {
       const body = {
-        page: "home",
-        text: {
+        page: 'home',
+        content: {
           tabImage: imageTab,
           tabs: tabData || [],
           heroData: heroData || []
         },
-      };
+        keyword: keyword,
+        description: getValues('description'),
+        title: getValues('title'),
+        canonicalUrl: getValues('canonicalUrl')
+      }
       await deleteCache({ tag: "home" });
-      return axios.post("page/home", body);
+      return axios.post("pages", body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["home"] });
@@ -90,19 +104,23 @@ export default function HomePage() {
     },
   });
   const syncData = () => {
-    setHeroData(data?.text?.heroData || [{
+    setHeroData(data?.content?.heroData || [{
       id: 1,
       img: "",
       title: "",
       text: "",
       alt: ""
     }])
-    setTabData(data?.text?.tabs || [{
+    setTabData(data?.content?.tabs || [{
       id: 1,
       text: "",
       title: ""
     }])
-    setImageTab(data?.text?.tabImage || null)
+    setImageTab(data?.content?.tabImage || null)
+    setKeyword(data?.keyword || [])
+    setValue('title', data?.title)
+    setValue('description', data?.description)
+    setValue('canonicalUrl', data?.canonicalUrl)
   };
   useEffect(() => {
     if (data) {
@@ -111,7 +129,60 @@ export default function HomePage() {
   }, [data]);
   return (
     <div className='w-full p-2'>
-      <span className="mb-5 block font-semibold">محتوای اول صفحه :</span>
+      <span className="mb-5 block font-semibold">عنوان صفحه (Title) :</span>
+      <FieldsInputs data={{
+        label: 'عنوان صفحه',
+        name: 'title',
+        type: 'text',
+        icon: <MdTitle />
+      }} register={register} />
+      <span className="my-5 block font-semibold">تگ های صفحه (Keyword) :</span>
+      <Autocomplete
+        multiple
+        className="shadow-md"
+        id="tags-filled"
+        options={[].map((option) => option)}
+        defaultValue={[]}
+        freeSolo
+        onChange={(_, newValue) => setKeyword(newValue)}
+        value={keyword}
+        renderTags={(value: readonly string[], getTagProps) =>
+          value.map((option: string, index: number) => {
+            const { key, ...tagProps } = getTagProps({ index });
+            return (
+              <Chip
+                variant="outlined"
+                label={option}
+                key={key}
+                {...tagProps}
+              />
+            );
+          })
+        }
+        renderInput={(params) => (
+          <TextField
+            autoComplete="off"
+            {...params}
+            label="کلمات کلیدی"
+            placeholder="اینتر بزنید..."
+          />
+        )}
+      />
+      <span className="my-5 block font-semibold">توضیحات صفحه (Description) :</span>
+      <FieldsInputs data={{
+        label: 'توضیحات',
+        name: 'description',
+        type: 'text',
+        icon: <MdOutlineDescription />
+      }} register={register} />
+      <span className="my-5 block font-semibold">آدرس صفحه اصلی برای جلوگیری از محتوای تکراری (Canonical) :</span>
+      <FieldsInputs data={{
+        label: 'آدرس',
+        name: 'canonicalUrl',
+        type: 'text',
+        icon: <MdReplyAll />
+      }} register={register} />
+      <span className="my-5 block font-semibold">محتوای اول صفحه :</span>
       {heroData.map((i, index) => (
         <div className='flex gap-5 my-3 items-center' key={index}>
           <IconButton

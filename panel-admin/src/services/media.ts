@@ -13,8 +13,6 @@ const fetchImage = async ({ pageParam, searchQuery }: any) => {
     } else {
         url = "media?" + query
     }
-    console.log(url);
-
     const { data } = await axios.get(url);
     return data;
 };

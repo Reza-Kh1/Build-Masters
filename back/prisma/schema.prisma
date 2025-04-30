@@ -222,11 +222,10 @@ model onlinePrice {
 model PageData {
   id           Int      @id @default(autoincrement())
   page         String   @unique
-  conetent     Json
+  content     Json
   keyword      String[]
   description  String?
   title        String?
-  name         String?
   canonicalUrl String?
 
   @@index([page])
