@@ -31,7 +31,7 @@ export default function Contractor() {
   }, [search]);
   const columnDefs: ColDef[] = [
     {
-      field: "avatar", headerName: "عکس", flex: 1,
+      field: "avatar", headerName: "عکس", flex: 1,rowDrag: true ,
       cellRenderer: (params: ICellRendererParams) => (<img src={params.value} alt="project" className="w-12 h-12 shadow-md rounded-full" />)
     },
     { field: "name", headerName: "نام" },
@@ -55,7 +55,7 @@ export default function Contractor() {
     {
       headerName: "عملیات",
       cellRenderer: (params: ICellRendererParams) => (
-        <div className="flex gap-2 h-full items-center justify-center">
+        <div className="flex gap-2 h-full items-center justify-center w-full">
           <Create id={params.data.name} />
           <DeleteButton id={params.value} keyQuery="AllContractor" urlAction="contractor" headerText="حذف مجری" />
         </div>
@@ -81,6 +81,7 @@ export default function Contractor() {
               rowHeight={55}
               theme={myThemeTable}
               enableRtl
+              rowDragManaged
               defaultColDef={{
                 cellStyle: { direction: 'rtl' },
                 headerStyle: { direction: 'rtl' },

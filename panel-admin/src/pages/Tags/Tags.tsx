@@ -53,7 +53,7 @@ export default function Tags() {
   });
 
   const columnDefs: ColDef[] = [
-    { field: "name", headerName: "نام", flex: 2 },
+    { field: "name", headerName: "نام", flex: 2 ,rowDrag: true },
     {
       headerName: "عملیات",
       field: "id",
@@ -61,7 +61,7 @@ export default function Tags() {
       filter: false,
       sortable: false,
       cellRenderer: (params: ICellRendererParams) => (
-        <div className="flex gap-2 h-full items-center justify-center">
+        <div className="flex gap-2 h-full items-center justify-center w-full">
           <EditButton
             loadingBtn={pendingupate}
             actionForm={updatetag}
@@ -97,7 +97,8 @@ export default function Tags() {
       {data?.length ? (
         <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
           <AgGridReact
-          enableRtl
+            enableRtl
+            rowDragManaged
             rowData={data}
             columnDefs={columnDefs}
             rowHeight={55}

@@ -3,11 +3,13 @@ import {
   AccordionActions,
   AccordionDetails,
   AccordionSummary,
+  Autocomplete,
   Button,
+  Chip,
   IconButton,
   TextField,
 } from "@mui/material";
-import { MdClose } from "react-icons/md";
+import { MdClose, MdOutlineDescription, MdReplyAll, MdTitle } from "react-icons/md";
 import { FaPlus } from "react-icons/fa6";
 import { IoIosArrowDown } from "react-icons/io";
 import { MdDataSaverOn } from "react-icons/md";
@@ -19,10 +21,12 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import PendingApi from "../PendingApi/PendingApi";
 import deleteCache from "../../services/revalidate";
+import { useForm } from "react-hook-form";
+import FieldsInputs from "../FieldsInputs/FieldsInputs";
 type DataType = {
   id: number;
   page: string;
-  text: {
+  content: {
     description: string;
     title: string;
     accordion: {
@@ -31,8 +35,15 @@ type DataType = {
       arry: { name: string; text: string; id: number }[];
     }[];
   };
+  keyword: string[]
+  description: string
+  title: string
+  canonicalUrl: string
 };
+
 export default function Faqs() {
+  const { register, getValues, setValue } = useForm()
+  const [keyword, setKeyword] = useState<string[]>([])
   const [dataText, setDataText] = useState({
     title: "",
     description: "",
@@ -79,18 +90,22 @@ export default function Faqs() {
   const dropAccordion = (id: number) => {
     const newAc = accordion.filter((filter) => filter.id !== id);
     setAccrodion(newAc);
-  };  
+  };
   const { isPending, mutate: saveHandler } = useMutation({
-    mutationFn:async () => {
+    mutationFn: async () => {
       const body = {
-        page: "faqs",
-        text: {
+        page: 'faqs',
+        content: {
           ...dataText,
           accordion,
         },
-      };
-      await deleteCache({ tag:"page/faqs"});
-      return axios.post("page/faqs", body);
+        keyword: keyword,
+        description: getValues('description'),
+        title: getValues('title'),
+        canonicalUrl: getValues('canonicalUrl')
+      }
+      await deleteCache({ tag: "page/faqs" });
+      return axios.post("pages", body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["faqs"] });
@@ -103,23 +118,81 @@ export default function Faqs() {
   });
   const syncData = () => {
     setDataText({
-      description: data?.text?.description || "",
-      title: data?.text?.title || "",
+      description: data?.content?.description || "",
+      title: data?.content?.title || "",
     });
     setAccrodion(
-      data?.text.accordion || [
+      data?.content?.accordion || [
         { name: "", id: 1, arry: [{ name: "", text: "", id: 1 }] },
       ]
     );
+    setKeyword(data?.keyword || [])
+    setValue('title', data?.title)
+    setValue('description', data?.description)
+    setValue('canonicalUrl', data?.canonicalUrl)
   };
   useEffect(() => {
     if (data) {
       syncData();
     }
-  }, [data]);  
+  }, [data]);
   return (
     <div className="w-full p-2">
       {isPending && <PendingApi />}
+      <span className="mb-5 block font-semibold">عنوان صفحه (Title) :</span>
+      <FieldsInputs data={{
+        label: 'عنوان صفحه',
+        name: 'title',
+        type: 'text',
+        icon: <MdTitle />
+      }} register={register} />
+      <span className="my-5 block font-semibold">تگ های صفحه (Keyword) :</span>
+      <Autocomplete
+        multiple
+        className="shadow-md"
+        id="tags-filled"
+        options={[].map((option) => option)}
+        defaultValue={[]}
+        freeSolo
+        onChange={(_, newValue) => setKeyword(newValue)}
+        value={keyword}
+        renderTags={(value: readonly string[], getTagProps) =>
+          value.map((option: string, index: number) => {
+            const { key, ...tagProps } = getTagProps({ index });
+            return (
+              <Chip
+                variant="outlined"
+                label={option}
+                key={key}
+                {...tagProps}
+              />
+            );
+          })
+        }
+        renderInput={(params) => (
+          <TextField
+            autoComplete="off"
+            {...params}
+            label="کلمات کلیدی"
+            placeholder="اینتر بزنید..."
+          />
+        )}
+      />
+      <span className="my-5 block font-semibold">توضیحات صفحه (Description) :</span>
+      <FieldsInputs data={{
+        label: 'توضیحات',
+        name: 'description',
+        type: 'text',
+        icon: <MdOutlineDescription />
+      }} register={register} />
+      <span className="my-5 block font-semibold">آدرس صفحه اصلی برای جلوگیری از محتوای تکراری (Canonical) :</span>
+      <FieldsInputs data={{
+        label: 'آدرس',
+        name: 'canonicalUrl',
+        type: 'text',
+        icon: <MdReplyAll />
+      }} register={register} />
+      <span className="my-5 block font-semibold">عنوان متنی صفحه :</span>
       <div className="flex flex-col gap-3">
         <TextField
           fullWidth

@@ -55,7 +55,7 @@ export default function Users() {
     },
   });
   const columnDefs: ColDef[] = [
-    { field: "name", headerName: "نام", flex: 2 },
+    { field: "name", headerName: "نام", flex: 2 ,rowDrag: true },
     { field: "email", headerName: "ایمیل" },
     { field: "phone", headerName: "شماره تلفن" },
     {
@@ -75,7 +75,7 @@ export default function Users() {
     {
       headerName: "عملیات",
       cellRenderer: (params: ICellRendererParams) => (
-        <div className="flex gap-2 h-full items-center justify-center">
+        <div className="flex gap-2 h-full items-center justify-center w-full">
           <EditButton
             loadingBtn={updatePending}
             actionForm={updateUser}
@@ -100,8 +100,6 @@ export default function Users() {
         </div>
       ),
       field: "id",
-      pinned: 'left',
-      width: 200,
       filter: false,
       sortable: false,
     },
@@ -140,11 +138,12 @@ export default function Users() {
           ]}
           title="افزودن کاربر جدید"
         />
-        <SearchBox searchText roleUSer order  />
+        <SearchBox searchText roleUSer order />
         {data?.pages[0]?.data.length ? (
           <>
             <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
               <AgGridReact
+                rowDragManaged
                 enableRtl
                 rowData={data?.pages[0]?.data}
                 columnDefs={columnDefs}

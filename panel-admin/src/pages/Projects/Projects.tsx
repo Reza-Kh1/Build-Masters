@@ -28,7 +28,7 @@ export default function Projects() {
     setSearchQuery(query);
   }, [search]);
   const columnDefs: ColDef[] = [
-    { field: "name", headerName: "نام", flex: 2 },
+    { field: "name", headerName: "نام", flex: 2,rowDrag: true  },
     { field: "slug", headerName: "اسلاگ", flex: 2 },
     { field: "image", headerName: "عکس", flex: 2, cellRenderer: (params: ICellRendererParams) => (<img src={params.value} alt="project" className="w-12 h-12 shadow-md rounded-full" />) },
     { field: "isPublished", headerName: "وضعیت انتشار", flex: 1 },
@@ -53,7 +53,7 @@ export default function Projects() {
       filter: false,
       sortable: false,
       cellRenderer: (params: ICellRendererParams) => (
-        <div className="flex gap-2 h-full items-center justify-center">
+        <div className="flex gap-2 h-full items-center justify-center w-full">
           <Create id={params.data.slug} />
           <DeleteButton id={params.value} keyQuery="GetUsers" urlAction="user" headerText="حذف کاربران" />
         </div>
@@ -71,6 +71,7 @@ export default function Projects() {
           <>
             <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
               <AgGridReact
+                rowDragManaged
                 enableRtl
                 rowData={data?.pages[0]?.data}
                 columnDefs={columnDefs}

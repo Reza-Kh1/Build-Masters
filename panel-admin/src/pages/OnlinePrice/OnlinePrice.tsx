@@ -84,7 +84,7 @@ export default function OnlinePrice() {
     setSearchQuery(query);
   }, [search]);
   const columnDefs: ColDef[] = [
-    { field: "name", headerName: "نام", flex: 1 },
+    { field: "name", headerName: "نام", flex: 1 ,rowDrag: true },
     { field: "phone", headerName: "شماره تلفن", flex: 1 },
     { field: "subject", headerName: "دسته", flex: 1 },
     { field: "price", headerName: "قیمت", valueFormatter: (param) => param?.value ? Number(param.value).toLocaleString("fa") : 'ثبت نشده', flex: 1 },
@@ -97,7 +97,7 @@ export default function OnlinePrice() {
       filter: false,
       sortable: false,
       cellRenderer: (params: ICellRendererParams) => (
-        <div className="flex gap-2 h-full items-center justify-center">
+        <div className="flex gap-2 h-full items-center justify-center w-full">
           <Button onClick={() => { setSingleData(params.data), setOpen(true) }} color="success" endIcon={<FaEye />} variant="contained">نمایش</Button>
           <DeleteButton id={params.value} keyQuery="Onlineprice" urlAction="onlinePrice" headerText="حذف درخواست" />
         </div>
@@ -111,6 +111,7 @@ export default function OnlinePrice() {
       {data?.pages[0].data.length ? (
         <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
           <AgGridReact
+            rowDragManaged
             enableRtl
             rowData={data?.pages[0]?.data}
             columnDefs={columnDefs}

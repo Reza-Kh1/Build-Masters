@@ -25,7 +25,7 @@ const dataMenuFooter = [
 type DataType = {
   page: string;
   id: number;
-  text: {
+  content: {
     logoUrl: DataMediaType;
     text: string;
     menuLink: MenuFooterType[];
@@ -41,7 +41,7 @@ export default function Footer() {
     queryKey: ["footer"],
     queryFn: () => fetchPageInfo("footer"),
     staleTime: 1000 * 60 * 60 * 24,
-  });
+  });  
   const deleteBtn = (id: number, index: number) => {
     const newMenu = menuFooter.map((item, ind) => {
       if (index === ind) {
@@ -67,15 +67,19 @@ export default function Footer() {
   const { isPending, mutate: saveHandler } = useMutation({
     mutationFn: async () => {
       const body = {
-        page: "footer",
-        text: {
+        page: 'footer',
+        content: {
           logoUrl: logo,
           text: text,
           menuLink: menuFooter,
         },
-      };
+        keyword: [],
+        description: null,
+        title: null,
+        canonicalUrl: null
+      }
       await deleteCache({ tag: "footer" });
-      return axios.post("page/footer", body);
+      return axios.post("pages", body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["footer"] });
@@ -87,18 +91,19 @@ export default function Footer() {
     },
   });
   const syncData = () => {
-    setText(data?.text?.text || "");
+    setText(data?.content?.text || "");
     setLogo({
-      url: data?.text?.logoUrl?.url || "",
-      alt: data?.text?.logoUrl?.alt || "",
+      url: data?.content?.logoUrl?.url || "",
+      alt: data?.content?.logoUrl?.alt || "",
     });
-    setMenuFooter(data?.text?.menuLink || dataMenuFooter);
+    setMenuFooter(data?.content?.menuLink || dataMenuFooter);
   };
   useEffect(() => {
     if (data) {
       syncData();
     }
   }, [data]);
+
   return (
     <div className="w-full p-2">
       {isPending && <PendingApi />}
@@ -110,7 +115,7 @@ export default function Footer() {
             autoComplete="off"
             className="shadow-md"
             label={"توضیحات بخش اول"}
-            defaultValue={data?.text}
+            defaultValue={data?.content?.text}
             rows={6}
             onChange={({ target }) => setText(target.value)}
             value={text}

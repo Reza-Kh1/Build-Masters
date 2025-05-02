@@ -153,8 +153,13 @@ a {
 
 .ag-theme-quartz .ag-cell {
     padding: 12px 16px !important;
-  }
-  
-  .ag-theme-quartz .ag-header-cell {
+}
+
+.ag-theme-quartz .ag-header-cell {
     padding: 14px 16px !important;
-  }
+}
+
+.ag-cell {
+    align-items: center;
+    display: flex;
+}

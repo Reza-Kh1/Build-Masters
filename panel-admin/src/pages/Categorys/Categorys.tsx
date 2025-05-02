@@ -63,7 +63,7 @@ export default function Categorys() {
   }
 
   const columnDefs: ColDef[] = [
-    { field: "name", headerName: "نام", flex: 2 },
+    { field: "name", headerName: "نام", flex: 2, rowDrag: true },
     { field: "slug", headerName: "اسلاگ" },
     {
       field: "SubCategoryTo", headerName: "زیر مجموعه", valueFormatter: (params) => {
@@ -77,7 +77,7 @@ export default function Categorys() {
     {
       headerName: "عملیات",
       cellRenderer: (params: ICellRendererParams) => (
-        <div className="flex gap-2 h-full items-center justify-center">
+        <div className="flex gap-2 h-full items-center justify-center w-full">
           <EditButton
             loadingBtn={updatePending}
             actionForm={updateCategory}
@@ -99,8 +99,7 @@ export default function Categorys() {
       width: 200,
       filter: false,
       sortable: false,
-    },
-
+    }
   ]
 
   return (
@@ -126,10 +125,11 @@ export default function Categorys() {
           {data?.length ? (
             <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
               <AgGridReact
+              rowHeight={55}
                 enableRtl
                 rowData={data}
+                rowDragManaged
                 columnDefs={columnDefs}
-                rowHeight={55}
                 theme={myThemeTable}
                 defaultColDef={{
                   cellStyle: { direction: 'rtl' },

@@ -222,7 +222,7 @@ model onlinePrice {
 model PageData {
   id           Int      @id @default(autoincrement())
   page         String   @unique
-  content     Json
+  content      Json
   keyword      String[]
   description  String?
   title        String?

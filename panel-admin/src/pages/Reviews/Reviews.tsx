@@ -144,7 +144,7 @@ export default function Reviews() {
     setSearchQuery(query);
   }, [search]);
   const columnDefs: ColDef[] = [
-    { field: "name", headerName: "نام", flex: 1 },
+    { field: "name", headerName: "نام", flex: 1, rowDrag: true },
     { field: "content", headerName: "متن", flex: 2 },
     {
       field: "id", headerName: "برای", flex: 1, cellRenderer: ({ data }: ICellRendererParams) => {
@@ -199,7 +199,7 @@ export default function Reviews() {
     {
       headerName: "عملیات",
       cellRenderer: (params: ICellRendererParams) => (
-        <div className="flex gap-2 h-full items-center justify-center">
+        <div className="flex gap-2 h-full items-center justify-center w-full">
           {params.data.isPublished ? (
             <Button
               onClick={() => publishedHandler(params.data)}
@@ -260,6 +260,7 @@ export default function Reviews() {
           <>
             <div className="my-4 w-full h-[450px] [--ag-font-size:16px] [--ag-font-family:iranSans]">
               <AgGridReact
+                rowDragManaged
                 enableRtl
                 rowData={data?.pages[0]?.data}
                 columnDefs={columnDefs}

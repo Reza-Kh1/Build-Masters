@@ -1,5 +1,7 @@
 import {
+  Autocomplete,
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -9,7 +11,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { FaPenToSquare, FaPlus } from "react-icons/fa6";
-import { MdClose } from "react-icons/md";
+import { MdClose, MdOutlineDescription, MdReplyAll, MdTitle } from "react-icons/md";
 import { MdDataSaverOn } from "react-icons/md";
 import SelectMedia from "../SelectMedia/SelectMedia";
 import ImageComponent from "../ImageComponent/ImageComponent";
@@ -19,14 +21,17 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import PendingApi from "../PendingApi/PendingApi";
 import deleteCache from "../../services/revalidate";
+import { useForm } from "react-hook-form";
+import FieldsInputs from "../FieldsInputs/FieldsInputs";
+
 type ImgArryType = {
   url: string;
-  alt: string;
+  alt?: string;
 };
 type DataType = {
   id: number;
   page: string;
-  text: {
+  content: {
     imgArry: ImgArryType[];
     title1: string;
     text1: string;
@@ -34,7 +39,12 @@ type DataType = {
     text2: string;
     textArry: { id: number; text: string }[];
   };
+  keyword: string[],
+  description: string
+  title: string
+  canonicalUrl: string
 };
+
 export default function AboutMe() {
   const [dataText, setDataText] = useState({
     title1: "",
@@ -42,6 +52,8 @@ export default function AboutMe() {
     title2: "",
     text2: "",
   });
+  const { register, getValues, setValue } = useForm()
+  const [keyword, setKeyword] = useState<string[]>([])
   const [open, setOpen] = useState<boolean>(false);
   const [editImage, setEditImage] = useState<ImgArryType>();
   const [textArry, setTextArry] = useState([{ id: 1, text: "" }]);
@@ -77,8 +89,8 @@ export default function AboutMe() {
   const { isPending, mutate: saveHandler } = useMutation({
     mutationFn: async () => {
       const body = {
-        page: "aboutMe",
-        text: {
+        page: 'aboutMe',
+        content: {
           imgArry,
           title1: dataText.title1,
           text1: dataText.text1,
@@ -86,9 +98,13 @@ export default function AboutMe() {
           text2: dataText.text2,
           textArry: textArry,
         },
-      };
+        keyword: keyword,
+        description: getValues('description'),
+        title: getValues('title'),
+        canonicalUrl: getValues('canonicalUrl')
+      }
       await deleteCache({ tag: "aboutUs" });
-      return axios.post("page/aboutMe", body);
+      return axios.post("pages", body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["aboutMe"] });
@@ -100,14 +116,19 @@ export default function AboutMe() {
     },
   });
   const syncData = () => {
-    setImgArry(data?.text?.imgArry || []);
+    setImgArry(data?.content?.imgArry || []);
     setDataText({
-      text1: data?.text?.text1 || "",
-      text2: data?.text?.text2 || "",
-      title1: data?.text?.title1 || "",
-      title2: data?.text?.title2 || "",
+      text1: data?.content?.text1 || "",
+      text2: data?.content?.text2 || "",
+      title1: data?.content?.title1 || "",
+      title2: data?.content?.title2 || "",
     });
-    setTextArry(data?.text.textArry || [{ id: 1, text: "" }]);
+    setTextArry(data?.content.textArry || [{ id: 1, text: "" }]);
+
+    setKeyword(data?.keyword || [])
+    setValue('title', data?.title)
+    setValue('description', data?.description)
+    setValue('canonicalUrl', data?.canonicalUrl)
   };
   useEffect(() => {
     if (data) {
@@ -117,6 +138,59 @@ export default function AboutMe() {
   return (
     <div className="w-full p-2">
       {isPending && <PendingApi />}
+      <span className="mb-5 block font-semibold">عنوان صفحه (Title) :</span>
+      <FieldsInputs data={{
+        label: 'عنوان صفحه',
+        name: 'title',
+        type: 'text',
+        icon: <MdTitle />
+      }} register={register} />
+      <span className="my-5 block font-semibold">تگ های صفحه (Keyword) :</span>
+      <Autocomplete
+        multiple
+        className="shadow-md"
+        id="tags-filled"
+        options={[].map((option) => option)}
+        defaultValue={[]}
+        freeSolo
+        onChange={(_, newValue) => setKeyword(newValue)}
+        value={keyword}
+        renderTags={(value: readonly string[], getTagProps) =>
+          value.map((option: string, index: number) => {
+            const { key, ...tagProps } = getTagProps({ index });
+            return (
+              <Chip
+                variant="outlined"
+                label={option}
+                key={key}
+                {...tagProps}
+              />
+            );
+          })
+        }
+        renderInput={(params) => (
+          <TextField
+            autoComplete="off"
+            {...params}
+            label="کلمات کلیدی"
+            placeholder="اینتر بزنید..."
+          />
+        )}
+      />
+      <span className="my-5 block font-semibold">توضیحات صفحه (Description) :</span>
+      <FieldsInputs data={{
+        label: 'توضیحات',
+        name: 'description',
+        type: 'text',
+        icon: <MdOutlineDescription />
+      }} register={register} />
+      <span className="my-5 block font-semibold">آدرس صفحه اصلی برای جلوگیری از محتوای تکراری (Canonical) :</span>
+      <FieldsInputs data={{
+        label: 'آدرس',
+        name: 'canonicalUrl',
+        type: 'text',
+        icon: <MdReplyAll />
+      }} register={register} />
       <span className="mb-4 block font-semibold">بخش اول :</span>
       <div className="flex gap-7 mb-5">
         <div className="flex flex-col w-1/2 gap-5">

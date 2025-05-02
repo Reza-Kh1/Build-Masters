@@ -31,7 +31,7 @@ export default function PageInfo() {
     <div className="w-full flex flex-col gap-4">
       <TitlePage title="صفحه اصلی" page={<HomePage />} />
       <TitlePage title="فوتر" page={<Footer />} />
-      <TitlePage title="درباره ما" page={<AboutMe />} />
+      <TitlePage title="صفحه درباره ما" page={<AboutMe />} />
       <TitlePage title="صفحه سوالات متداول" page={<Faqs />} />
     </div>
   );
