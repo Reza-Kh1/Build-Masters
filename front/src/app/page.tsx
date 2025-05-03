@@ -5,72 +5,69 @@ import OurServices from "@/components/OurServices/OurServices";
 import SwiperCards from "@/components/SwiperCards/SwiperCards";
 import SwiperHero from "@/components/SwiperHero/SwiperHero";
 import { FaPhone } from "react-icons/fa6";
-import { AllExpertType, AllPostType, AllProjectType, HomePageType } from "./type";
+import { AllContractorType, AllPostType, AllProjectType, HomePageType } from "./type";
 import { dataApi } from "@/data/tagsName";
 import TabsComponent from "@/components/Tabs/Tabs";
 import ImgTag from "@/components/ImgTag/ImgTag";
 import { servicesData } from "@/data/dataService";
 import Link from "next/link";
-import { Metadata } from "next";
+
 const nameSite = process.env.NEXT_PUBLIC_NAME_SITE || ""
-const getData = () => {
+const getData = (): Promise<HomePageType> => {
   return fetchApi({ url: dataApi.home.url, tags: dataApi.home.tags, next: dataApi.home.cache })
 }
-const getProject = () => {
+const getProject = (): Promise<AllProjectType> => {
   return fetchApi({ url: dataApi.projects.url, tags: dataApi.projects.tags, next: dataApi.projects.cache })
 }
-const getPosts = () => {
+const getPosts = (): Promise<AllPostType> => {
   return fetchApi({ url: dataApi.posts.url, tags: dataApi.posts.tags, next: dataApi.posts.cache })
 }
-const getExperts = () => {
-  return fetchApi({ url: dataApi.experts.url, tags: dataApi.experts.tags, next: dataApi.experts.cache })
+const getContractor = (): Promise<AllContractorType> => {
+  return fetchApi({ url: dataApi.contractor.url, tags: dataApi.contractor.tags, next: dataApi.contractor.cache })
 }
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
-  title: `${nameSite} | پیشرو در ساخت و ساز و بازسازی`,
-  description: 'با ${nameSite}، پروژه‌های ساختمانی و بازسازی خود را با کیفیت بالا و در زمان کوتاه به انجام برسانید. از طراحی تا اجرا، ما همراه شما هستیم.',
-  keywords: [
-    'ساخت و ساز',
-    'بازسازی ساختمان',
-    'پروژه‌های ساختمانی',
-    'کیفیت ساخت',
-    'خدمات ساختمانی',
-    'طراحی و اجرا',
-  ],
-  openGraph: {
-    title: `${nameSite} | پیشرو در خدمات ساخت و ساز`,
-    description: 'ما در ${nameSite} خدمات متنوعی از طراحی تا اجرای پروژه‌های ساختمانی ارائه می‌دهیم. کیفیت، زمان‌بندی و هزینه مناسب را با ما تجربه کنید.',
-    url: `${process.env.NEXT_PUBLIC_URL}`,
-    images: [
-      {
-        url: `${process.env.NEXT_PUBLIC_URL + "/about-us.jpg"}`,
-        width: 1200,
-        height: 630,
-        alt: `صفحه اصلی ${nameSite}`,
-      },
-    ],
-    type: 'website',
-    locale: "fa_IR",
-    siteName: nameSite,
-  },
-  twitter: {
-    card: 'summary_large_image',
-    creator: "@buildMasters",
-    site: "@buildMasters",
-  },
-  robots: "index,follow",
-  alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_URL}`,
-  },
+export async function metadata() {
+  const meta = await getData()
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
+    title: meta?.title,
+    description: meta?.description,
+    keywords: meta?.keyword,
+    openGraph: {
+      title: meta?.title,
+      description: meta?.description,
+      url: `${process.env.NEXT_PUBLIC_URL}`,
+      images: [
+        {
+          url: `${process.env.NEXT_PUBLIC_URL + "/about-us.jpg"}`,
+          width: 1200,
+          height: 630,
+          alt: `صفحه اصلی ${nameSite}`,
+        },
+      ],
+      type: 'website',
+      locale: "fa_IR",
+      siteName: nameSite,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      creator: "@buildMasters",
+      site: "@buildMasters",
+    },
+    robots: "index,follow",
+    alternates: {
+      canonical: meta?.canonicalUrl,
+    },
+  }
 };
+
 export default async function Home() {
-  // const projects: AllProjectType = await getProject()
-  // const posts: AllPostType = await getPosts()
-  // const experts: AllExpertType = await getExperts()
-  // const { data }: HomePageType = await getData()
+  const projects = await getProject()
+  const posts: AllPostType = await getPosts()
+  const contractor = await getContractor()
+  const data = await getData()
   return (
     <>
-      {/* <SwiperHero data={data?.text?.heroData} /> */}
+      {data && <SwiperHero data={data?.content?.heroData} />}
       <div className="p-3 md:p-5 my-3 md:my-6 bg-gradient-to-t to-blue-low from-blue-full dark:from-[#242b36] dark:to-[#232528] shadow-md">
         <div className="max-w-7xl w-full flex gap-5 justify-between items-center mx-auto">
           <div className="flex flex-col gap-1 md:gap-2">
@@ -108,19 +105,19 @@ export default async function Home() {
       </div>
       <OurServices />
       <div className="classDiv">
-        {/* <SwiperCards
+        <SwiperCards
           isProject
-          data={projects.rows}
+          data={projects.data}
           title="پروژه های ما"
           url="/blog?order=createdAt-DESC&page=1"
         />
-        <TabsComponent tabs={data?.text?.tabs} image={data?.text?.tabImage} />
+        {data && <TabsComponent tabs={data?.content?.tabs} image={data?.content?.tabImage} />}
         <SwiperCards
           isPost
-          data={posts.rows}
+          data={posts.data}
           title="آخرین پست های منتشر شده"
           url="/blog?order=createdAt-DESC&page=1"
-        /> */}
+        />
       </div>
       <div className="bg-gradient-to-t to-blue-full from-blue-low dark:from-[#242b36] dark:to-[#232528] py-3 shadow-md">
         <div className="classDiv flex-col gap-3 md:gap-5 items-center ">
@@ -143,12 +140,12 @@ export default async function Home() {
         </div>
       </div>
       <div className="classDiv">
-        {/* <SwiperCards
+        <SwiperCards
           isExpert
-          data={experts.rows}
+          data={contractor?.data}
           title="مجریان تیم"
           url="/blog?order=createdAt-DESC&page=1"
-        /> */}
+        />
       </div>
       <ContactSocialMedia />
     </>

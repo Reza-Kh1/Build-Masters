@@ -14,7 +14,7 @@ export default function SwiperHero({ data }: { data: HeroDataType[] }) {
         clickable: true,
       }}
       autoplay
-      loop={true}
+      loop={data.length > 1 ? true : false}
       modules={[EffectFade, Pagination, Autoplay]}
       className="mySwiper"
     >

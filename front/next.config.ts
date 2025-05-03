@@ -8,6 +8,16 @@ const nextConfig: NextConfig = {
         hostname: "building-blog.storage.iran.liara.space",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "dl.buildmasters.ir",
+        pathname: "**",
+      },
+      {
+        protocol: "http",
+        hostname: "dl.buildmasters.ir",
+        pathname: "**",
+      },
     ],
   },
   reactStrictMode: true,
@@ -22,8 +32,8 @@ const nextConfig: NextConfig = {
           { key: "Access-Control-Allow-Credentials", value: "true" },
           {
             key: "Access-Control-Allow-Origin",
-            // value: "http://localhost:5173",
-            value: "https://admin.buildmasters.ir",
+            value: "http://localhost:5173",
+            // value: "https://admin.buildmasters.ir",
           },
           {
             key: "Access-Control-Allow-Methods",

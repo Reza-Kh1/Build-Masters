@@ -3,27 +3,18 @@ import React, { Suspense, useEffect, useState } from "react";
 import { IoIosArrowUp } from "react-icons/io";
 import { CategoryType } from "@/app/type";
 import Link from "next/link";
-import {
-  FaAngleDoubleDown,
-  FaAngleLeft,
-  FaHome,
-  FaPhone,
-} from "react-icons/fa";
 import DarkMode from "../DarkMode/DarkMode";
 import SearchBox from "../SearchBox/SearchBox";
 import Image from "next/image";
 import NavlinkHeader from "./NavlinkHeader";
 import { Drawer, IconButton } from "@mui/material";
-import {
-  MdMapsHomeWork,
-  MdMenuOpen,
-  MdOutlineQuestionMark,
-} from "react-icons/md";
 import { GrArticle, GrUserWorker } from "react-icons/gr";
 import { FaRegComments, FaUsersViewfinder } from "react-icons/fa6";
 import { LiaFileInvoiceDollarSolid } from "react-icons/lia";
 import IconSocialMedia from "../IconSocialMedia/IconSocialMedia";
 import { usePathname } from "next/navigation";
+import { MdMapsHomeWork, MdMenuOpen, MdOutlineQuestionMark } from "react-icons/md";
+import { FaAngleDoubleDown, FaAngleLeft, FaHome, FaPhone } from "react-icons/fa";
 const menuTitle = [
   {
     name: "پروژه ها",
@@ -63,7 +54,7 @@ export default function HeaderSticky({
 }: {
   category: CategoryType[];
 }) {
-  const [scroll, setScroll] = useState<Number>(0);
+  const [scroll, setScroll] = useState<number>(0);
   const [visible, setVisible] = useState<boolean>(true);
   const [scrollTop, setScrollTop] = useState<boolean>(false);
   const [openMenu, setOpenMenu] = useState<boolean>(false);
@@ -97,7 +88,7 @@ export default function HeaderSticky({
   }, [params]);
   useEffect(() => {
     const handleScroll = () => {
-      const currentScroll = window.scrollY as Number;
+      const currentScroll = Number(window.scrollY);
       const sizePage = document.body.scrollHeight;
       const scrollPage = window.scrollY + window.innerHeight;
       const mathLocation = Math.floor((scrollPage / sizePage) * 100);
@@ -128,7 +119,7 @@ export default function HeaderSticky({
         className={`header-sticky shadow-shadow-header shadow-[#17315a] dark:shadow-low-dark bg-blue-color/90 dark:bg-zinc-900/80 ${visible
           ? "header-show bg-blue-color/90 dark:!bg-zinc-900/80"
           : "header-hidden"
-          } `}
+          }`}
       >
         <div className="max-w-7xl w-full py-1 md:py-3 px-3 xl:px-0 flex mx-auto">
           <div className="w-full flex justify-between items-center">
@@ -139,7 +130,7 @@ export default function HeaderSticky({
                   type="button"
                   aria-label="open menu"
                 >
-                  <MdMenuOpen className="text-gray-200"/>
+                  <MdMenuOpen className="text-gray-200" />
                 </IconButton>
                 <Drawer
                   anchor={"left"}
@@ -233,7 +224,7 @@ export default function HeaderSticky({
                       </ul>
                     </div>
                     <div className="mt-8 flex justify-center pb-5">
-                      <IconSocialMedia size="!text-2xl"/>
+                      <IconSocialMedia size="!text-2xl" />
                     </div>
                   </nav>
                 </Drawer>

@@ -78,71 +78,64 @@ type PostType = {
   Comments: CommentsType[];
 };
 type AllPostType = {
-  count: number;
-  rows: CardPostType[];
-  paginate: PaginationType;
+  data: CardPostType[];
+  pagination: PaginationType;
 };
 type TagsType = {
   id: number;
   name: string;
 };
 type Footertype = {
-  data: {
-    id: number;
-    page: string;
-    text: {
-      text: string;
-      logoUrl: {
-        alt: string;
-        url: string;
-      };
-      menuLink: {
-        id: number;
-        link: string;
-        name: string;
-      }[][];
+  id: number;
+  page: string;
+  text: {
+    text: string;
+    logoUrl: {
+      alt: string;
+      url: string;
     };
-  } | null;
-};
+    menuLink: {
+      id: number;
+      link: string;
+      name: string;
+    }[][];
+  };
+} | null;
 type AboutUsType = {
-  data: {
-    id: number;
-    page: string;
-    text: {
-      text1: string | null;
-      text2: string | null;
-      title1: string | null;
-      title2: string | null;
-      imgArry: {
-        alt: string;
-        url: string;
-      }[];
-      textArry: {
+  id: number;
+  page: string;
+  text: {
+    text1: string | null;
+    text2: string | null;
+    title1: string | null;
+    title2: string | null;
+    imgArry: {
+      alt: string;
+      url: string;
+    }[];
+    textArry: {
+      id: number;
+      text: string;
+    }[];
+  };
+} | null;
+type FaqsType = {
+  id: number;
+  page: string;
+  text: {
+    title: string;
+    accordion: {
+      id: number;
+      name: string;
+      arry: {
         id: number;
+        name: string;
         text: string;
       }[];
-    };
-  } | null;
-};
-type FaqsType = {
-  data: {
-    id: number;
-    page: string;
-    text: {
-      title: string;
-      accordion: {
-        id: number;
-        name: string;
-        arry: {
-          id: number;
-          name: string;
-          text: string;
-        }[];
-      }[];
-      description: string;
-    };
-  } | null;
-};
+    }[];
+    description: string;
+  };
+} | null
 type ImageType = {
   url: string;
   alt: string;
@@ -152,7 +145,7 @@ type CommentsPage = {
     count: number;
     rows: CommentsType[];
   };
-  paginate: PaginationType;
+  pagination: PaginationType;
   countNull: number;
 };
 type FilterQueryType = {
@@ -162,10 +155,11 @@ type FilterQueryType = {
   tags?: string;
   expert?: string;
 };
-type ExpertType = {
-  id: number;
-  name: string;
-  phone: string;
+type ContractorType = {
+  id: number
+  name: string
+  phone: string
+  email: string
   socialMedia: {
     id: number;
     link: string;
@@ -178,24 +172,27 @@ type ExpertType = {
     | "web"
     | "twitter"
     | "linkedin";
-  }[];
-  address: string;
-  description: string;
-  image: string;
-  createdAt: Date;
-  updatedAt: Date;
-  Tags?: TagsType[];
-  Projects: CardProjectsType[];
+  }[],
+  bio: string
+  avatar: string
+  totalComment: number
+  rating: string
+  createdAt: Date
+  updatedAt: Date
+  categoryId: number
+  userId: string
+  Tags: TagsType[]
+  Project: ProjectType[]
+  Category: CategoryType
+  Comment: CommentsType[]
 };
-type AllExpertType = {
-  count: number;
-  rows: ExpertType[];
-  paginate: PaginationType;
+type AllContractorType = {
+  data: ContractorType[];
+  pagination: PaginationType;
 };
 type AllProjectType = {
-  count: number;
-  rows: CardProjectsType[];
-  paginate: PaginationType;
+  data: CardProjectsType[];
+  pagination: PaginationType;
 };
 type ProjectType = {
   id: number;
@@ -212,7 +209,7 @@ type ProjectType = {
   workerId: number;
   size: null | string
   price: null | string
-  Worker: ExpertType;
+  Worker: ContractorType;
   Tags: TagsType[];
 };
 type HeroDataType = {
@@ -228,15 +225,17 @@ type TabDataType = {
   title: string
 }
 type HomePageType = {
-  data: {
-    page: string
-    text: {
-      tabImage: { alt: string, url: string } | null,
-      tabs: TabDataType[],
-      heroData: HeroDataType[]
-    }
+  page: string
+  content: {
+    tabImage: { alt: string, url: string } | null,
+    tabs: TabDataType[],
+    heroData: HeroDataType[]
   }
-}
+  keyword: string[]
+  description: string | null
+  title: string | null
+  canonicalUrl: string | null
+} | null
 export type {
   FaqsType,
   ImageType,
@@ -254,8 +253,8 @@ export type {
   CommentsPage,
   TagsType,
   FilterQueryType,
-  ExpertType,
-  AllExpertType,
+  ContractorType,
+  AllContractorType,
   AllProjectType,
   ProjectType,
   HomePageType,

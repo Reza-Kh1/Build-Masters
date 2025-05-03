@@ -46,7 +46,7 @@ export const fetchApi = async ({
     if (body) {
         options.body = JSON.stringify(body);
     }
-    try {        
+    try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/${url}`, options);
         const json = await res.json();
         if (!res.ok) {

@@ -10,7 +10,7 @@ const getData = () => {
   return fetchApi({ url: dataApi.header.url, next: dataApi.header.cache, tags: dataApi.header.tags })
 }
 export default async function Header() {
-  const data: CategoryType[] = await getData()
+  const data: CategoryType[] = await getData()  
   return (
     <>
       <header className="w-full h-full">
