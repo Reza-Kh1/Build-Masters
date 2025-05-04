@@ -1,12 +1,12 @@
 import { FilterQueryType } from '@/app/type'
 import React from 'react'
 type TagInfoType = {
-    searchData: FilterQueryType
+    searchData?: FilterQueryType
     text: string
     categoryName: string
 }
 export default function TagInfo({ searchData, text, categoryName }: TagInfoType) {
-    const { search, tags } = searchData
+    const { search, tags }: any = searchData
     return (
         <section>
             {tags ?

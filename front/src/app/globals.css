@@ -1,4 +1,31 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --breakpoint-3xl: 1920px;
+  --color-h-dark: #e9ecef;
+  --color-p-dark: #dadada;
+  --color-hover: #b0b0b0;
+  --color-s-dark: #feaf51;
+  --color-c-blue: #3c476a;
+  --color-c-orange: #fe8764;
+  --shadow-custom-dark: 0px 1px 4px #000000;
+  --shadow-shadow-header: 0px 3px 2px #b4b4b4;
+  --shadow-low-dark: #171717;
+  --shadow-full-dark: #000000;
+  --color-c-blue-low: #1f2866;
+  --color-blue-full: #07285e;
+  --color-orange-low: #e7af9c;
+  --color-orange-full: #dd6415;
+  --color-blue: #3c476a;
+  --color-light-theme: #ffffff;
+  --color-blue-color: #07285e;
+  --color-orange-color: #ff631c;
+  --color-hight-dark: #1d1d1d;
+  --color-input-dark: #48484b69;
+  --color-custom-dark: #212121;
+  --color-info-dark: #232528;
+}
 
 @layer utilities {
   .text-balance {
@@ -9,6 +36,7 @@
 body {
   margin: 0;
   font-family: var(--sahel-font), Arial, Helvetica, sans-serif !important;
+  background-color: aliceblue;
 }
 
 ul {

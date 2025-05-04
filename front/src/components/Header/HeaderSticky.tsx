@@ -18,12 +18,12 @@ import { FaAngleDoubleDown, FaAngleLeft, FaHome, FaPhone } from "react-icons/fa"
 const menuTitle = [
   {
     name: "پروژه ها",
-    url: "/project?order=createdAt-DESC&page=1",
+    url: "/project?order=desc&page=1",
     icon: <MdMapsHomeWork className="text-gray-200 dark:text-s-dark" />,
   },
   {
     name: "وبلاگ",
-    url: "/blog?order=createdAt-DESC&page=1",
+    url: "/blog?order=desc&page=1",
     icon: <GrArticle className="text-gray-200 dark:text-s-dark" />,
   },
   {
@@ -38,7 +38,7 @@ const menuTitle = [
   },
   {
     name: "مجریان",
-    url: "/experts?order=createdAt-DESC&page=1",
+    url: "/contractor?order=desc&page=1",
     icon: <GrUserWorker className="text-gray-200 dark:text-s-dark" />,
   },
   {
@@ -246,7 +246,7 @@ export default function HeaderSticky({
                     <NavlinkHeader
                       title={i.name}
                       url={i.url}
-                      className="group-hover:text-c-orange text-gray-200 dark:text-p-dark hover:scale-105 py-3 transition-all scale-1 flex items-center"
+                      className="group-hover:text-c-orange text-gray-200 dark:text-p-dark hover:scale-105 py-3 transition-all flex items-center"
                     />
                     {i.name === "وبلاگ" && category?.length ? (
                       <>
