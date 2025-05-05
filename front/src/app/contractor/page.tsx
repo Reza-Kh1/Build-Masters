@@ -73,8 +73,6 @@ export const metadata: Metadata = {
 export default async function page(props: { searchParams?: FilterQueryType }) {
   const searchParams = await props.searchParams;
   const dataTags = await getTags();
-  console.log(dataTags);
-
   const data: AllContractorType = await getData(searchParams);
   return (
     <>

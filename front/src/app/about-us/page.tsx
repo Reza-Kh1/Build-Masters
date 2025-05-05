@@ -7,13 +7,12 @@ import BannerCallUs from "../../components/BannerCallUs/BannerCallUs";
 import { fetchApi } from "@/action/fetchApi";
 import { AboutUsType, AllProjectType } from "../type";
 import ContactSocialMedia from "@/components/ContactSocialMedia/ContactSocialMedia";
-import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import SwiperCards from "@/components/SwiperCards/SwiperCards";
 import { dataApi } from "@/data/tagsName";
 import OurServices from "@/components/OurServices/OurServices";
 const nameSite = process.env.NEXT_PUBLIC_NAME_SITE || ""
-const getData = async () => {
+const getData = async (): Promise<AboutUsType> => {
   const data = await fetchApi({ url: dataApi.aboutUs.url, next: dataApi.aboutUs.cache, tags: dataApi.aboutUs.tags });
   if (data.error) return notFound();
   return data;
@@ -23,40 +22,43 @@ const getProjects = async () => {
   if (data.error) return notFound();
   return data
 }
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
-  title: `درباره ما | ${nameSite}`,
-  description: 'آماده ایم تا با شروع این همکاری ،رویاهای ساخت و ساز شما را به واقعیت تبدیل کنیم - با هم ، از ایده تا اجرا پیش خواهیم رفت.',
-  keywords: ['پروژه‌های ساختمانی', 'مشاوره ساخت‌وساز', nameSite, 'خدمات پیمانکاری'],
-  openGraph: {
-    siteName:nameSite,
-    title: `درباره ما | ${nameSite}`,
-    description: 'آماده ایم تا با شروع این همکاری ،رویاهای ساخت و ساز شما را به واقعیت تبدیل کنیم - با هم ، از ایده تا اجرا پیش خواهیم رفت.',
-    url: `${process.env.NEXT_PUBLIC_URL + "/about-us"}`,
-    images: [
-      {
-        type:"image/png",
-        url: "/about-us.jpg",
-        width: 800,
-        height: 450,
-        alt: `درباره ما سایت ${nameSite}`,
-      },
-    ],
-    type: 'website',
-    locale:"fa_IR",    
-  },
-  twitter: {
-    card: 'summary_large_image',
-    creator:"@buildMasters",
-    site:"@buildMasters"
-  },
-  robots: "noindex,nofollow",
-  alternates: {
-    canonical: "/about-us",
-  },
+export const metadata = async () => {
+  const data = await getData();
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
+    title: data?.title,
+    description: data?.description,
+    keywords: data?.keyword,
+    openGraph: {
+      siteName: nameSite,
+      title: data?.title,
+      description: data?.description,
+      url: `${process.env.NEXT_PUBLIC_URL + "/about-us"}`,
+      images: [
+        {
+          type: "image/png",
+          url: "/about-us.jpg",
+          width: 800,
+          height: 450,
+          alt: `درباره ما سایت ${nameSite}`,
+        },
+      ],
+      type: 'website',
+      locale: "fa_IR",
+    },
+    twitter: {
+      card: 'summary_large_image',
+      creator: "@buildMasters",
+      site: "@buildMasters"
+    },
+    robots: "noindex,nofollow",
+    alternates: {
+      canonical: data?.canonicalUrl,
+    },
+  }
 };
 export default async function page() {
-  const { data }: AboutUsType = await getData();
+  const data = await getData();
   const projects: AllProjectType = await getProjects()
   return (
     <>
@@ -70,27 +72,27 @@ export default async function page() {
       </section>
       <div className="classDiv flex flex-col md:flex-row gap-4 md:gap-3">
         <section className="w-full md:w-1/2">
-          <h2 className="lg:text-lg font-semibold dark:text-h-dark">{data?.text?.title1}</h2>
+          <h2 className="lg:text-lg font-semibold dark:text-h-dark">{data?.content?.title1}</h2>
           <p className="!leading-8 mt-3 text-justify text-sm lg:text-base text-gray-800 dark:text-p-dark">
-            {data?.text?.text1}
+            {data?.content?.text1}
           </p>
         </section>
         <div className="w-full md:w-1/2">
-          <SwiperGallery imagesSrc={data?.text?.imgArry} />
+          <SwiperGallery imagesSrc={data?.content?.imgArry} />
         </div>
       </div>
       <OurServices />
       <div className="classDiv">
-        <SwiperCards data={projects.rows} isProject title="پروژه های ما" url="/project" />
+        <SwiperCards data={projects.data} isProject title="پروژه های ما" url="/project" />
       </div>
       <BannerCallUs />
       <div className="classDiv flex flex-col md:flex-row gap-3 items-center">
         <section className="w-full md:w-1/2">
-          <h3 className="lg:text-xl mb-3 font-semibold dark:text-h-dark">{data?.text?.title2}</h3>
-          <h4 className="text-sm text-gray-700 mb-3 dark:text-s-dark">{data?.text?.text2}</h4>
-          {data?.text?.textArry.length ? (
+          <h3 className="lg:text-xl mb-3 font-semibold dark:text-h-dark">{data?.content?.title2}</h3>
+          <h4 className="text-sm text-gray-700 mb-3 dark:text-s-dark">{data?.content?.text2}</h4>
+          {data?.content?.textArry.length ? (
             <ul className="flex flex-col gap-1 lg:gap-2">
-              {data?.text?.textArry.map((i, index) => (
+              {data?.content?.textArry.map((i, index) => (
                 <li key={index} className="flex text-gray-800 items-center gap-2 lg:gap-3 dark:text-p-dark">
                   <i>
                     <FaCheck />

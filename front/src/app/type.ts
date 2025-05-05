@@ -8,6 +8,10 @@ type CardPostType = {
   totalComments: null | number;
   updatedAt: Date;
 };
+type TagsType = {
+  id: number;
+  name: string;
+};
 type ALlPostCategory = {
   count: number;
   rows: CardPostType[];
@@ -58,33 +62,33 @@ type CommentsType = {
   replies: CommentsType[];
 };
 type PostType = {
-  id: number;
-  title: string;
-  image: string;
-  description: string;
-  totalComments: number;
-  status: boolean;
-  updatedAt: Date;
+  id: number
+  name: string
+  image: string
+  description: string
+  isPublished: boolean
+  totalComment: number
+  createdAt: Date
+  updatedAt: Date
+  userId: string
+  categoryId: number,
   DetailPost: {
-    text: string;
-    title: string;
-    keyword: string[];
-  };
-  User: {
-    name: string;
-  };
+    id: number,
+    content: string
+    title: string
+    keyword: string[]
+    postId: number
+  }
   Tags: TagsType[];
   Category: CategoryType;
-  Comments: CommentsType[];
+  Comment: CommentsType[];
+  user: { name: string }
 };
 type AllPostType = {
-  data: CardPostType[];
+  data: PostType[];
   pagination: PaginationType;
 };
-type TagsType = {
-  id: number;
-  name: string;
-};
+
 type Footertype = {
   id: number;
   page: string;
@@ -104,7 +108,7 @@ type Footertype = {
 type AboutUsType = {
   id: number;
   page: string;
-  text: {
+  content: {
     text1: string | null;
     text2: string | null;
     title1: string | null;
@@ -118,11 +122,15 @@ type AboutUsType = {
       text: string;
     }[];
   };
+  keyword: string[]
+  description: string
+  title: string
+  canonicalUrl: string
 } | null;
 type FaqsType = {
   id: number;
   page: string;
-  text: {
+  content: {
     title: string;
     accordion: {
       id: number;
@@ -134,7 +142,11 @@ type FaqsType = {
       }[];
     }[];
     description: string;
-  };
+  }
+  keyword: string[]
+  description: string
+  title: string
+  canonicalUrl: string
 } | null
 type ImageType = {
   url: string;

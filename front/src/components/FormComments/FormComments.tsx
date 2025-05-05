@@ -2,7 +2,6 @@
 import React from "react";
 import InputForm from "../InputForm/InputForm";
 import toast from "react-hot-toast";
-import { useFormState } from "react-dom";
 import actionComments from "@/action/actionComments";
 import CustomButton from "../CustomButton/CustomButton";
 import { TbMessage2Plus } from "react-icons/tb";
@@ -11,7 +10,7 @@ const initialize = {
   err: "",
 };
 export default function FormComments({ postId }: { postId?: number }) {
-  const [state, formAction] = useFormState(actionComments, initialize);
+  const [state, formAction] = React.useActionState(actionComments, initialize);
   if (state?.msg) {
     toast.dismiss("toast");
     toast.success("پس از تایید نمایش داده میشود", { id: "toast" });

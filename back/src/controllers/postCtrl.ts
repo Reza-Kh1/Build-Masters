@@ -118,7 +118,58 @@ const getSinglePost = expressAsyncHandler(async (req, res) => {
       res.status(404).json({ msg: 'Not Found' });
       return;
     }
-    res.send(data || null);
+    const allPost = await prisma.post.findMany({
+      where: { categoryId: data.categoryId },
+      include: {
+        Category: {
+          select: {
+            name: true,
+            slug: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 5
+    })
+    const allProject = await prisma.project.findMany({
+      where: { categoryId: data.categoryId },
+      select: {
+        Category: {
+          select: {
+            name: true,
+            slug: true,
+          },
+        },
+        Tags: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+        Contractor: {
+          select: {
+            name: true,
+            id: true,
+            avatar: true,
+          },
+        },
+        name: true,
+        slug: true,
+        image: true,
+        id: true,
+        address: true,
+        isPublished: true,
+        updateAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+    })
+    const allData = {
+      posts: allPost,
+      projects: allProject,
+      data
+    }
+    res.send(allData);
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
   }

@@ -6,7 +6,7 @@ import React, { Suspense } from "react";
 import BannerCallUs from "../../components/BannerCallUs/BannerCallUs";
 import ContactSocialMedia from "@/components/ContactSocialMedia/ContactSocialMedia";
 import { fetchApi } from "@/action/fetchApi";
-import { AllProjectType, FilterQueryType, TagsType } from "../type";
+import { AllProjectType, FilterQueryType } from "../type";
 import { Metadata } from "next";
 import { dataApi } from "@/data/tagsName";
 import DontData from "@/components/DontData/DontData";
@@ -14,7 +14,7 @@ import { notFound } from "next/navigation";
 import SelectTag from "@/components/SelectTag/SelectTag";
 import TagInfo from "@/components/TagInfo/TagInfo";
 const nameSite = process.env.NEXT_PUBLIC_NAME_SITE || ""
-const getData = async (query: FilterQueryType) => {
+const getData = async (query?: FilterQueryType) => {
   const url = dataApi.projects.url + "?" + new URLSearchParams(query);
   const data = await fetchApi({ url, tags: dataApi.projects.tags, next: dataApi.projects.cache });
   if (data.error) return notFound();
@@ -73,10 +73,11 @@ export const metadata: Metadata = {
     canonical: `${process.env.NEXT_PUBLIC_URL + "/project"}`,
   },
 };
-export default async function page({ searchParams }: { searchParams: FilterQueryType; }) {
+export default async function page(props: { searchParams?: FilterQueryType }) {
+  const searchParams = await props.searchParams;
   const data: AllProjectType = await getData(searchParams);
   const { data: dataExpert }: { data: ExpertNameType[] } = await getExpertName();
-  const { data: dataTags }: { data: TagsType[] } = await getTags();
+  const dataTags = await getTags();
   return (
     <>
       <Breadcrums />
@@ -88,10 +89,10 @@ export default async function page({ searchParams }: { searchParams: FilterQuery
           </nav>
         </section>
         <TagInfo categoryName="پروژه های" searchData={searchParams} text="تمام پروژه ها در این صفحه فهرست شده اند." />
-        {data.rows.length ?
+        {data.data.length ?
           (
             <div className="my-5 md:my-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-              {data.rows.map((item, index) => (
+              {data.data.map((item, index) => (
                 <CardProjects project={item} key={index} />
               ))}
             </div>
@@ -101,7 +102,7 @@ export default async function page({ searchParams }: { searchParams: FilterQuery
         }
         <div>
           <Suspense fallback={<LoadingSearch />}>
-            <Pagination pagination={data.paginate} />
+            <Pagination pagination={data.pagination} />
           </Suspense>
         </div>
       </div >

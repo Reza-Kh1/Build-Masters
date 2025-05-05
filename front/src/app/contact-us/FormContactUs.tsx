@@ -3,7 +3,6 @@ import actionContactUs from "@/action/actionContactUs";
 import CustomButton from "@/components/CustomButton/CustomButton";
 import InputForm from "@/components/InputForm/InputForm";
 import React from "react";
-import { useFormState } from "react-dom";
 import toast from "react-hot-toast";
 import { TbMessage2Check } from "react-icons/tb";
 const initialize = {
@@ -11,7 +10,7 @@ const initialize = {
   err: ""
 }
 export default function FormContactUs() {
-  const [state, formAction] = useFormState(actionContactUs, initialize);
+  const [state, formAction] = React.useActionState(actionContactUs, initialize);
   if (state?.msg) {
     toast.dismiss("toast")
     toast.success("پیام با موفقیت ارسال شد", { id: "toast" })

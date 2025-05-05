@@ -62,7 +62,7 @@ export async function metadata() {
 
 export default async function Home() {
   const projects = await getProject()
-  const posts: AllPostType = await getPosts()
+  const posts = await getPosts()
   const contractor = await getContractor()
   const data = await getData()
   return (

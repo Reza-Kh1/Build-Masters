@@ -4,7 +4,6 @@ import toast from 'react-hot-toast'
 import axios from 'axios'
 import { FaTrashAlt, FaUpload } from 'react-icons/fa'
 import { IconButton } from '@mui/material'
-import { FaTrash, FaTrashCanArrowUp } from 'react-icons/fa6'
 type UploadImageType = {
     mediaArry: string[]
     setMediaArry: (value: string[]) => void
@@ -23,14 +22,14 @@ export default function UploadImage({ mediaArry, setMediaArry }: UploadImageType
         const formData = new FormData();
         Array.from(newFile).forEach((file) => {
             resultSize = resultSize + file.size
-            formData.append("media", file);
+            formData.append("file", file);
         });
         if (resultSize > maxSize) {
             setProgress(null);
             return toast.error("!حجم فایل نباید بیش از 10 مگابایت باشد")
         }
         const uploadPromise = async () => {
-            const { data } = await axios.post("media/user", formData, {
+            const { data } = await axios.post("media", formData, {
                 onUploadProgress: (event) => {
                     if (event.lengthComputable && event.total) {
                         const percentComplete = Math.round(
@@ -40,8 +39,8 @@ export default function UploadImage({ mediaArry, setMediaArry }: UploadImageType
                     }
                 },
             })
-            const getUrl = data.url.map((i: any) => i.url)
-            setMediaArry([...mediaArry, ...getUrl])
+            const getUrl = data.url
+            setMediaArry([...mediaArry, getUrl])
             setProgress(null)
         }
         toast.promise(uploadPromise(), {
@@ -49,6 +48,7 @@ export default function UploadImage({ mediaArry, setMediaArry }: UploadImageType
             error: "با خطا مواجه شدیم",
             success: "با موفقیت آپلود شد"
         }, { position: "bottom-center" })
+        setProgress(null)
     };
     return (
         <div className="flex flex-wrap">

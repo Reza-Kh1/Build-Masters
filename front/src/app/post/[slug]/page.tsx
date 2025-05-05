@@ -8,7 +8,7 @@ import FormComments from "@/components/FormComments/FormComments";
 import BannerCallUs from "@/components/BannerCallUs/BannerCallUs";
 import { fetchApi } from "@/action/fetchApi";
 import { Metadata } from "next";
-import { CardPostType, CardProjectsType, PostType } from "@/app/type";
+import { PostType, ProjectType } from "@/app/type";
 import Script from "next/script";
 import parse from "html-react-parser";
 import CommentPost from "./CommentPost";
@@ -19,10 +19,10 @@ import { dataApi } from "@/data/tagsName";
 import Link from "next/link";
 type DataPostPageType = {
   data: PostType;
-  posts: CardPostType[];
-  projects: CardProjectsType[];
+  posts: PostType[]
+  projects: ProjectType[]
 };
-const getData = async (name: string) => {
+const getData = async (name: string): Promise<DataPostPageType> => {
   const data = await fetchApi({
     url: `${dataApi.singlePost.url}/${name.replace(/-/g, " ")}`,
     next: dataApi.singlePost.cache,
@@ -33,7 +33,7 @@ const getData = async (name: string) => {
   return data;
 };
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { data }: DataPostPageType = await getData(params.slug);
+  const { data } = await getData(params.slug);
   return {
     metadataBase: new URL(
       process.env.NEXT_PUBLIC_URL || "http://localhost:3000"
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     keywords: data?.DetailPost?.keyword,
     openGraph: {
       url:
-        process.env.NEXTAUTH_URL + "/post/" + data?.title?.replace(/ /g, "-"),
+        process.env.NEXTAUTH_URL + "/post/" + data?.name?.replace(/ /g, "-"),
       title: data?.DetailPost?.title,
       description: data?.description,
       images: [
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
           url: data?.image,
           width: 1200,
           height: 800,
-          alt: data?.title,
+          alt: data?.name,
         },
       ],
       siteName: "اساتید ساخت و ساز",
@@ -66,26 +66,26 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 export default async function page({ params }: { params: { slug: string } }) {
-  const { data, posts, projects }: DataPostPageType = await getData(params.slug);
+  const { data, posts, projects } = await getData(params.slug);
   const jsonld = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    headline: data?.title || "عنوان مقاله",
+    headline: data?.name || "عنوان مقاله",
     image: data?.image || "آدرس تصویر",
     description: data?.description || "توضیحات مقاله",
     author: {
       "@type": "Person",
-      name: data?.User.name || "نام نویسنده",
+      name: data?.user.name || "نام نویسنده",
     },
     datePublished: data?.updatedAt || "تاریخ انتشار",
-    articleBody: data?.DetailPost?.text || "متن مقاله",
+    articleBody: data?.DetailPost.content || "متن مقاله",
     keywords: data?.DetailPost?.keyword?.join(", ") || "کلمات کلیدی",
     articleSection: data.Category.name,
     url:
-      `${process.env.NEXTAUTH_URL}/blog/${data?.title.replace(/ /g, "-")}` ||
+      `${process.env.NEXTAUTH_URL}/blog/${data?.name.replace(/ /g, "-")}` ||
       "آدرس مقاله",
   };
-  const LinkTagPost = data.Tags[data.Tags.length - 1].name.replace(/ /g,"-") 
+  const LinkTagPost = data.Tags[data.Tags.length - 1].name.replace(/ /g, "-")
   return (
     <>
       <Script
@@ -97,7 +97,7 @@ export default async function page({ params }: { params: { slug: string } }) {
         <ImgTag
           width={1450}
           height={450}
-          alt={data?.title}
+          alt={data?.name}
           src={data?.image}
           className="h-96 object-cover w-full md:max-h-[600px] md:h-auto md:min-h-[450px]"
         />
@@ -109,7 +109,7 @@ export default async function page({ params }: { params: { slug: string } }) {
             id="post-name"
             className="lg:text-xl text-c-blue text-sm cutline cutline-1 font-bold dark:text-h-dark"
           >
-            {data?.title}
+            {data?.name}
           </h1>
           <div className="flex text-gray-500 px-1 dark:text-s-dark text-sm items-center justify-center gap-2 md:gap-4 mt-4 md:mt-7">
             <div className="hidden md:flex gap-4">
@@ -136,7 +136,7 @@ export default async function page({ params }: { params: { slug: string } }) {
             <span className="border-r border-dashed border-black dark:border-bg-dark h-6 w-1"></span>
             <h2 className="cutline cutline-1">
               <IoPerson className="inline ml-1" />
-              {data?.User?.name}
+              {data?.user?.name}
             </h2>
             <span className="border-r border-dashed border-black dark:border-bg-dark h-6 w-1"></span>
             <span className="flex gap-1 md:gap-2 items-center">
@@ -168,14 +168,14 @@ export default async function page({ params }: { params: { slug: string } }) {
         </div>
       </section>
       <article className="classDiv !max-w-3xl mx-auto text-justify !leading-8 dark:text-p-dark text-gray-700">
-        {data?.DetailPost?.text && parse(data?.DetailPost?.text)}
+        {data?.DetailPost?.content && parse(data?.DetailPost.content)}
       </article>
       <BannerCallUs />
       <div id="comments-section" className="classDiv !max-w-3xl">
         <CommentPost
-          comments={data.Comments}
+          comments={data.Comment}
           postId={data.id}
-          totalComments={data.totalComments}
+          totalComments={data.totalComment}
         />
         <div className="my-6">
           <FormComments postId={data.id} />

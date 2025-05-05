@@ -4,7 +4,6 @@ import { Autocomplete, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { TbReceipt2 } from "react-icons/tb";
 import toast from "react-hot-toast";
-import { useFormState } from "react-dom";
 import UploadImage from "@/components/UploadImage/UploadImage";
 import actionProject from "@/action/actionProject";
 const options = [
@@ -34,8 +33,7 @@ const initialize = {
 }
 export default function FormRequest() {
   const [mediaArry, setMediaArry] = useState<string[]>([]);
-  const [state, formAction] = useFormState(actionProject, initialize)
-  const [openNotif, setOpenNotif] = useState<boolean>(false)
+  const [state, formAction] = React.useActionState(actionProject, initialize)
   const [formValues, setFormValues] = useState({
     nameValue: "", phoneValue: "", metraghValue: "", priceValue: "", textValue: ""
   });

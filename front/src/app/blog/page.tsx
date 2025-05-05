@@ -3,7 +3,7 @@ import Breadcrums from "@/components/Breadcrums/Breadcrums";
 import Cards from "@/components/Cards/Cards";
 import Pagination from "@/components/Pagination/Pagination";
 import React, { Suspense } from "react";
-import { AllPostType, FilterQueryType, TagsType } from "../type";
+import { AllPostType, FilterQueryType } from "../type";
 import ContactSocialMedia from "@/components/ContactSocialMedia/ContactSocialMedia";
 import { Metadata } from "next";
 import { dataApi } from "@/data/tagsName";
@@ -12,9 +12,8 @@ import { notFound } from "next/navigation";
 import SelectTag from "@/components/SelectTag/SelectTag";
 import TagInfo from "@/components/TagInfo/TagInfo";
 const nameSite = process.env.NEXT_PUBLIC_NAME_SITE || "";
-const getData = async (query: FilterQueryType) => {
-  console.log(query);
-  
+
+const getData = async (query?: FilterQueryType): Promise<AllPostType> => {
   const url = "post?" + new URLSearchParams(query);
   const data = await fetchApi({
     url,
@@ -69,13 +68,10 @@ export const metadata: Metadata = {
     canonical: "/blog",
   },
 };
-export default async function page({
-  searchParams,
-}: {
-  searchParams: FilterQueryType;
-}) {
-  // const data: AllPostType = await getData(searchParams);
-  // const { data: dataTags }: { data: TagsType[] } = await getTags();
+export default async function page(props: { searchParams?: FilterQueryType }) {
+  const searchParams = await props.searchParams;
+  const data: AllPostType = await getData(searchParams);
+  const dataTags = await getTags();
   return (
     <>
       <Breadcrums />
@@ -83,19 +79,19 @@ export default async function page({
         <section className="flex w-full items-center justify-between">
           <h1 className="font-semibold lg:text-xl text-c-blue">وبلاگ</h1>
           <nav aria-label="منوی دسته بندی ها برای وبلاگ" className="w-2/6">
-            {/* <SelectTag urlPage="blog" dataTags={dataTags} /> */}
+            <SelectTag urlPage="blog" dataTags={dataTags} />
           </nav>
         </section>
         <TagInfo text="تمام مطالب در همین صفحه فهرست شده اند." categoryName="مطالب" searchData={searchParams} />
-        {/* <div className="my-5">
-          {data.rows.length ? (
-            <Cards props={data.rows} />
+        <div className="my-5">
+          {data.data.length ? (
+            <Cards props={data.data} />
           ) : (
             <DontData name="هیچ پستی یافت نشد!" />
           )}
-        </div> */}
+        </div>
         <Suspense fallback={"در حال بارگیری ..."}>
-          {/* <Pagination pagination={data.paginate} /> */}
+          <Pagination pagination={data.pagination} />
         </Suspense>
       </div>
       <ContactSocialMedia />
