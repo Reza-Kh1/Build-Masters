@@ -35,7 +35,7 @@ export default function Create({ id }: { id?: string }) {
     const [gallery, setGallery] = useState<string[]>([])
     const [video, setVideo] = useState<string | null>(null)
 
-    const { data: singleData } = useQuery<ProjectType>({
+    const { data: singleData } = useQuery<{ data: ProjectType, projects: ProjectType[] }>({
         queryKey: ["projectSingle", id],
         queryFn: () => fetchSingleProject(id),
         staleTime: 1000 * 60 * 60 * 24,
@@ -143,7 +143,7 @@ export default function Create({ id }: { id?: string }) {
                 video
             }
             body.contractorId === 's' ? body.contractorId = null : null
-            return axios.put("project/" + singleData?.id, body);
+            return axios.put("project/" + singleData?.data.id, body);
         },
         onSuccess: () => {
             toast.success("اطلاعات پروژه ویرایش شد");
@@ -157,19 +157,19 @@ export default function Create({ id }: { id?: string }) {
     });
 
     useEffect(() => {
-        if (id && singleData) {
-            setValue('name', singleData.name)
-            setValue('slug', singleData.slug)
-            setValue('address', singleData.address)
-            setValue('price', singleData.price)
-            setValue('stratDate', singleData.stratDate)
-            setValue('tags', singleData.Tags?.map((i) => i.id) || [])
-            setValue('endDate', singleData.endDate)
-            setValue('description', singleData.description)
-            setValue('isPublished', singleData.isPublished)
-            setGallery(singleData.gallery || [])
-            setImage(singleData.image)
-            setVideo(singleData.video)
+        if (id && singleData?.data) {
+            setValue('name', singleData.data.name)
+            setValue('slug', singleData.data.slug)
+            setValue('address', singleData.data.address)
+            setValue('price', singleData.data.price)
+            setValue('stratDate', singleData.data.stratDate)
+            setValue('tags', singleData.data.Tags?.map((i) => i.id) || [])
+            setValue('endDate', singleData.data.endDate)
+            setValue('description', singleData.data.description)
+            setValue('isPublished', singleData.data.isPublished)
+            setGallery(singleData.data.gallery || [])
+            setImage(singleData.data.image)
+            setVideo(singleData.data.video)
         }
     }, [singleData, openDialog])
 
@@ -193,13 +193,13 @@ export default function Create({ id }: { id?: string }) {
                 <DialogTitle className='bg-blue-100'>
                     ایجاد پروژه جدید
                 </DialogTitle>
-                {id && !singleData ?
+                {id && !singleData?.data ?
                     null
                     :
                     <DialogContent>
                         {(createPending || updatePending) && <PendingApi />}
                         <form className="w-full grid grid-cols-4 items-end gap-4 mt-5">
-                            {fields.map((row, index) => <FieldsInputs defualtVal={singleData} setValue={setValue} register={register} data={row} key={index} />)}
+                            {fields.map((row, index) => <FieldsInputs defualtVal={singleData?.data} setValue={setValue} register={register} data={row} key={index} />)}
                         </form>
                         <div className='flex flex-col gap-5'>
                             <div className="flex my-5">

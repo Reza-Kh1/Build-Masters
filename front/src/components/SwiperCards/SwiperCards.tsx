@@ -5,12 +5,12 @@ import { Pagination } from "swiper/modules";
 import CardProjects from "../CardProjects/CardProjects";
 import CustomButton from "../CustomButton/CustomButton";
 import Link from "next/link";
-import { CardProjectsType, ContractorType, PostType } from "@/app/type";
+import { ContractorType, PostType, ProjectType } from "@/app/type";
 import CardPost from "../CardPost/CardPost";
 import { PiListPlus } from "react-icons/pi";
 import CardExperts from "../CardExperts/CardExperts";
 type SwiperCardsType = {
-  data: CardProjectsType[] | PostType[] | ContractorType[];
+  data: ProjectType[] | PostType[] | ContractorType[];
   url: string;
   title: string;
   isExpert?: boolean;
@@ -71,7 +71,7 @@ export default function SwiperCards({
           {isProject &&
             data.map((item, index) => (
               <SwiperSlide key={index}>
-                <CardProjects project={item as CardProjectsType} />
+                <CardProjects project={item as ProjectType} />
               </SwiperSlide>
             ))}
           {isExpert &&

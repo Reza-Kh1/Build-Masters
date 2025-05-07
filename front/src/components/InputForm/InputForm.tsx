@@ -58,6 +58,14 @@ export default function InputForm({
             className={className ? className : classInput}
             id={id}
             value={value}
+            onInvalid={(e) => {
+              const target = e.currentTarget as HTMLInputElement;
+              target.setCustomValidity('لطفاً این فیلد را پر کنید');
+            }}
+            onInput={(e) => {
+              const target = e.currentTarget as HTMLInputElement;
+              target.setCustomValidity('');
+            }}
           />
           <span className="absolute dark:text-s-dark left-2 text-xs top-1/2 bg-slate-100 h-[90%] flex items-center transform -translate-y-1/2">
             {slotProps}
@@ -75,6 +83,14 @@ export default function InputForm({
           name={name}
           className={className ? className : classInput}
           id={id}
+          onInvalid={(e) => {
+            const target = e.currentTarget as HTMLInputElement;
+            target.setCustomValidity('لطفاً این فیلد را پر کنید');
+          }}
+          onInput={(e) => {
+            const target = e.currentTarget as HTMLInputElement;
+            target.setCustomValidity('');
+          }}
         />
       );
     }

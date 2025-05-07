@@ -172,19 +172,20 @@ type ContractorType = {
   name: string
   phone: string
   email: string
-  socialMedia: {
-    id: number;
-    link: string;
-    text: string;
-    type:
-    | "whatsapp"
-    | "telegram"
-    | "instagram"
-    | "phone"
-    | "web"
-    | "twitter"
-    | "linkedin";
-  }[],
+  socialMedia: string
+  // {
+  //   id: number;
+  //   link: string;
+  //   text: string;
+  //   type:
+  //   | "whatsapp"
+  //   | "telegram"
+  //   | "instagram"
+  //   | "phone"
+  //   | "web"
+  //   | "twitter"
+  //   | "linkedin";
+  // }[]
   bio: string
   avatar: string
   totalComment: number
@@ -203,26 +204,29 @@ type AllContractorType = {
   pagination: PaginationType;
 };
 type AllProjectType = {
-  data: CardProjectsType[];
+  data: ProjectType[];
   pagination: PaginationType;
 };
 type ProjectType = {
-  id: number;
-  name: string;
-  address: string;
-  image: string;
-  gallery: ImageType[];
-  video: string | null;
-  alt: string;
-  description: string;
-  status: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  workerId: number;
-  size: null | string
-  price: null | string
-  Worker: ContractorType;
-  Tags: TagsType[];
+  id: number
+  name: string
+  slug: string
+  address: string
+  image: string
+  gallery: string[]
+  video: string
+  description: string
+  stratDate: Date | null
+  endDate: Date | null
+  price: number | null
+  isPublished: boolean
+  categoryId: number
+  contractorId: number
+  createdAt: Date
+  updateAt: Date
+  Category: CategoryType
+  Contractor: ContractorType
+  Tags: TagsType[]
 };
 type HeroDataType = {
   id: number

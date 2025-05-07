@@ -37,7 +37,7 @@ export default function Create({ id }: { id?: string }) {
     const query = useQueryClient();
     const { setValue, register, handleSubmit, reset, } = useForm();
 
-    const { data: singleData } = useQuery<ContractorType>({
+    const { data: singleData } = useQuery<{ data: ContractorType }>({
         queryKey: ["GetSingleContractor", id],
         queryFn: () => fetchSingleContractor(id),
         staleTime: 1000 * 60 * 60 * 24,
@@ -64,9 +64,9 @@ export default function Create({ id }: { id?: string }) {
     });
 
     const dataUserInput = () => {
-        if (dataUsers?.length && singleData?.userId) {
+        if (dataUsers?.length && singleData?.data?.userId) {
             const body = dataUsers?.map((row: any) => { return { value: row.id, name: row.name } })
-            return [...body, { value: singleData?.userId, name: "انتخاب شده" }]
+            return [...body, { value: singleData?.data?.userId, name: "انتخاب شده" }]
         } else {
             return dataUsers?.length ? dataUsers?.map((row: any) => { return { value: row.id, name: row.name } }) : []
         }
@@ -128,7 +128,7 @@ export default function Create({ id }: { id?: string }) {
                 avatar,
                 socialMedia: JSON.stringify(socialMedia)
             }
-            return axios.put("contractor/" + singleData?.id, body);
+            return axios.put("contractor/" + singleData?.data?.id, body);
         },
         onSuccess: () => {
             toast.success("اطلاعات مجری ویرایش شد");
@@ -142,15 +142,15 @@ export default function Create({ id }: { id?: string }) {
 
     useEffect(() => {
         if (id && singleData) {
-            setValue('email', singleData.email)
-            setValue('name', singleData.name)
-            setValue('bio', singleData.bio)
-            setValue('phone', singleData.phone)
-            setValue('userId', singleData.userId)
-            setValue('categoryId', singleData.categoryId)
-            setValue('tagName', singleData.Tags)
-            setAvatar(singleData.avatar)
-            setSocialMedia(JSON.parse(singleData.socialMedia || ''))
+            setValue('email', singleData?.data?.email)
+            setValue('name', singleData?.data?.name)
+            setValue('bio', singleData?.data?.bio)
+            setValue('phone', singleData?.data?.phone)
+            setValue('userId', singleData?.data?.userId)
+            setValue('categoryId', singleData?.data?.categoryId)
+            setValue('tagName', singleData?.data?.Tags)
+            setAvatar(singleData?.data?.avatar)
+            setSocialMedia(JSON.parse(singleData?.data?.socialMedia || ''))
         }
     }, [singleData])
 
@@ -174,13 +174,13 @@ export default function Create({ id }: { id?: string }) {
                 <DialogTitle className='bg-blue-100'>
                     ایجاد مجری جدید
                 </DialogTitle>
-                {id && !singleData ?
+                {id && !singleData?.data ?
                     null
                     :
                     <DialogContent>
                         {(createPending || updatePending) && <PendingApi />}
                         <form className="w-full grid grid-cols-4  gap-4 mt-5">
-                            {fields.map((row, index) => <FieldsInputs defualtVal={singleData} register={register} data={row} key={index} />)}
+                            {fields.map((row, index) => <FieldsInputs defualtVal={singleData?.data} register={register} data={row} key={index} />)}
                         </form>
                         <div className="flex py-7">
                             <FormSocialMedia

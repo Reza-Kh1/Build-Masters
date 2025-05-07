@@ -1,5 +1,5 @@
 import { fetchApi } from "@/action/fetchApi";
-import { ExpertType } from "@/app/type";
+import { ContractorType } from "@/app/type";
 import BannerCallUs from "@/components/BannerCallUs/BannerCallUs";
 import Breadcrums from "@/components/Breadcrums/Breadcrums";
 import ImgTag from "@/components/ImgTag/ImgTag";
@@ -14,6 +14,8 @@ import { Metadata } from "next";
 import Script from "next/script";
 import { dataApi } from "@/data/tagsName";
 import { notFound } from "next/navigation";
+import CommentPost from "@/app/post/[slug]/CommentPost";
+import FormComments from "@/components/FormComments/FormComments";
 const dataSocialMedia = [
   {
     value: "whatsapp",
@@ -46,14 +48,15 @@ const dataSocialMedia = [
   },
 ];
 const nameSite = process.env.NEXT_PUBLIC_NAME_SITE || ""
-const getData = async (name: string) => {
+const getData = async (name: string): Promise<{ data: ContractorType, contractors: ContractorType[] }> => {
   const url = dataApi.singleExpert.url + "/" + name.replace(/-/g, " ");
   const data = await fetchApi({ url, next: dataApi.singleExpert.cache });
   if (data.error) return notFound();
   return data
 };
 export async function generateMetadata({ params }: { params: { name: string } }): Promise<Metadata> {
-  const { data }: { data: ExpertType } = await getData(params.name);
+  const { name } = await params
+  const { data } = await getData(name);
   const baseUrl = process.env.NEXTAUTH_URL;
   const urlPage = data.name.replace(/ /g, "-");
   const tags = data.Tags?.map(i => i.name) || ""
@@ -90,24 +93,21 @@ export async function generateMetadata({ params }: { params: { name: string } })
   };
 }
 export default async function page({ params }: { params: { name: string } }) {
-  const { data }: { data: ExpertType } = await getData(params.name);
+  const { name } = await params
+  const { data, contractors } = await getData(name);
+  const social = data?.socialMedia ? JSON.parse(data.socialMedia) : []
   const jsonld = {
     "@context": "https://schema.org",
     "@type": "profile",
     "name": data?.name || "نام فرد",
-    "description": data?.description || "بیوگرافی فرد",
-    "image": data?.image || `${process.env.NEXTAUTH_URL}/comments/image-admin.png`,
+    "description": data?.bio || "بیوگرافی فرد",
+    "image": data?.avatar || `${process.env.NEXTAUTH_URL}/comments/image-admin.png`,
     "url": `${process.env.NEXTAUTH_URL}/profile/${data?.name.replace(/ /g, "-")}`,
-    "sameAs": data.socialMedia.map((i) => i.link) || []
-    ,
+    "sameAs": social.map((i: string) => i.link),
     "jobTitle": data?.Tags ? data.Tags[0].name : "عنوان شغلی",
     "worksFor": {
       "@type": "Organization",
       "name": data?.name || "نام شرکت",
-    },
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": data?.address || "مکان",
     },
     "contactPoint": {
       "@type": "ContactPoint",
@@ -136,7 +136,7 @@ export default async function page({ params }: { params: { name: string } }) {
           </section>
           <ImgTag
             alt={data.name}
-            src={data.image}
+            src={data.avatar}
             width={300}
             height={300}
             className="rounded-full shadow-md w-40 h-40 object-cover mx-auto"
@@ -193,20 +193,20 @@ export default async function page({ params }: { params: { name: string } }) {
           </Link>
         </div>
         <div className="w-full md:w-2/3 flex flex-col gap-5">
-          {data?.description || data?.address ?
+          {data?.bio ?
             <section aria-labelledby="information-expert" className="bg-gradient-to-br to-blue-500 dark:to-[#363e4a] dark:from-[#1b1b1f] transition-all dark:shadow-full-dark dark:hover:shadow-none from-slate-300 rounded-md shadow-md p-4">
               <h2 className="text-lg dark:text-h-dark md:text-xl mb-3 block ">معرفی</h2>
-              <p id="information-expert" className="dark:text-p-dark">{data?.description || "ثبت نشده"}</p>
-              <h3 className="text-lg dark:text-h-dark md:text-xl my-3 block ">آدرس</h3>
-              <p className="dark:text-p-dark">{data?.address || "ثبت نشده"}</p>
+              <p id="information-expert" className="dark:text-p-dark">{data?.bio || "ثبت نشده"}</p>
+              {/* <h3 className="text-lg dark:text-h-dark md:text-xl my-3 block ">آدرس</h3>
+              <p className="dark:text-p-dark">{data?.address || "ثبت نشده"}</p> */}
             </section>
             : null}
           {
-            data.socialMedia.length ?
+            social.length ?
               <div className="bg-gradient-to-tr to-blue-500 dark:to-[#363e4a] dark:from-[#1b1b1f] transition-all dark:shadow-full-dark dark:hover:shadow-none from-slate-300 rounded-md shadow-md p-4">
                 <h2 className="text-lg dark:text-h-dark  md:text-xl mb-3 block">شبکه های اجتماعی</h2>
                 <section aria-labelledby="social-media" className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-5">
-                  {data.socialMedia.map((i, index) => (
+                  {social.map((i: any, index: number) => (
                     <Link
                       href={i.link}
                       key={index}
@@ -228,12 +228,22 @@ export default async function page({ params }: { params: { name: string } }) {
         </div>
       </div>
       <BannerCallUs />
+      <div id="comments-section" className="classDiv !max-w-3xl">
+        <CommentPost
+          comments={data.Comment}
+          postId={data.id}
+          totalComments={data.totalComment}
+        />
+        <div className="my-6">
+          <FormComments id={data.id} isContractor />
+        </div>
+      </div>
       <div className="classDiv">
         <SwiperCards
-          isProject
+          isExpert
           title="پروژه های بیشتر"
-          url={`/project/experts/${data.name.replace(/ /g,"-")}?page=1&order=createdAt-DESC&expert=${data.id}`}
-          data={data.Projects}
+          url={`/project/experts/${data.name.replace(/ /g, "-")}?page=1&order=createdAt-DESC&expert=${data.id}`}
+          data={contractors}
         />
       </div>
     </>

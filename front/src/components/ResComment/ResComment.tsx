@@ -4,14 +4,12 @@ import { TransitionProps } from "@mui/material/transitions";
 import React, { useState } from "react";
 import { IoArrowRedoSharp } from "react-icons/io5";
 import { MdClose } from "react-icons/md";
-import { TbMessage2Plus, TbMessageReply } from "react-icons/tb";
+import { TbMessage2Plus } from "react-icons/tb";
 import InputForm from "../InputForm/InputForm";
 import ImgTag from "../ImgTag/ImgTag";
 import { CommentsType } from "@/app/type";
-import { fetchApi } from "@/action/fetchApi";
 import CustomButton from "../CustomButton/CustomButton";
 import toast from "react-hot-toast";
-import { useFormState } from "react-dom";
 import actionComments from "@/action/actionComments";
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -32,7 +30,7 @@ export default function ResComment({
   postId?: number;
   comment: CommentsType;
 }) {
-  const [state, formAction] = useFormState(actionComments, initialize);
+  const [state, formAction] = React.useActionState(actionComments, initialize);
   const [open, setOpen] = useState(false);
   if (state?.msg) {
     toast.dismiss("toast");

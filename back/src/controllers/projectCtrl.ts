@@ -93,7 +93,7 @@ const getAllProject = expressAsyncHandler(async (req, res) => {
         Contractor: {
           select: {
             name: true,
-            id:true,
+            id: true,
             avatar: true,
           },
         },
@@ -207,8 +207,48 @@ const getSingleProject = expressAsyncHandler(async (req, res) => {
         },
       },
     });
-    setCache(keyCache, data);
-    res.send(data);
+    const projects = await prisma.project.findMany({
+      where: {
+        NOT: { id: data?.id },
+        categoryId: data?.categoryId
+      },
+      select: {
+        Category: {
+          select: {
+            name: true,
+            slug: true,
+          },
+        },
+        Tags: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+        Contractor: {
+          select: {
+            name: true,
+            id: true,
+            avatar: true,
+          },
+        },
+        name: true,
+        slug: true,
+        image: true,
+        id: true,
+        address: true,
+        isPublished: true,
+        updateAt: true,
+      },
+      take: 5,
+      orderBy: { updateAt: 'desc' }
+    })
+    const body = {
+      data,
+      projects
+    }
+    // setCache(keyCache, data);
+    res.send(body);
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
   }

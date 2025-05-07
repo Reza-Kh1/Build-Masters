@@ -1,5 +1,5 @@
 import { fetchApi } from "@/action/fetchApi";
-import { CardProjectsType, ProjectType } from "@/app/type";
+import { ProjectType } from "@/app/type";
 import Breadcrums from "@/components/Breadcrums/Breadcrums";
 import ImgTag from "@/components/ImgTag/ImgTag";
 import { Metadata } from "next";
@@ -18,7 +18,7 @@ import CardExperts from "@/components/CardExperts/CardExperts";
 import SwiperGallery from "@/components/SwiperGallery/SwiperGallery";
 import { dataApi } from "@/data/tagsName";
 import { FaPhotoVideo } from "react-icons/fa";
-const getData = async (name: string) => {
+const getData = async (name: string): Promise<{ data: ProjectType; projects: ProjectType[] }> => {
   const url = `${dataApi.singleProject.url}/${name.replace(/-/g, " ")}`
   const data = await fetchApi({ url, next: dataApi.singleProject.cache });
   if (data?.error) {
@@ -26,30 +26,27 @@ const getData = async (name: string) => {
   }
   return data;
 };
-export async function generateMetadata({
-  params,
-}: {
-  params: { name: string };
-}): Promise<Metadata> {
-  const { data }: { data: ProjectType } = await getData(params.name);
+export async function generateMetadata({ params }: { params: { name: string }; }): Promise<Metadata> {
+  const { name } = await params
+  const data: { data: ProjectType } = await getData(name);
   return {
     metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
-    title: data?.name,
-    description: data?.description,
-    keywords: data?.Tags.map((i) => i.name),
+    title: data.data?.name,
+    description: data.data?.description,
+    keywords: data.data?.Tags.map((i) => i.name),
     robots: "noindex,nofollow",
     openGraph: {
       type: "article",
       url:
-        process.env.NEXTAUTH_URL + "/project/" + data?.name.replace(/ /g, "-"),
-      title: data?.name,
-      description: data?.description,
+        process.env.NEXTAUTH_URL + "/project/" + data.data?.name.replace(/ /g, "-"),
+      title: data.data?.name,
+      description: data.data?.description,
       images: [
         {
-          url: data?.image,
+          url: data.data?.image,
           width: 1200,
           height: 800,
-          alt: data?.alt,
+          alt: data.data?.name,
         },
       ],
       siteName: process.env.NEXT_PUBLIC_NAME_SITE,
@@ -62,12 +59,14 @@ export async function generateMetadata({
     },
     alternates: {
       canonical:
-        process.env.NEXTAUTH_URL + "/project/" + data?.name.replace(/ /g, "-"),
+        process.env.NEXTAUTH_URL + "/project/" + data.data?.name.replace(/ /g, "-"),
     },
   };
 }
 export default async function page({ params }: { params: { name: string } }) {
-  const { data, projects, }: { data: ProjectType; projects: CardProjectsType[] } = await getData(params.name);
+  const { name } = await params
+  const { data, projects } = await getData(name);
+
   const jsonld = {
     "@context": "https://schema.org",
     "@type": "article",
@@ -76,9 +75,9 @@ export default async function page({ params }: { params: { name: string } }) {
     description: data?.description || "توضیحات پروژه",
     author: {
       "@type": "Person",
-      name: data?.Worker.name || "نام نویسنده",
+      name: data?.Contractor.name || "نام نویسنده",
     },
-    datePublished: data?.updatedAt || "تاریخ انتشار",
+    datePublished: data?.updateAt || "تاریخ انتشار",
     articleBody: data?.description || "متن پروژه",
     keywords: data?.Tags.map((i) => i.name) || "کلمات کلیدی",
     url:
@@ -93,7 +92,7 @@ export default async function page({ params }: { params: { name: string } }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }}
       />
       <div className="w-full mx-auto relative">
-        <ImgTag width={1450} height={450} alt={data?.alt} src={data?.image} className="h-96 object-cover w-full md:max-h-[600px] md:h-auto md:min-h-[450px]" />
+        <ImgTag width={1450} height={450} alt={data?.name} src={data?.image} className="h-96 object-cover w-full md:max-h-[600px] md:h-auto md:min-h-[450px]" />
         <section className="bg-gray-50 text-gray-700 dark:bg-info-dark dark:shadow-low-dark py-3 md:py-6 rounded-md w-11/12 md:w-3/4 shadow-lg text-center absolute bottom-12 md:bottom-20 left-1/2 transform -translate-x-1/2 translate-y-full">
           <h1 className="lg:text-xl dark:text-h-dark text-sm cutline cutline-1 font-semibold">{data?.name}
           </h1>
@@ -114,12 +113,12 @@ export default async function page({ params }: { params: { name: string } }) {
             <span className="hidden md:block border-r border-dashed border-black dark:border-bg-dark h-6 w-1"></span>
             <span className="text-sm md:text-base cutline cutline-1">
               <GrUserWorker className="inline ml-1 md:ml-2" />
-              {data?.Worker?.name}
+              {data?.Contractor?.name}
             </span>
             <span className="border-r border-dashed border-black dark:border-bg-dark h-6 w-1"></span>
             <span className="flex gap-2 text-sm md:text-base items-center">
               <FaCalendarDays />
-              {new Date(data?.updatedAt).toLocaleDateString("fa")}
+              {new Date(data?.updateAt).toLocaleDateString("fa")}
             </span>
             <span className="border-r border-dashed border-black dark:border-bg-dark h-6 w-1"></span>
             <span>
@@ -181,7 +180,7 @@ export default async function page({ params }: { params: { name: string } }) {
               <i className="text-xl lg:text-2xl p-3 hover:bg-gray-200 rounded-full bg-gray-100 dark:bg-info-dark dark:shadow-low-dark dark:hover:shadow-none shadow-md">
                 <GiPencilRuler />
               </i>
-              <h3 className="text-sm lg:text-xl dark:text-p-dark text-gray-600">
+              {/* <h3 className="text-sm lg:text-xl dark:text-p-dark text-gray-600">
                 متراژ :
                 {Number(data.size) ? (
                   <>
@@ -191,13 +190,13 @@ export default async function page({ params }: { params: { name: string } }) {
                 ) : (
                   <span className="text-xs lg:text-sm"> ثبت نشده!</span>
                 )}
-              </h3>
+              </h3> */}
             </div>
           </div>
           <span className="border-t w-full h-1 block my-4 md:my-6"></span>
           <div className="w-full">
             <h2 className="text-lg lg:text-xl dark:text-h-dark text-gray-700 mb-3">تصاویر پروژه</h2>
-            <SwiperGallery imagesSrc={data.gallery} />
+            <SwiperGallery imagesSrc={data.gallery.map((item) => { return { url: item, alt: data.name } })} />
           </div>
           {data?.video ? (
             <>
@@ -207,7 +206,7 @@ export default async function page({ params }: { params: { name: string } }) {
                 <video
                   className="video-player h-52 md:h-80"
                   controls
-                  poster={data.gallery[data.gallery.length - 1].url}
+                  poster={data.gallery[data.gallery.length - 1]}
                 >
                   {data?.video?.search(".mp4") ? (
                     <source src={data?.video} type="video/mp4" />
@@ -221,7 +220,7 @@ export default async function page({ params }: { params: { name: string } }) {
           ) : null}
         </section>
         <aside className="w-full sm:w-1/2 mx-auto md:w-1/3 md:h-80 md:sticky md:left-0 overflow-hidden md:top-24 md:p-2">
-          <CardExperts {...data.Worker} />
+          <CardExperts {...data.Contractor} />
         </aside>
       </div>
       <BannerCallUs />

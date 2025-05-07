@@ -130,7 +130,7 @@ model Comment {
   name        String
   phone       String
   content     String   @db.Text
-  rating      Int?
+  rating      Float?
   roleType    RoleType @default(USER)
 
   postId         Int?

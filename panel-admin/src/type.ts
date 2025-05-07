@@ -67,31 +67,31 @@ type PostType = {
 };
 
 type SinglePostType = {
-  id: string;
-  name: string;
-  image: string;
-  slug: string;
-  description: string;
-  totalComment: null | number;
-  isPublished: boolean;
-  updatedAt: Date;
-  DetailPost: {
-    title: string | null;
-    content: string | null;
-    keyword: null | string[];
-  };
-  user: {
-    name: string;
-  };
-  Category?: {
-    name: string;
     id: string;
-    slug: string;
-  };
-  Tags: {
-    id: number;
     name: string;
-  }[];
+    image: string;
+    slug: string;
+    description: string;
+    totalComment: null | number;
+    isPublished: boolean;
+    updatedAt: Date;
+    DetailPost: {
+      title: string | null;
+      content: string | null;
+      keyword: null | string[];
+    };
+    user: {
+      name: string;
+    };
+    Category?: {
+      name: string;
+      id: string;
+      slug: string;
+    };
+    Tags: {
+      id: number;
+      name: string;
+    }[];
 };
 
 type AllReviewType = {

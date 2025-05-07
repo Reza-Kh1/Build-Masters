@@ -4,7 +4,6 @@ import { PrismaClient } from '@prisma/client';
 import { deleteCahce, getCache, setCache } from '../utils/deleteCache';
 import pagination from '../utils/pagination';
 import token from 'jsonwebtoken';
-import path from 'path';
 const prisma = new PrismaClient();
 const pageLimit = Number(process.env.PAGE_LIMITE);
 type QueryComment = {
@@ -116,7 +115,7 @@ const createComment = expressAsyncHandler(async (req, res) => {
         roleType: roleType || undefined,
         phone,
         content,
-        rating,
+        rating: Number(rating),
         postId,
         contractorId,
         commentReply,

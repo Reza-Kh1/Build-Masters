@@ -20,12 +20,13 @@ const Transition = forwardRef(function Transition(
 
 export default function Create({ name, setName }: { name?: string, setName: (val: string) => void }) {
     const [openDialog, setOpenDialog] = useState<boolean>(false)
-    const { data: singleData } = useQuery<SinglePostType>({
+    const { data } = useQuery<{ data: SinglePostType }>({
         queryKey: ["siglePost", name],
         queryFn: () => fetchSinglePost(name),
         staleTime: 1000 * 60 * 60 * 24,
         enabled: !!name && openDialog,
     });
+
     useEffect(() => {
         if (name) {
             setOpenDialog(true)
@@ -51,11 +52,11 @@ export default function Create({ name, setName }: { name?: string, setName: (val
                 <DialogTitle className='bg-blue-100'>
                     ایجاد پست جدید
                 </DialogTitle>
-                {name && !singleData ?
+                {name && !data ?
                     null
                     :
                     <DialogContent>
-                        <FormPost dataPost={singleData} />
+                        <FormPost dataPost={data?.data} />
                     </DialogContent>
                 }
                 <DialogActions className='!justify-between'>

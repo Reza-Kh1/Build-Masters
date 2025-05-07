@@ -33,7 +33,8 @@ const getData = async (name: string): Promise<DataPostPageType> => {
   return data;
 };
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { data } = await getData(params.slug);
+  const { slug } = await params
+  const { data } = await getData(slug);
   return {
     metadataBase: new URL(
       process.env.NEXT_PUBLIC_URL || "http://localhost:3000"
@@ -66,7 +67,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 export default async function page({ params }: { params: { slug: string } }) {
-  const { data, posts, projects } = await getData(params.slug);
+  const { slug } = await params
+  const { data, posts, projects } = await getData(slug);
   const jsonld = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -170,17 +172,6 @@ export default async function page({ params }: { params: { slug: string } }) {
       <article className="classDiv !max-w-3xl mx-auto text-justify !leading-8 dark:text-p-dark text-gray-700">
         {data?.DetailPost?.content && parse(data?.DetailPost.content)}
       </article>
-      <BannerCallUs />
-      <div id="comments-section" className="classDiv !max-w-3xl">
-        <CommentPost
-          comments={data.Comment}
-          postId={data.id}
-          totalComments={data.totalComment}
-        />
-        <div className="my-6">
-          <FormComments postId={data.id} />
-        </div>
-      </div>
       <div className="classDiv" aria-labelledby="related-posts">
         <SwiperCards
           title="پست های مشابه"
@@ -194,6 +185,17 @@ export default async function page({ params }: { params: { slug: string } }) {
           data={projects}
           url={`/project?page=1&tags=${data.Tags[data.Tags.length - 1].name}`}
         />
+      </div>
+      <BannerCallUs />
+      <div id="comments-section" className="classDiv !max-w-3xl">
+        <CommentPost
+          comments={data.Comment}
+          postId={data.id}
+          totalComments={data.totalComment}
+        />
+        <div className="my-6">
+          <FormComments id={data.id} isPost />
+        </div>
       </div>
     </>
   );

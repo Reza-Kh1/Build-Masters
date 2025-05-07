@@ -119,7 +119,11 @@ const getSinglePost = expressAsyncHandler(async (req, res) => {
       return;
     }
     const allPost = await prisma.post.findMany({
-      where: { categoryId: data.categoryId },
+      where: {
+        NOT: {
+          id: data.id
+        }, categoryId: data.categoryId
+      },
       include: {
         Category: {
           select: {

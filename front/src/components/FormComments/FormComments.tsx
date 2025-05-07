@@ -5,11 +5,17 @@ import toast from "react-hot-toast";
 import actionComments from "@/action/actionComments";
 import CustomButton from "../CustomButton/CustomButton";
 import { TbMessage2Plus } from "react-icons/tb";
+import { Rating } from "@mui/material";
 const initialize = {
   msg: "",
   err: "",
 };
-export default function FormComments({ postId }: { postId?: number }) {
+type FormCommentsType = {
+  id: number
+  isContractor?: boolean
+  isPost?: boolean
+}
+export default function FormComments({ id, isContractor, isPost }: FormCommentsType) {
   const [state, formAction] = React.useActionState(actionComments, initialize);
   if (state?.msg) {
     toast.dismiss("toast");
@@ -20,8 +26,11 @@ export default function FormComments({ postId }: { postId?: number }) {
     toast.error("با خطا مواجه شدیم");
   }
   const commentsHandler = async (form: FormData) => {
-    if (postId) {
-      form.append("postId", JSON.stringify(postId));
+    if (isPost) {
+      form.append("postId", JSON.stringify(id));
+    }
+    if (isContractor) {
+      form.append("contractorId", JSON.stringify(id));
     }
     formAction(form);
   };
@@ -54,17 +63,17 @@ export default function FormComments({ postId }: { postId?: number }) {
               required
             />
           </div>
-          <div className="w-full">
-            <span className="text-sm mb-1 inline-block">ایمیل :</span>
-            <InputForm type="email" name="email" placeholder="ایمیل" />
-          </div>
+          <Rating
+            name="rating"
+            precision={0.5}
+          />
         </div>
         <div>
           <span className="text-sm mb-1 inline-block">
             متن نظر خود را بنویسید :*
           </span>
           <textarea
-            name="text"
+            name="content"
             rows={8}
             required
             className="bg-slate-100 w-full shadow-md focus-visible:outline-blue-300 resize-none p-2 rounded-md dark:shadow-low-dark dark:bg-input-dark"

@@ -2,21 +2,23 @@
 import { fetchApi } from "./fetchApi";
 const actionComments = async (prevState: any, formData: FormData) => {
   const getPostId = formData.get("postId") as string;
+  const getContractorId = formData.get("contractorId") as string;
   const getRepliesId = formData.get("replies") as string;
-  const emailValue = formData.get("email")
   const body = {
     name: formData.get("name"),
     phone: formData.get("phone"),
-    text: formData.get("text"),
+    content: formData.get("content"),
+    rating: formData.get("rating"),
   } as any;
-  if (emailValue) {
-    body.email = formData.get("email")
-  }
+
   if (getPostId) {
     body.postId = JSON.parse(getPostId)
   }
   if (getRepliesId) {
-    body.replies = JSON.parse(getRepliesId)
+    body.commentReply = JSON.parse(getRepliesId)
+  }
+  if (getContractorId) {
+    body.contractorId = JSON.parse(getContractorId)
   }
   try {
     const data = await fetchApi({ url: "comment", method: "POST", body });
@@ -30,7 +32,7 @@ const actionComments = async (prevState: any, formData: FormData) => {
   } catch (err) {
     return {
       msg: "",
-      err: "err",
+      err: err,
     };
   }
 };

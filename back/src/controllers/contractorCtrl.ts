@@ -189,17 +189,16 @@ const deleteContractor = expressAsyncHandler(async (req, res) => {
 const getSingleContractor = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
-    const cacheKey = `Contractors:${id}`;
-    const cache = await getCache(cacheKey);
-    if (cache) {
-      res.send(cache);
-      return;
-    }
+    // const cacheKey = `Contractors:${id}`;
+    // const cache = await getCache(cacheKey);
+    // if (cache) {
+    //   res.send(cache);
+    //   return;
+    // }
     const data = await prisma.contractor.findUnique({
       where: { name: id },
       include: {
         Tags: true,
-        Project: true,
         Category: {
           select: {
             id: true,
@@ -207,11 +206,64 @@ const getSingleContractor = expressAsyncHandler(async (req, res) => {
             slug: true,
           },
         },
-        Comment: true,
+        Comment: {
+          where: {
+            isPublished: true,
+            commentReply: null
+          },
+          select: {
+            CommentReplys: {
+              select: {
+                id: true,
+                name: true,
+                createdAt: true,
+                rating: true,
+                roleType: true,
+                content: true
+              }
+            },
+            id: true,
+            name: true,
+            createdAt: true,
+            rating: true,
+            roleType: true,
+            content: true
+          }
+        },
       },
     });
-    setCache(cacheKey, data);
-    res.send(data);
+    const contractors = await prisma.contractor.findMany({
+      where: {
+        NOT: { id: data?.id },
+        Tags: {
+          some: { id: { in: data?.Tags.map((i) => i.id) } }
+        }
+      },
+      select: {
+        Category: {
+          select: {
+            name: true,
+            slug: true,
+          },
+        },
+        userId: true,
+        id: true,
+        Tags: true,
+        avatar: true,
+        name: true,
+        createdAt: true,
+        rating: true,
+        totalComment: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 5
+    })
+    const body = {
+      data,
+      contractors
+    }
+    // setCache(cacheKey, body);
+    res.send(body);
   } catch (err) {
     throw customError('خطا در دیتابیس', 500, err);
   }
